@@ -26,15 +26,20 @@
 
       
       <div class="mt-auto border-t border-slate-100 pt-4">
-        <div class="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left">
+        <NuxtLink
+          to="/profile"
+          class="group flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition hover:bg-slate-100"
+          active-class="!bg-indigo-50"
+        >
           <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-xs font-semibold text-white ring-2 ring-white">
             {{ initials }}
           </div>
           <div class="min-w-0 text-sm leading-tight">
             <p class="truncate font-medium text-slate-800">{{ displayName }}</p>
-            <p class="text-xs capitalize text-slate-400">{{ profile?.role || 'employee' }}</p>
+            <p class="text-xs capitalize text-slate-400">{{ role }}</p>
           </div>
-        </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-auto shrink-0 text-slate-300 transition group-hover:text-slate-500"><path d="m9 18 6-6-6-6"/></svg>
+        </NuxtLink>
 
         <button
           class="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600"
@@ -79,23 +84,10 @@
 <script setup>
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-const { profile, fetchProfile } = useProfile()
+const { displayName, role, initials, fetchProfile } = useProfile()
 
 onMounted(fetchProfile)
 watch(user, fetchProfile)
-
-const displayName = computed(() => profile.value?.full_name || user.value?.email || 'User')
-
-const initials = computed(() => {
-  const source = profile.value?.full_name || user.value?.email || 'U'
-  return source
-    .split(/[\s@.]+/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase()
-})
 
 async function logout() {
   await supabase.auth.signOut()
