@@ -14,24 +14,40 @@
       </div>
 
       <!-- Form -->
-      <form class="max-h-[70vh] space-y-4 overflow-y-auto px-6 py-5" @submit.prevent="save">
+      <form class="max-h-[70vh] space-y-5 overflow-y-auto px-6 py-5" @submit.prevent="save">
+        <!-- Project & client -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Project name <span class="text-red-500">*</span></label>
+            <label class="mb-1 block text-sm font-medium text-slate-700">Project Title <span class="text-red-500">*</span></label>
             <input v-model="form.project_name" required type="text" placeholder="e.g. Website Redesign" :class="inputClass" />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Client name</label>
-            <input v-model="form.client_name" type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
+            <label class="mb-1 block text-sm font-medium text-slate-700">Client name <span class="text-red-500">*</span></label>
+            <input v-model="form.client_name" required type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700">Employee name <span class="text-red-500">*</span></label>
+            <input v-model="form.employee_name" required type="text" placeholder="e.g. Aarav Shah" :class="inputClass" />
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700">Project type</label>
+            <select v-model="form.project_type" :class="inputClass">
+              <option value="">Select…</option>
+              <option v-for="opt in projectTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
           </div>
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Meeting title <span class="text-red-500">*</span></label>
-          <input v-model="form.title" required type="text" placeholder="e.g. Weekly sync" :class="inputClass" />
+          <label class="mb-1 block text-sm font-medium text-slate-700">Job description</label>
+          <textarea v-model="form.job_description" rows="3" placeholder="Role / scope of work…" :class="inputClass" />
         </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <!-- Meeting details -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Date &amp; time <span class="text-red-500">*</span></label>
             <input v-model="form.meeting_at" required type="datetime-local" :class="inputClass" />
@@ -40,48 +56,46 @@
             <label class="mb-1 block text-sm font-medium text-slate-700">Duration (min)</label>
             <input v-model="form.duration_minutes" type="number" min="0" placeholder="30" :class="inputClass" />
           </div>
-          <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Meeting type</label>
-            <select v-model="form.meeting_type" :class="inputClass">
-              <option value="">Select…</option>
-              <option value="client_call">Client call</option>
-              <option value="internal_sync">Internal sync</option>
-              <option value="status_update">Status update</option>
-              <option value="kickoff">Kickoff</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Attendees</label>
-          <input v-model="form.attendees" type="text" placeholder="Comma-separated names" :class="inputClass" />
-        </div>
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Notes</label>
-          <textarea v-model="form.notes" rows="3" placeholder="What was discussed…" :class="inputClass" />
-        </div>
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Outcome / decisions made</label>
-          <textarea v-model="form.outcome" rows="2" placeholder="What was decided…" :class="inputClass" />
-        </div>
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Action items</label>
-          <textarea v-model="form.action_items" rows="2" placeholder="One per line, optionally with owner / due date…" :class="inputClass" />
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Attachment / link</label>
-            <input v-model="form.attachment_url" type="url" placeholder="https://…" :class="inputClass" />
+            <label class="mb-1 block text-sm font-medium text-slate-700">Meeting status <span class="text-red-500">*</span></label>
+            <select v-model="form.meeting_status" required :class="inputClass">
+              <option value="">Select…</option>
+              <option v-for="opt in meetingStatusOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
           </div>
-          <label class="flex items-center gap-2 sm:mt-7">
-            <input v-model="form.follow_up_needed" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
-            <span class="text-sm font-medium text-slate-700">Follow-up needed?</span>
-          </label>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700">Meeting outcome <span class="text-red-500">*</span></label>
+            <select v-model="form.meeting_outcome" required :class="inputClass">
+              <option value="">Select…</option>
+              <option v-for="opt in meetingOutcomeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Commercials -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700">Budget discussed</label>
+            <input v-model="form.budget_discussed" type="text" placeholder="e.g. $10,000" :class="inputClass" />
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700">Deadline / expected timeline</label>
+            <input v-model="form.deadline" type="text" placeholder="e.g. 6 weeks" :class="inputClass" />
+          </div>
+        </div>
+
+        <!-- Discussion -->
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Notes / meeting summary</label>
+          <textarea v-model="form.notes" rows="3" placeholder="What was discussed…" :class="inputClass" />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Requirements discussed</label>
+          <textarea v-model="form.requirements_discussed" rows="2" placeholder="Client requirements…" :class="inputClass" />
         </div>
 
         <p v-if="error" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ error }}</p>
@@ -123,16 +137,17 @@ function blankForm() {
   return {
     project_name: '',
     client_name: '',
-    title: '',
+    employee_name: '',
+    project_type: '',
+    job_description: '',
     meeting_at: '',
     duration_minutes: '',
-    meeting_type: '',
-    attendees: '',
+    meeting_status: '',
+    meeting_outcome: '',
+    budget_discussed: '',
+    deadline: '',
     notes: '',
-    outcome: '',
-    action_items: '',
-    attachment_url: '',
-    follow_up_needed: false,
+    requirements_discussed: '',
   }
 }
 
@@ -148,8 +163,15 @@ function close() {
 }
 
 async function save() {
-  if (!form.project_name || !form.title || !form.meeting_at) {
-    error.value = 'Project name, meeting title and date & time are required.'
+  if (
+    !form.project_name ||
+    !form.client_name ||
+    !form.employee_name ||
+    !form.meeting_at ||
+    !form.meeting_status ||
+    !form.meeting_outcome
+  ) {
+    error.value = 'Please fill in all required (*) fields.'
     return
   }
   loading.value = true
