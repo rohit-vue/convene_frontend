@@ -11,12 +11,11 @@ export const projectTypeOptions: SelectOption[] = [
   { value: 'milestone', label: 'Milestone' },
 ]
 
-export const meetingStatusOptions: SelectOption[] = [
-  { value: 'scheduled', label: 'Scheduled' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'rescheduled', label: 'Rescheduled' },
-  { value: 'cancelled', label: 'Cancelled' },
-  { value: 'no_response', label: 'No response' },
+export const upworkAccountOptions: SelectOption[] = [
+  { value: 'ashutosh.excel2011@gmail.com', label: 'ashutosh.excel2011@gmail.com' },
+  { value: 'sidharth.excel2011@gmail.com', label: 'sidharth.excel2011@gmail.com' },
+  { value: 'rohit.excel2011@gmail.com', label: 'rohit.excel2011@gmail.com' },
+  { value: 'vaibhav.excel2011@gmail.com', label: 'vaibhav.excel2011@gmail.com' },
 ]
 
 export const meetingOutcomeOptions: SelectOption[] = [
@@ -32,15 +31,15 @@ function toLabelMap(options: SelectOption[]): Record<string, string> {
 }
 
 const projectTypeLabelMap = toLabelMap(projectTypeOptions)
-const statusLabelMap = toLabelMap(meetingStatusOptions)
+const upworkAccountLabelMap = toLabelMap(upworkAccountOptions)
 const outcomeLabelMap = toLabelMap(meetingOutcomeOptions)
 
 export function projectTypeLabel(value?: string | null): string {
   return (value && projectTypeLabelMap[value]) || '—'
 }
 
-export function meetingStatusLabel(value?: string | null): string {
-  return (value && statusLabelMap[value]) || '—'
+export function upworkAccountLabel(value?: string | null): string {
+  return (value && upworkAccountLabelMap[value]) || '—'
 }
 
 export function meetingOutcomeLabel(value?: string | null): string {

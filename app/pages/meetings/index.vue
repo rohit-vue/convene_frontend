@@ -20,8 +20,8 @@
             <th class="px-6 py-4 font-medium">Project</th>
             <th class="px-6 py-4 font-medium">Client</th>
             <th class="px-6 py-4 font-medium">Upwork type</th>
+            <th class="px-6 py-4 font-medium">Upwork account</th>
             <th class="px-6 py-4 font-medium">Date &amp; time</th>
-            <th class="px-6 py-4 font-medium">Status</th>
             <th class="px-6 py-4 font-medium">Outcome</th>
           </tr>
         </thead>
@@ -35,8 +35,8 @@
             <td class="px-6 py-4 font-medium text-slate-800">{{ m.project_name }}</td>
             <td class="px-6 py-4 text-slate-600">{{ m.client_name || '—' }}</td>
             <td class="px-6 py-4 text-slate-600">{{ projectTypeLabel(m.project_type) }}</td>
+            <td class="px-6 py-4 text-slate-600">{{ upworkAccountLabel(m.upwork_account) }}</td>
             <td class="px-6 py-4 text-slate-600">{{ formatDate(m.meeting_at) }}</td>
-            <td class="px-6 py-4 text-slate-600">{{ meetingStatusLabel(m.meeting_status) }}</td>
             <td class="px-6 py-4 text-slate-600">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
           </tr>
 
