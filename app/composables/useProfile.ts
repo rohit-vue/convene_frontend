@@ -9,19 +9,43 @@ export const useProfile = () => {
   const profile = useState<Profile | null>('profile', () => null)
 
   async function fetchProfile() {
-    if (!user.value) {
+    const id = user.value?.id
+    if (!id) {
       profile.value = null
       return
     }
     const { data } = await supabase
       .from('profiles')
       .select('full_name, role')
-      .eq('id', user.value.id)
+      .eq('id', id)
       .single()
-    profile.value = (data as Profile) ?? null
+    profile.value = data ? (data as Profile) : null
   }
 
-  const isAdmin = computed(() => profile.value?.role === 'admin')
+  // Prefer the profile row, then the name captured at signup, before any fallback.
+  const fullName = computed(
+    () =>
+      profile.value?.full_name ||
+      (user.value?.user_metadata?.full_name as string | undefined) ||
+      null,
+  )
 
-  return { profile, isAdmin, fetchProfile }
+  const displayName = computed(() => fullName.value || user.value?.email || 'User')
+
+  const role = computed(() => profile.value?.role ?? 'employee')
+
+  const isAdmin = computed(() => role.value === 'admin')
+
+  const initials = computed(() => {
+    const source = fullName.value || user.value?.email || 'U'
+    return source
+      .split(/[\s@.]+/)
+      .filter(Boolean)
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase()
+  })
+
+  return { profile, fullName, displayName, role, isAdmin, initials, fetchProfile }
 }
