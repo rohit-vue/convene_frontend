@@ -14,60 +14,88 @@
       <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold tracking-tight">{{ meeting.title }}</h1>
-            <p class="mt-1 text-sm text-slate-500">
-              {{ meeting.project_name }}<span v-if="meeting.client_name"> · {{ meeting.client_name }}</span>
-            </p>
+            <h1 class="text-2xl font-bold tracking-tight">{{ meeting.project_name }}</h1>
+            <p v-if="meeting.client_name" class="mt-1 text-sm text-slate-500">{{ meeting.client_name }}</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-              {{ typeLabel(meeting.meeting_type) }}
-            </span>
             <span
-              v-if="meeting.follow_up_needed"
-              class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700"
+              v-if="meeting.project_type"
+              class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"
             >
-              <span class="h-1.5 w-1.5 rounded-full bg-amber-500" /> Follow-up needed
+              {{ projectTypeLabel(meeting.project_type) }}
+            </span>
+            <span class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+              {{ meetingStatusLabel(meeting.meeting_status) }}
+            </span>
+            <span class="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+              {{ meetingOutcomeLabel(meeting.meeting_outcome) }}
             </span>
           </div>
         </div>
+      </div>
 
-        <div class="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-sm text-slate-600">
-          <div><span class="text-slate-400">When:</span> {{ formatDate(meeting.meeting_at) }}</div>
-          <div v-if="meeting.duration_minutes"><span class="text-slate-400">Duration:</span> {{ meeting.duration_minutes }} min</div>
-          <div v-if="meeting.attendees"><span class="text-slate-400">Attendees:</span> {{ meeting.attendees }}</div>
-        </div>
+      <!-- Details -->
+      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Details</h2>
+        <dl class="mt-4 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Project name</dt>
+            <dd class="mt-1 text-sm text-slate-700">{{ meeting.project_name || '—' }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Client name</dt>
+            <dd class="mt-1 text-sm text-slate-700">{{ meeting.client_name || '—' }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Employee name</dt>
+            <dd class="mt-1 text-sm text-slate-700">{{ meeting.employee_name || '—' }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Upwork project type</dt>
+            <dd class="mt-1 text-sm text-slate-700">{{ projectTypeLabel(meeting.project_type) }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Meeting status</dt>
+            <dd class="mt-1 text-sm text-slate-700">{{ meetingStatusLabel(meeting.meeting_status) }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Meeting outcome</dt>
+            <dd class="mt-1 text-sm text-slate-700">{{ meetingOutcomeLabel(meeting.meeting_outcome) }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Date &amp; time</dt>
+            <dd class="mt-1 text-sm text-slate-700">{{ formatDate(meeting.meeting_at) }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Duration (min)</dt>
+            <dd class="mt-1 text-sm text-slate-700">{{ meeting.duration_minutes ? meeting.duration_minutes + ' min' : '—' }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Budget discussed</dt>
+            <dd class="mt-1 text-sm text-slate-700">{{ meeting.budget_discussed || '—' }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Deadline / expected timeline</dt>
+            <dd class="mt-1 text-sm text-slate-700">{{ meeting.deadline || '—' }}</dd>
+          </div>
+        </dl>
       </div>
 
       <!-- Content sections -->
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <section class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm lg:col-span-2">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Job description</h2>
+          <p class="mt-3 whitespace-pre-wrap text-sm text-slate-700">{{ meeting.job_description || 'No job description.' }}</p>
+        </section>
+
         <section class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Notes</h2>
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Notes / meeting summary</h2>
           <p class="mt-3 whitespace-pre-wrap text-sm text-slate-700">{{ meeting.notes || 'No notes recorded.' }}</p>
         </section>
 
         <section class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Outcome / decisions</h2>
-          <p class="mt-3 whitespace-pre-wrap text-sm text-slate-700">{{ meeting.outcome || 'No outcome recorded.' }}</p>
-        </section>
-
-        <section class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Action items</h2>
-          <p class="mt-3 whitespace-pre-wrap text-sm text-slate-700">{{ meeting.action_items || 'No action items.' }}</p>
-        </section>
-
-        <section class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Attachment / link</h2>
-          <a
-            v-if="meeting.attachment_url"
-            :href="meeting.attachment_url"
-            target="_blank"
-            rel="noopener"
-            class="mt-3 inline-block break-all text-sm font-medium text-indigo-600 hover:text-indigo-700"
-          >
-            {{ meeting.attachment_url }}
-          </a>
-          <p v-else class="mt-3 text-sm text-slate-700">No attachment.</p>
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Requirements discussed</h2>
+          <p class="mt-3 whitespace-pre-wrap text-sm text-slate-700">{{ meeting.requirements_discussed || 'None recorded.' }}</p>
         </section>
       </div>
     </div>
@@ -92,16 +120,5 @@ function formatDate(value) {
     dateStyle: 'full',
     timeStyle: 'short',
   })
-}
-
-const typeLabels = {
-  client_call: 'Client call',
-  internal_sync: 'Internal sync',
-  status_update: 'Status update',
-  kickoff: 'Kickoff',
-  other: 'Other',
-}
-function typeLabel(type) {
-  return typeLabels[type] || 'Meeting'
 }
 </script>

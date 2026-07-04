@@ -17,12 +17,12 @@
       <table class="w-full text-sm">
         <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
           <tr>
-            <th class="px-6 py-4 font-medium">Title</th>
             <th class="px-6 py-4 font-medium">Project</th>
             <th class="px-6 py-4 font-medium">Client</th>
+            <th class="px-6 py-4 font-medium">Upwork type</th>
             <th class="px-6 py-4 font-medium">Date &amp; time</th>
-            <th class="px-6 py-4 font-medium">Type</th>
-            <th class="px-6 py-4 font-medium">Follow-up</th>
+            <th class="px-6 py-4 font-medium">Status</th>
+            <th class="px-6 py-4 font-medium">Outcome</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -32,24 +32,12 @@
             class="cursor-pointer transition hover:bg-slate-50"
             @click="navigateTo(`/meetings/${m.id}`)"
           >
-            <td class="px-6 py-4 font-medium text-slate-800">{{ m.title }}</td>
-            <td class="px-6 py-4 text-slate-600">{{ m.project_name }}</td>
+            <td class="px-6 py-4 font-medium text-slate-800">{{ m.project_name }}</td>
             <td class="px-6 py-4 text-slate-600">{{ m.client_name || '—' }}</td>
+            <td class="px-6 py-4 text-slate-600">{{ projectTypeLabel(m.project_type) }}</td>
             <td class="px-6 py-4 text-slate-600">{{ formatDate(m.meeting_at) }}</td>
-            <td class="px-6 py-4">
-              <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                {{ typeLabel(m.meeting_type) }}
-              </span>
-            </td>
-            <td class="px-6 py-4">
-              <span
-                v-if="m.follow_up_needed"
-                class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700"
-              >
-                <span class="h-1.5 w-1.5 rounded-full bg-amber-500" /> Needed
-              </span>
-              <span v-else class="text-xs text-slate-400">—</span>
-            </td>
+            <td class="px-6 py-4 text-slate-600">{{ meetingStatusLabel(m.meeting_status) }}</td>
+            <td class="px-6 py-4 text-slate-600">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
           </tr>
 
           <tr v-if="meetings && meetings.length === 0">
@@ -87,16 +75,5 @@ function formatDate(value) {
     dateStyle: 'medium',
     timeStyle: 'short',
   })
-}
-
-const typeLabels = {
-  client_call: 'Client call',
-  internal_sync: 'Internal sync',
-  status_update: 'Status update',
-  kickoff: 'Kickoff',
-  other: 'Other',
-}
-function typeLabel(type) {
-  return typeLabels[type] || '—'
 }
 </script>
