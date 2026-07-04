@@ -3,11 +3,8 @@
     
     <aside class="fixed inset-y-0 left-0 z-20 flex w-64 flex-col border-r border-slate-200 bg-white px-4 py-6">
       
-      <div class="mb-8 flex items-center gap-3 px-2">
-        <div class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-sm font-bold text-white shadow-sm">
-          C
-        </div>
-        <span class="text-lg font-semibold tracking-tight">Convene</span>
+      <div class="mb-8 px-2">
+        <img src="/convenelogo.png" alt="Convene" class="w-full object-contain" />
       </div>
 
      

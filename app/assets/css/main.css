@@ -1,5 +1,35 @@
 @import "tailwindcss";
 
+/*
+ * Convene brand palette (light theme), derived from the logo.
+ * The built-in `indigo` scale is remapped to the logo's navy blue (primary),
+ * and `violet` to the logo's teal (accent), so every existing utility class
+ * (buttons, gradients, badges, focus rings) follows the brand automatically.
+ */
+@theme {
+  --color-indigo-50: #eef4f9;
+  --color-indigo-100: #d5e4f1;
+  --color-indigo-200: #aecbe0;
+  --color-indigo-300: #7ba7c8;
+  --color-indigo-400: #4a7fa8;
+  --color-indigo-500: #2f6089;
+  --color-indigo-600: #264e70;
+  --color-indigo-700: #1e3a5f;
+  --color-indigo-800: #182f4c;
+  --color-indigo-900: #12233a;
+
+  --color-violet-50: #e8f6f4;
+  --color-violet-100: #c8ebe6;
+  --color-violet-200: #97dad0;
+  --color-violet-300: #63c4b8;
+  --color-violet-400: #3aab9f;
+  --color-violet-500: #2f9e93;
+  --color-violet-600: #26837a;
+  --color-violet-700: #216a63;
+  --color-violet-800: #1c554f;
+  --color-violet-900: #164641;
+}
+
 :root {
   --bg: #f8fafc;
 }
