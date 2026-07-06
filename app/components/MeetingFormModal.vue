@@ -29,22 +29,12 @@
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Employee <span class="text-red-500">*</span></label>
-            <select v-model="form.employee_id" required :class="inputClass">
-              <option value="">Select…</option>
-              <option v-for="e in employees" :key="e.id" :value="e.id">{{ e.name }}</option>
-            </select>
-          </div>
-          <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Project type</label>
             <select v-model="form.project_type" :class="inputClass">
               <option value="">Select…</option>
               <option v-for="opt in projectTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
             </select>
           </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Upwork account</label>
             <select v-model="form.upwork_account" :class="inputClass">
@@ -153,7 +143,6 @@ function blankForm() {
   return {
     project_name: '',
     client_name: '',
-    employee_id: '',
     project_type: '',
     upwork_account: '',
     job_description: '',
@@ -202,7 +191,6 @@ async function save() {
   if (
     !form.project_name ||
     !form.client_name ||
-    !form.employee_id ||
     !form.meeting_at ||
     !form.meeting_outcome
   ) {
