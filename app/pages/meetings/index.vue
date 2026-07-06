@@ -56,13 +56,13 @@
 <script setup>
 definePageMeta({ middleware: 'employee' })
 
-const { apiFetch } = useApi()
+const { list } = useMeetings()
 
 const showModal = ref(false)
 
 const { data: meetings, refresh } = await useAsyncData(
   'meetings',
-  () => apiFetch('/api/meetings'),
+  () => list(),
   { server: false, default: () => [] },
 )
 

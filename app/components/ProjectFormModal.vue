@@ -124,7 +124,7 @@ const emit = defineEmits(['close', 'saved'])
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
 
-const { apiFetch } = useApi()
+const { create, update, remove: deleteProject } = useProjects()
 
 const loading = ref(false)
 const error = ref('')
@@ -184,9 +184,9 @@ async function save() {
   try {
     if (isEdit.value) {
       const { status, ...body } = form
-      await apiFetch(`/api/projects/${props.project.id}`, { method: 'PATCH', body })
+      await update(props.project.id, body)
     } else {
-      await apiFetch('/api/projects', { method: 'POST', body: { ...form } })
+      await create({ ...form })
     }
     emit('saved')
   } catch (e) {
@@ -202,7 +202,7 @@ async function remove() {
   loading.value = true
   error.value = ''
   try {
-    await apiFetch(`/api/projects/${props.project.id}`, { method: 'DELETE' })
+    await deleteProject(props.project.id)
     emit('saved')
   } catch (e) {
     error.value = e?.data?.error || e?.message || 'Failed to delete project.'

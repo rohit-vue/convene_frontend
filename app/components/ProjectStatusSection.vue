@@ -95,7 +95,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['updated'])
 
-const { apiFetch } = useApi()
+const { getStatusHistory, changeStatus } = useProjects()
 
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
@@ -116,7 +116,7 @@ const statusOk = ref(false)
 
 const { data: history, pending: historyLoading, refresh: refreshHistory } = await useAsyncData(
   `project-status-history-${props.projectId}`,
-  () => apiFetch(`/api/projects/${props.projectId}/status-history`),
+  () => getStatusHistory(props.projectId),
   { server: false, default: () => [] },
 )
 
@@ -134,12 +134,9 @@ async function submitStatusChange() {
   statusError.value = ''
   statusOk.value = false
   try {
-    await apiFetch(`/api/projects/${props.projectId}/status`, {
-      method: 'POST',
-      body: {
-        status: newStatus.value,
-        comment: comment.value.trim(),
-      },
+    await changeStatus(props.projectId, {
+      status: newStatus.value,
+      comment: comment.value.trim(),
     })
     statusOk.value = true
     newStatus.value = ''

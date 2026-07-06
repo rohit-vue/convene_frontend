@@ -94,7 +94,7 @@
 <script setup>
 definePageMeta({ middleware: 'employee' })
 
-const { apiFetch } = useApi()
+const { list } = useProjects()
 
 const showModal = ref(false)
 const editing = ref(null)
@@ -102,7 +102,7 @@ const activeFilter = ref('all')
 
 const { data: projects, refresh } = await useAsyncData(
   'projects',
-  () => apiFetch('/api/projects'),
+  () => list(),
   { server: false, default: () => [] },
 )
 

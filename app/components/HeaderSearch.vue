@@ -100,7 +100,7 @@
 </template>
 
 <script setup>
-const { apiFetch } = useApi()
+const { search } = useSearch()
 const { isAdmin } = useProfile()
 
 const root = ref(null)
@@ -159,7 +159,7 @@ async function runSearch(term) {
   searched.value = false
 
   try {
-    results.value = await apiFetch(`/api/search?q=${encodeURIComponent(term)}`)
+    results.value = await search(term)
     searched.value = true
     highlightIndex.value = flatItems.value.length ? 0 : -1
   } catch {

@@ -98,15 +98,15 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({ middleware: 'admin' })
 
 const route = useRoute()
-const { apiFetch } = useApi()
+const { getMeeting } = useEmployees()
 
 const { data: meeting, error } = await useAsyncData(
   `admin-meeting-${route.params.id}-${route.params.meetingId}`,
-  () => apiFetch(`/api/employees/${route.params.id}/meetings/${route.params.meetingId}`),
+  () => getMeeting(route.params.id as string, route.params.meetingId as string),
   { server: false },
 )
 

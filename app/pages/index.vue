@@ -108,11 +108,11 @@
 
 <script setup>
 const { isAdmin, isEmployee } = useProfile()
-const { apiFetch } = useApi()
+const { getOverview } = useDashboard()
 
 const { data: overview } = await useAsyncData(
   'dashboard-overview',
-  () => apiFetch('/api/dashboard/overview'),
+  () => getOverview(),
   { server: false },
 )
 

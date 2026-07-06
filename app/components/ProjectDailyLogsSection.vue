@@ -119,22 +119,31 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const props = defineProps({
   projectId: { type: String, required: true },
   jobType: { type: String, default: '' },
   readOnly: { type: Boolean, default: false },
-  fetchPath: { type: String, default: '' },
+  adminEmployeeId: { type: String, default: '' },
 })
 
-const { apiFetch } = useApi()
+const { getDailyLogs, createDailyLog, updateDailyLog, getAdminDailyLogs } = useProjects()
 
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
 
 const isHourly = computed(() => props.jobType === 'hourly')
 
-const logsPath = computed(() => props.fetchPath || `/api/projects/${props.projectId}/daily-logs`)
+const logsPathKey = computed(() =>
+  props.adminEmployeeId
+    ? `admin-${props.adminEmployeeId}-${props.projectId}`
+    : props.projectId,
+)
+
+const fetchLogs = () =>
+  props.adminEmployeeId
+    ? getAdminDailyLogs(props.adminEmployeeId, props.projectId)
+    : getDailyLogs(props.projectId)
 
 const logDate = ref(new Date().toISOString().slice(0, 10))
 const tasksDone = ref('')
@@ -145,8 +154,8 @@ const saveError = ref('')
 const saveOk = ref(false)
 
 const { data: logs, pending: logsLoading, refresh: refreshLogs } = await useAsyncData(
-  `project-daily-logs-${props.projectId}-${props.fetchPath || 'employee'}`,
-  () => apiFetch(logsPath.value),
+  () => `project-daily-logs-${logsPathKey.value}`,
+  () => fetchLogs(),
   { server: false, default: () => [] },
 )
 
@@ -199,15 +208,9 @@ async function submitLog() {
 
   try {
     if (editingId.value) {
-      await apiFetch(`${logsPath.value}/${editingId.value}`, {
-        method: 'PUT',
-        body,
-      })
+      await updateDailyLog(props.projectId, editingId.value, body)
     } else {
-      await apiFetch(logsPath.value, {
-        method: 'POST',
-        body,
-      })
+      await createDailyLog(props.projectId, body)
     }
     saveOk.value = true
     resetForm()
