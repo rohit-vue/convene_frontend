@@ -105,6 +105,8 @@
           :current-status="project.status"
           @updated="onStatusUpdated"
         />
+
+        <ProjectDailyLogsSection :project-id="route.params.id" :job-type="form.job_type" />
       </form>
     </div>
 
