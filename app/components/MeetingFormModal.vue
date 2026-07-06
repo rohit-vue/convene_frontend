@@ -29,8 +29,11 @@
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Employee name <span class="text-red-500">*</span></label>
-            <input v-model="form.employee_name" required type="text" placeholder="e.g. Aarav Shah" :class="inputClass" />
+            <label class="mb-1 block text-sm font-medium text-slate-700">Employee <span class="text-red-500">*</span></label>
+            <select v-model="form.employee_id" required :class="inputClass">
+              <option value="">Select…</option>
+              <option v-for="e in employees" :key="e.id" :value="e.id">{{ e.name }}</option>
+            </select>
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Project type</label>
@@ -137,6 +140,12 @@ const inputClass =
 
 const { apiFetch } = useApi()
 
+const { data: employees } = await useAsyncData(
+  'employees-for-meetings',
+  () => apiFetch('/api/employees'),
+  { server: false, default: () => [] },
+)
+
 const loading = ref(false)
 const error = ref('')
 
@@ -144,7 +153,7 @@ function blankForm() {
   return {
     project_name: '',
     client_name: '',
-    employee_name: '',
+    employee_id: '',
     project_type: '',
     upwork_account: '',
     job_description: '',
@@ -193,7 +202,7 @@ async function save() {
   if (
     !form.project_name ||
     !form.client_name ||
-    !form.employee_name ||
+    !form.employee_id ||
     !form.meeting_at ||
     !form.meeting_outcome
   ) {
