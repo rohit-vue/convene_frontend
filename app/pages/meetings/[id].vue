@@ -45,8 +45,11 @@
             <input v-model="form.client_name" required type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
           </div>
           <div>
-            <label :class="labelClass">Employee name <span class="text-red-500">*</span></label>
-            <input v-model="form.employee_name" required type="text" placeholder="e.g. Aarav Shah" :class="inputClass" />
+            <label :class="labelClass">Employee <span class="text-red-500">*</span></label>
+            <select v-model="form.employee_id" required :class="inputClass">
+              <option value="">Select…</option>
+              <option v-for="e in employees" :key="e.id" :value="e.id">{{ e.name }}</option>
+            </select>
           </div>
           <div>
             <label :class="labelClass">Upwork project type</label>
@@ -126,6 +129,12 @@ const { data: meeting, error, refresh } = await useAsyncData(
   { server: false },
 )
 
+const { data: employees } = await useAsyncData(
+  'employees-for-meeting-detail',
+  () => apiFetch('/api/employees'),
+  { server: false, default: () => [] },
+)
+
 const labelClass = 'mb-1 block text-sm font-medium text-slate-700'
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
@@ -138,7 +147,7 @@ function blankForm() {
   return {
     project_name: '',
     client_name: '',
-    employee_name: '',
+    employee_id: '',
     project_type: '',
     upwork_account: '',
     job_description: '',
@@ -181,7 +190,7 @@ async function save() {
   if (
     !form.project_name ||
     !form.client_name ||
-    !form.employee_name ||
+    !form.employee_id ||
     !form.meeting_at ||
     !form.meeting_outcome
   ) {

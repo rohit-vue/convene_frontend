@@ -30,7 +30,8 @@
       <div
         v-for="p in filteredProjects"
         :key="p.id"
-        class="flex flex-col rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:shadow-md"
+        class="flex cursor-pointer flex-col rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:border-indigo-100 hover:shadow-md"
+        @click="navigateTo(`/projects/${p.id}`)"
       >
         <div class="flex items-start justify-between gap-3">
           <div class="min-w-0">
@@ -43,12 +44,15 @@
         </div>
 
         <p class="mt-3 line-clamp-3 flex-1 text-sm text-slate-600">
-          {{ p.description || 'No details added yet.' }}
+          {{ p.job_description || p.description || 'No details added yet.' }}
         </p>
 
         <div class="mt-4 flex flex-wrap items-center gap-2 text-xs">
-          <span class="rounded-full px-2.5 py-1 font-medium" :class="priorityMeta[p.priority].badge">
-            {{ priorityMeta[p.priority].label }} priority
+          <span v-if="p.job_type" class="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
+            {{ jobTypeLabel(p.job_type) }}
+          </span>
+          <span v-if="p.job_category" class="rounded-full bg-violet-50 px-2.5 py-1 font-medium text-violet-700">
+            {{ jobCategoryLabel(p.job_category) }}
           </span>
           <span v-if="p.due_date" class="inline-flex items-center gap-1 text-slate-500">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
@@ -56,15 +60,7 @@
           </span>
         </div>
 
-        <div class="mt-5 flex items-center gap-2 border-t border-slate-100 pt-4">
-          <select
-            :value="p.status"
-            class="flex-1 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
-            :disabled="busyId === p.id"
-            @change="updateStatus(p, $event.target.value)"
-          >
-            <option v-for="s in statuses" :key="s.value" :value="s.value">{{ s.label }}</option>
-          </select>
+        <div class="mt-5 flex items-center justify-end gap-2 border-t border-slate-100 pt-4" @click.stop>
           <button
             class="rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50"
             @click="openEdit(p)"
@@ -101,7 +97,6 @@ const { apiFetch } = useApi()
 const showModal = ref(false)
 const editing = ref(null)
 const activeFilter = ref('all')
-const busyId = ref(null)
 
 const { data: projects, refresh } = await useAsyncData(
   'projects',
@@ -123,12 +118,6 @@ const statusMeta = {
   on_hold: { label: 'On hold', badge: 'bg-amber-50 text-amber-700' },
   completed: { label: 'Completed', badge: 'bg-emerald-50 text-emerald-700' },
   cancelled: { label: 'Cancelled', badge: 'bg-red-50 text-red-600' },
-}
-
-const priorityMeta = {
-  low: { label: 'Low', badge: 'bg-slate-100 text-slate-500' },
-  medium: { label: 'Medium', badge: 'bg-violet-50 text-violet-700' },
-  high: { label: 'High', badge: 'bg-red-50 text-red-600' },
 }
 
 const filters = [
@@ -166,17 +155,6 @@ function closeModal() {
 async function onSaved() {
   closeModal()
   await refresh()
-}
-
-async function updateStatus(project, status) {
-  if (status === project.status) return
-  busyId.value = project.id
-  try {
-    await apiFetch(`/api/projects/${project.id}`, { method: 'PATCH', body: { status } })
-  } finally {
-    busyId.value = null
-    await refresh()
-  }
 }
 
 function formatDate(value) {
