@@ -12,16 +12,16 @@ export const projectTypeOptions: SelectOption[] = [
 ]
 
 export const upworkAccountOptions: SelectOption[] = [
-  { value: 'ashutosh.excel2011@gmail.com', label: 'ashutosh.excel2011@gmail.com' },
-  { value: 'sidharth.excel2011@gmail.com', label: 'sidharth.excel2011@gmail.com' },
-  { value: 'rohit.excel2011@gmail.com', label: 'rohit.excel2011@gmail.com' },
-  { value: 'vaibhav.excel2011@gmail.com', label: 'vaibhav.excel2011@gmail.com' },
+  { value: 'Rohit K', label: 'Rohit K' },
+  { value: 'Vaibhav Srivastav', label: 'Vaibhav Srivastav' },
+  { value: 'Gulshan Khera', label: 'Gulshan Khera' },
+  { value: 'Ashutosh Pandey', label: 'Ashutosh Pandey' },
 ]
 
 export const meetingOutcomeOptions: SelectOption[] = [
   { value: 'won', label: 'Won' },
   { value: 'holding', label: 'Holding' },
-  { value: 'not_selected', label: 'Not selected' },
+  { value: 'others', label: 'Others' },
   { value: 'follow_up_required', label: 'Follow-up required' },
   { value: 'pending_reply', label: 'Pending reply' },
 ]
