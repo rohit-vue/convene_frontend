@@ -130,6 +130,12 @@ const inputClass =
 
 const { apiFetch } = useApi()
 
+const { data: employees } = await useAsyncData(
+  'employees-for-meetings',
+  () => apiFetch('/api/employees/options'),
+  { server: false, default: () => [] },
+)
+
 const loading = ref(false)
 const error = ref('')
 

@@ -45,6 +45,8 @@
 </template>
 
 <script setup>
+definePageMeta({ middleware: 'admin' })
+
 const { apiFetch } = useApi()
 
 const { data: employees } = await useAsyncData(

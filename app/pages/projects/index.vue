@@ -92,6 +92,8 @@
 </template>
 
 <script setup>
+definePageMeta({ middleware: 'employee' })
+
 const { apiFetch } = useApi()
 
 const showModal = ref(false)

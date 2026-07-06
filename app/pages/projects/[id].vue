@@ -113,6 +113,8 @@
 </template>
 
 <script setup>
+definePageMeta({ middleware: 'employee' })
+
 const route = useRoute()
 const { apiFetch } = useApi()
 
