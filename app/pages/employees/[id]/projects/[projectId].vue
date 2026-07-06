@@ -130,6 +130,13 @@
           </li>
         </ol>
       </div>
+
+      <ProjectDailyLogsSection
+        :project-id="route.params.projectId"
+        :job-type="project.job_type"
+        read-only
+        :fetch-path="`/api/employees/${route.params.id}/projects/${route.params.projectId}/daily-logs`"
+      />
     </div>
 
     <div v-else class="text-sm text-slate-400">Loading…</div>
