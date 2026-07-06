@@ -142,7 +142,7 @@ const { apiFetch } = useApi()
 
 const { data: employees } = await useAsyncData(
   'employees-for-meetings',
-  () => apiFetch('/api/employees'),
+  () => apiFetch('/api/employees/options'),
   { server: false, default: () => [] },
 )
 

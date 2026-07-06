@@ -120,6 +120,8 @@
 </template>
 
 <script setup>
+definePageMeta({ middleware: 'employee' })
+
 const route = useRoute()
 const { apiFetch } = useApi()
 
@@ -131,7 +133,7 @@ const { data: meeting, error, refresh } = await useAsyncData(
 
 const { data: employees } = await useAsyncData(
   'employees-for-meeting-detail',
-  () => apiFetch('/api/employees'),
+  () => apiFetch('/api/employees/options'),
   { server: false, default: () => [] },
 )
 
