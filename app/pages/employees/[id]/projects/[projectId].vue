@@ -134,8 +134,8 @@
       <ProjectDailyLogsSection
         :project-id="route.params.projectId"
         :job-type="project.job_type"
+        :admin-employee-id="route.params.id"
         read-only
-        :fetch-path="`/api/employees/${route.params.id}/projects/${route.params.projectId}/daily-logs`"
       />
     </div>
 
@@ -143,21 +143,21 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({ middleware: 'admin' })
 
 const route = useRoute()
-const { apiFetch } = useApi()
+const { getAdminProject, getAdminStatusHistory } = useProjects()
 
 const { data: project, error } = await useAsyncData(
   `admin-project-${route.params.id}-${route.params.projectId}`,
-  () => apiFetch(`/api/employees/${route.params.id}/projects/${route.params.projectId}`),
+  () => getAdminProject(route.params.id as string, route.params.projectId as string),
   { server: false },
 )
 
 const { data: history, pending: historyLoading } = await useAsyncData(
   `admin-project-history-${route.params.id}-${route.params.projectId}`,
-  () => apiFetch(`/api/employees/${route.params.id}/projects/${route.params.projectId}/status-history`),
+  () => getAdminStatusHistory(route.params.id as string, route.params.projectId as string),
   { server: false, default: () => [] },
 )
 

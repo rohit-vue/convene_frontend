@@ -231,21 +231,21 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({ middleware: 'employee' })
 
 const route = useRoute()
-const { apiFetch } = useApi()
+const { getById, update, listUpdates, createUpdate, updateUpdate } = useMeetings()
 
 const { data: meeting, error, refresh } = await useAsyncData(
   `meeting-${route.params.id}`,
-  () => apiFetch(`/api/meetings/${route.params.id}`),
+  () => getById(route.params.id as string),
   { server: false },
 )
 
 const { data: meetingUpdates, refresh: refreshUpdates } = await useAsyncData(
   `meeting-updates-${route.params.id}`,
-  () => apiFetch(`/api/meetings/${route.params.id}/updates`),
+  () => listUpdates(route.params.id as string),
   { server: false, default: () => [] },
 )
 
@@ -419,22 +419,20 @@ async function save() {
   saveError.value = ''
   saveOk.value = false
   try {
-    await apiFetch(`/api/meetings/${route.params.id}`, {
-      method: 'PUT',
-      body: {
-        project_name: form.project_name,
-        client_name: form.client_name,
-        project_type: form.project_type,
-        upwork_account: form.upwork_account,
-        job_description: form.job_description,
-        link_url: form.link_url,
-      },
+    await update(route.params.id as string, {
+      project_name: form.project_name,
+      client_name: form.client_name,
+      project_type: form.project_type,
+      upwork_account: form.upwork_account,
+      job_description: form.job_description,
+      link_url: form.link_url,
     })
 
-    await apiFetch(`/api/meetings/${route.params.id}/updates/${selectedUpdate.value.id}`, {
-      method: 'PUT',
-      body: buildUpdateBody(),
-    })
+    await updateUpdate(
+      route.params.id as string,
+      selectedUpdate.value.id,
+      buildUpdateBody(),
+    )
 
     saveOk.value = true
     await refresh()
@@ -465,10 +463,7 @@ async function saveFollowUpMeeting() {
       requirements_discussed: createForm.requirements_discussed || null,
     }
 
-    const created = await apiFetch(`/api/meetings/${route.params.id}/updates`, {
-      method: 'POST',
-      body,
-    })
+    const created = await createUpdate(route.params.id as string, body)
 
     showCreateModal.value = false
     await refresh()

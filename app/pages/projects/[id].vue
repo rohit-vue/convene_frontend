@@ -114,15 +114,15 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({ middleware: 'employee' })
 
 const route = useRoute()
-const { apiFetch } = useApi()
+const { getById, update } = useProjects()
 
 const { data: project, error, refresh } = await useAsyncData(
   `project-${route.params.id}`,
-  () => apiFetch(`/api/projects/${route.params.id}`),
+  () => getById(route.params.id as string),
   { server: false },
 )
 
@@ -186,10 +186,7 @@ async function save() {
   saveError.value = ''
   saveOk.value = false
   try {
-    await apiFetch(`/api/projects/${route.params.id}`, {
-      method: 'PATCH',
-      body: { ...form },
-    })
+    await update(route.params.id as string, { ...form })
     saveOk.value = true
     await refresh()
   } catch (e) {

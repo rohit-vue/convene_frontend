@@ -141,7 +141,7 @@
 </template>
 
 <script setup>
-const { apiFetch } = useApi()
+const { get, update: updateProfile } = useProfileApi()
 const { displayName, role, isAdmin, initials, fetchProfile } = useProfile()
 
 const inputClass =
@@ -184,7 +184,7 @@ function resetForm() {
 async function loadProfile() {
   loadError.value = ''
   try {
-    profileData.value = await apiFetch('/api/profile')
+    profileData.value = await get()
     resetForm()
   } catch (e) {
     loadError.value = e?.data?.error || e?.message || 'Failed to load profile.'
@@ -197,13 +197,10 @@ async function save() {
   saved.value = false
 
   try {
-    await apiFetch('/api/profile', {
-      method: 'PATCH',
-      body: {
-        full_name: form.full_name.trim(),
-        employee_code: form.employee_code.trim(),
-        job_title: form.job_title.trim(),
-      },
+    await updateProfile({
+      full_name: form.full_name.trim(),
+      employee_code: form.employee_code.trim(),
+      job_title: form.job_title.trim(),
     })
     await loadProfile()
     await fetchProfile()

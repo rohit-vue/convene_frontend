@@ -47,11 +47,11 @@
 <script setup>
 definePageMeta({ middleware: 'admin' })
 
-const { apiFetch } = useApi()
+const { list } = useEmployees()
 
 const { data: employees } = await useAsyncData(
   'employees',
-  () => apiFetch('/api/employees'),
+  () => list(),
   { server: false, default: () => [] },
 )
 

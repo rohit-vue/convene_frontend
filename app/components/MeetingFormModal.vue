@@ -128,11 +128,12 @@ const isEdit = computed(() => !!props.meeting?.id)
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
 
-const { apiFetch } = useApi()
+const { create, update } = useMeetings()
+const { getOptions } = useEmployees()
 
 const { data: employees } = await useAsyncData(
   'employees-for-meetings',
-  () => apiFetch('/api/employees/options'),
+  () => getOptions(),
   { server: false, default: () => [] },
 )
 
@@ -205,9 +206,9 @@ async function save() {
       meeting_at: new Date(form.meeting_at).toISOString(),
     }
     if (isEdit.value) {
-      await apiFetch(`/api/meetings/${props.meeting.id}`, { method: 'PUT', body })
+      await update(props.meeting.id, body)
     } else {
-      await apiFetch('/api/meetings', { method: 'POST', body })
+      await create(body)
       reset()
     }
     emit('saved')
