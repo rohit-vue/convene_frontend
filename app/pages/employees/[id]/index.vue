@@ -63,7 +63,7 @@
                   </td>
                   <td class="whitespace-nowrap px-6 py-3 text-slate-600">{{ formatDateTime(m.meeting_at) }}</td>
                   <td class="px-6 py-3 text-slate-600">{{ m.duration_minutes ? `${m.duration_minutes} min` : '—' }}</td>
-                  <td class="px-6 py-3 text-slate-600">{{ m.budget_discussed || '—' }}</td>
+                  <td class="px-6 py-3 text-slate-600">{{ formatBudgetLabel(m.budget_discussed) }}</td>
                   <td class="px-6 py-3 text-slate-600">{{ m.deadline || '—' }}</td>
                   <td class="px-6 py-3">
                     <span

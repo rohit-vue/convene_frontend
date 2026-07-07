@@ -82,7 +82,7 @@
             </div>
             <div>
               <label :class="labelClass">Budget discussed</label>
-              <input v-model="createForm.budget_discussed" type="text" placeholder="e.g. $10,000" :class="inputClass" />
+              <BudgetInput v-model="createForm.budget_discussed" :input-class="inputClass" />
             </div>
             <div>
               <label :class="labelClass">Deadline / expected timeline</label>
@@ -207,7 +207,7 @@ function syncLogisticsForm(source) {
   if (source) {
     next.meeting_at = source.meeting_at ? toLocalInput(source.meeting_at) : ''
     next.duration_minutes = source.duration_minutes ?? ''
-    next.budget_discussed = source.budget_discussed ?? ''
+    next.budget_discussed = normalizeBudgetValue(source.budget_discussed)
     next.deadline = source.deadline ?? ''
     next.notes = source.notes ?? ''
     next.requirements_discussed = source.requirements_discussed ?? ''
@@ -222,7 +222,7 @@ function resetCreateForm() {
     meeting_at: '',
     duration_minutes: latest?.duration_minutes ?? '',
     meeting_outcome: '',
-    budget_discussed: latest?.budget_discussed ?? '',
+    budget_discussed: normalizeBudgetValue(latest?.budget_discussed),
     deadline: latest?.deadline ?? '',
     notes: '',
     requirements_discussed: '',
@@ -251,7 +251,7 @@ function buildUpdateBody(includeOutcome = true) {
   const body = {
     meeting_at: new Date(logisticsForm.meeting_at).toISOString(),
     duration_minutes: logisticsForm.duration_minutes ? Number(logisticsForm.duration_minutes) : null,
-    budget_discussed: logisticsForm.budget_discussed || null,
+    budget_discussed: sanitizeBudgetInput(logisticsForm.budget_discussed) || null,
     deadline: logisticsForm.deadline || null,
     notes: logisticsForm.notes || null,
     requirements_discussed: logisticsForm.requirements_discussed || null,
@@ -323,7 +323,7 @@ async function saveFollowUpMeeting() {
       meeting_at: new Date(createForm.meeting_at).toISOString(),
       duration_minutes: createForm.duration_minutes ? Number(createForm.duration_minutes) : null,
       meeting_outcome: createForm.meeting_outcome,
-      budget_discussed: createForm.budget_discussed || null,
+      budget_discussed: sanitizeBudgetInput(createForm.budget_discussed) || null,
       deadline: createForm.deadline || null,
       notes: createForm.notes || null,
       requirements_discussed: createForm.requirements_discussed || null,

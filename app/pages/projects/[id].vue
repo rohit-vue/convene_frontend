@@ -91,8 +91,19 @@
                 :input-class="inputClass"
               />
             </div>
+            <div v-if="form.job_type === 'hourly'">
+              <label :class="labelClass">Hourly rate</label>
+              <BudgetInput v-model="form.hourly_rate" :input-class="inputClass" placeholder="50" />
+            </div>
           </div>
         </div>
+
+        <ProjectMilestoneCostSection
+          v-if="form.job_type === 'contract'"
+          :project-id="route.params.id as string"
+          :project-status="project.status"
+          @updated="onPricingUpdated"
+        />
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
@@ -155,6 +166,7 @@ function blankForm() {
     start_date: '',
     job_category: '',
     job_type: '',
+    hourly_rate: '',
     upwork_account: '',
     link_url: '',
     job_description: '',
@@ -169,7 +181,11 @@ function fill(p) {
   const next = blankForm()
   if (p) {
     for (const key of Object.keys(next)) {
-      if (p[key] !== null && p[key] !== undefined) next[key] = p[key]
+      if (key === 'hourly_rate') {
+        next.hourly_rate = p.hourly_rate != null ? String(p.hourly_rate) : ''
+      } else if (p[key] !== null && p[key] !== undefined) {
+        next[key] = p[key]
+      }
     }
     if (!next.job_description && p.description) next.job_description = p.description
   }
@@ -179,6 +195,10 @@ function fill(p) {
 watch(project, (p) => { if (p) fill(p) }, { immediate: true })
 
 async function onStatusUpdated() {
+  await refresh()
+}
+
+async function onPricingUpdated() {
   await refresh()
 }
 
@@ -192,7 +212,18 @@ async function save() {
   saveError.value = ''
   saveOk.value = false
   try {
-    await update(route.params.id as string, { ...form })
+    const { hourly_rate: _hourlyRate, ...rest } = form
+    const payload = {
+      ...rest,
+      ...(form.job_type === 'hourly'
+        ? {
+            hourly_rate: form.hourly_rate
+              ? sanitizeBudgetInput(form.hourly_rate)
+              : '',
+          }
+        : {}),
+    }
+    await update(route.params.id as string, payload)
     saveOk.value = true
     await refresh()
   } catch (e) {

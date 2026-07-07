@@ -75,7 +75,7 @@
               <th class="px-6 py-4 font-medium">Employee</th>
               <th class="px-6 py-4 font-medium">Status</th>
               <th class="px-6 py-4 font-medium">Start date</th>
-              <th class="px-6 py-4 font-medium">Category</th>
+              <th class="px-6 py-4 font-medium">Project type</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
@@ -97,7 +97,7 @@
                 </span>
               </td>
               <td class="px-6 py-4 text-slate-600">{{ formatDate(p.start_date) }}</td>
-              <td class="px-6 py-4 text-slate-600">{{ jobCategoryLabel(p.job_category) }}</td>
+              <td class="px-6 py-4 text-slate-600">{{ jobTypeLabel(p.job_type) }}</td>
             </tr>
             <tr v-if="projects && adminFilteredProjects.length === 0">
               <td colspan="6" class="px-6 py-12 text-center text-sm text-slate-400">
@@ -157,15 +157,6 @@
               Due {{ formatDate(p.due_date) }}
             </span>
           </div>
-
-          <div class="mt-5 flex items-center justify-end gap-2 border-t border-slate-100 pt-4" @click.stop>
-            <button
-              class="rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50"
-              @click="openEdit(p)"
-            >
-              Edit
-            </button>
-          </div>
         </div>
       </div>
 
@@ -185,7 +176,7 @@
         </button>
       </div>
 
-      <ProjectFormModal :open="showModal" :project="editing" @close="closeModal" @saved="onSaved" />
+      <ProjectFormModal :open="showModal" @close="closeModal" @saved="onSaved" />
     </template>
   </div>
 </template>
@@ -201,7 +192,6 @@ if (!isAdmin.value && !isEmployee.value) {
 }
 
 const showModal = ref(false)
-const editing = ref(null)
 const activeFilter = ref('all')
 
 const filterDate = ref('')
@@ -330,18 +320,11 @@ function openProject(p) {
 }
 
 function openCreate() {
-  editing.value = null
-  showModal.value = true
-}
-
-function openEdit(project) {
-  editing.value = project
   showModal.value = true
 }
 
 function closeModal() {
   showModal.value = false
-  editing.value = null
 }
 
 async function onSaved() {
