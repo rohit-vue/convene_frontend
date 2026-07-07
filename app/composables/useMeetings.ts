@@ -1,10 +1,12 @@
 import type { AssignMeetingInput, Meeting, MeetingInput, MeetingUpdate } from '~/types/meetings'
+import type { MeetingExportRow } from '~/utils/exportMeetingsExcel'
 
 export const useMeetings = () => {
   const { apiFetch } = useApi()
 
   const list = () => apiFetch<Meeting[]>('/api/meetings')
   const listPending = () => apiFetch<Meeting[]>('/api/meetings/pending')
+  const exportAll = () => apiFetch<MeetingExportRow[]>('/api/meetings/export')
   const getById = (id: string) => apiFetch<Meeting>(`/api/meetings/${id}`)
   const create = (body: MeetingInput) =>
     apiFetch<Meeting>('/api/meetings', { method: 'POST', body })
@@ -27,6 +29,7 @@ export const useMeetings = () => {
   return {
     list,
     listPending,
+    exportAll,
     getById,
     create,
     assign,

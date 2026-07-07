@@ -7,13 +7,21 @@
           {{ isAdmin ? 'View and assign meetings across the team.' : 'Track and manage all your meetings.' }}
         </p>
       </div>
-      <button
-        v-if="isAdmin"
-        class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
-        @click="showAssignModal = true"
-      >
-        + Assign Meeting
-      </button>
+      <div v-if="isAdmin" class="flex items-center gap-3">
+        <button
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          :disabled="downloading"
+          @click="downloadAllMeetings"
+        >
+          {{ downloading ? 'Exporting…' : 'Export' }}
+        </button>
+        <button
+          class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+          @click="showAssignModal = true"
+        >
+          + Assign Meeting
+        </button>
+      </div>
       <button
         v-else
         class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
@@ -124,8 +132,10 @@
 </template>
 
 <script setup>
+import { downloadMeetingsExcel } from '~/utils/exportMeetingsExcel'
+
 const { isAdmin, isEmployee, fetchProfile } = useProfile()
-const { list } = useMeetings()
+const { list, exportAll } = useMeetings()
 
 await fetchProfile()
 
@@ -135,6 +145,7 @@ if (!isAdmin.value && !isEmployee.value) {
 
 const showModal = ref(false)
 const showAssignModal = ref(false)
+const downloading = ref(false)
 
 const filterDate = ref('')
 const dateSortOrder = ref('desc')
@@ -236,6 +247,19 @@ async function onSaved() {
 async function onAssignSaved() {
   showAssignModal.value = false
   await refresh()
+}
+
+async function downloadAllMeetings() {
+  if (downloading.value) return
+  downloading.value = true
+  try {
+    const rows = await exportAll()
+    downloadMeetingsExcel(rows)
+  } catch (err) {
+    console.error('Failed to download meetings:', err)
+  } finally {
+    downloading.value = false
+  }
 }
 
 function openMeeting(m) {
