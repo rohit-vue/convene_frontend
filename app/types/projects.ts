@@ -21,6 +21,7 @@ export interface Project {
   link_url?: string | null
   notes?: string | null
   assigned_to?: string | null
+  assignee_name?: string | null
   created_by?: string
   created_at?: string
   updated_at?: string

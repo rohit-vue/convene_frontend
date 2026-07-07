@@ -45,5 +45,6 @@ export interface AssignMeetingInput {
   project_name: string
   client_name: string
   upwork_account?: string
+  link_url?: string
   meeting_at: string
 }

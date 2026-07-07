@@ -110,6 +110,12 @@
             View all meetings <span>&rarr;</span>
           </NuxtLink>
           <NuxtLink
+            to="/projects"
+            class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+          >
+            View all projects <span>&rarr;</span>
+          </NuxtLink>
+          <NuxtLink
             to="/employees"
             class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
           >
