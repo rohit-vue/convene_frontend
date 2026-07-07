@@ -15,7 +15,7 @@
 
     <div
       v-if="open"
-      class="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl"
+      class="absolute right-0 top-full z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl"
     >
       <div class="border-b border-slate-100 px-4 py-3">
         <h3 class="text-sm font-semibold text-slate-800">Notifications</h3>

@@ -1,13 +1,26 @@
 <template>
   <div class="flex min-h-screen bg-slate-50 text-slate-800">
-    
-    <aside class="fixed inset-y-0 left-0 z-20 flex w-64 flex-col border-r border-slate-200 bg-white px-4 py-6">
-      
-      <div class="mb-8 px-2">
-        <img src="/convenelogo.png" alt="Convene" class="w-full object-contain" />
+    <div
+      v-if="sidebarOpen"
+      class="fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm lg:hidden"
+      @click="sidebarOpen = false"
+    />
+
+    <aside
+      class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white px-4 py-6 transition-transform duration-200 ease-in-out lg:translate-x-0"
+      :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+    >
+      <div class="mb-8 flex items-center justify-between px-2">
+        <img src="/convenelogo.png" alt="Convene" class="h-8 w-auto object-contain" />
+        <button
+          class="grid h-8 w-8 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 lg:hidden"
+          aria-label="Close menu"
+          @click="sidebarOpen = false"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
       </div>
 
-     
       <nav class="space-y-1">
         <NuxtLink
           v-for="item in nav"
@@ -15,18 +28,19 @@
           :to="item.to"
           class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
           active-class="!bg-indigo-50 !text-indigo-700"
+          @click="sidebarOpen = false"
         >
           <span class="text-slate-400 transition group-hover:text-slate-600" v-html="item.icon" />
           {{ item.label }}
         </NuxtLink>
       </nav>
 
-      
       <div class="mt-auto border-t border-slate-100 pt-4">
         <NuxtLink
           to="/profile"
           class="group flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition hover:bg-slate-100"
           active-class="!bg-indigo-50"
+          @click="sidebarOpen = false"
         >
           <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-xs font-semibold text-white ring-2 ring-white">
             {{ initials }}
@@ -48,19 +62,26 @@
       </div>
     </aside>
 
-  
-    <div class="flex flex-1 flex-col pl-64">
-     
-      <header class="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/70 px-8 py-4 backdrop-blur">
-        <HeaderSearch />
+    <div class="flex min-w-0 flex-1 flex-col lg:pl-64">
+      <header class="sticky top-0 z-10 flex items-center gap-3 border-b border-slate-200 bg-white/70 px-4 py-3 backdrop-blur sm:gap-4 sm:px-6 sm:py-4 lg:px-8">
+        <button
+          class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 lg:hidden"
+          aria-label="Open menu"
+          @click="sidebarOpen = true"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
 
-        <div class="flex items-center gap-4">
+        <div class="min-w-0 flex-1">
+          <HeaderSearch />
+        </div>
+
+        <div class="flex shrink-0 items-center gap-2 sm:gap-4">
           <NotificationBell />
         </div>
       </header>
 
-    
-      <main class="flex-1 p-8">
+      <main class="flex-1 p-4 sm:p-6 lg:p-8">
         <slot />
       </main>
     </div>
@@ -71,6 +92,25 @@
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const { displayName, role, initials, isAdmin, isEmployee, fetchProfile } = useProfile()
+const route = useRoute()
+
+const sidebarOpen = ref(false)
+
+watch(() => route.path, () => {
+  sidebarOpen.value = false
+})
+
+watch(sidebarOpen, (open) => {
+  if (import.meta.client) {
+    document.body.style.overflow = open ? 'hidden' : ''
+  }
+})
+
+onUnmounted(() => {
+  if (import.meta.client) {
+    document.body.style.overflow = ''
+  }
+})
 
 watch(user, fetchProfile, { immediate: true })
 

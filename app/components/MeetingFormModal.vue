@@ -61,7 +61,12 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Date &amp; time <span class="text-red-500">*</span></label>
-            <input v-model="form.meeting_at" required type="datetime-local" :class="inputClass" />
+            <DateTimePicker
+              v-model="form.meeting_at"
+              placeholder="Select date & time"
+              :input-class="inputClass"
+              full-width
+            />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Duration (min)</label>
@@ -123,6 +128,8 @@
 </template>
 
 <script setup>
+import { toLocalDateTimeInput } from '~/utils/dates'
+
 const props = defineProps({
   open: { type: Boolean, default: false },
   meeting: { type: Object, default: null },
@@ -166,21 +173,12 @@ function blankForm() {
 
 const form = reactive(blankForm())
 
-// Convert an ISO timestamp to the value a datetime-local input expects (local time).
-function toLocalInput(iso) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  const pad = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
-
 function reset() {
   const next = blankForm()
   if (props.meeting) {
     for (const key of Object.keys(next)) {
       if (key === 'meeting_at') {
-        next[key] = toLocalInput(props.meeting.meeting_at)
+        next[key] = toLocalDateTimeInput(props.meeting.meeting_at)
       } else if (key === 'budget_discussed') {
         next[key] = normalizeBudgetValue(props.meeting[key])
       } else if (props.meeting[key] !== null && props.meeting[key] !== undefined) {
