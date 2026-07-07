@@ -31,7 +31,7 @@
           <p v-if="n.body" class="mt-0.5 text-xs text-slate-500">{{ n.body }}</p>
           <p class="mt-1 text-xs text-slate-400">{{ formatTime(n.created_at) }}</p>
           <button
-            v-if="n.meeting_id && !n.read_at"
+            v-if="(n.meeting_id || n.project_id) && !n.read_at"
             class="mt-2 text-xs font-medium text-indigo-600 hover:text-indigo-700"
             @click="goToDashboard"
           >

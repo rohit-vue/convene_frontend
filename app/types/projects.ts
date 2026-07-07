@@ -4,6 +4,8 @@ export interface DailyLogInput {
   tracker_minutes: number
 }
 
+export type AssignmentStatus = 'pending' | 'accepted' | 'declined'
+
 export interface Project {
   id: string
   name: string
@@ -24,6 +26,8 @@ export interface Project {
   notes?: string | null
   assigned_to?: string | null
   assignee_name?: string | null
+  assignment_status?: AssignmentStatus | null
+  accepted_at?: string | null
   created_by?: string
   created_at?: string
   updated_at?: string
@@ -70,3 +74,14 @@ export interface ProjectDailyLog {
 }
 
 export type ProjectInput = Partial<Omit<Project, 'id' | 'created_at' | 'updated_at' | 'created_by'>>
+
+export interface AssignProjectInput {
+  employee_id: string
+  name: string
+  client_name: string
+  start_date?: string
+  job_category?: string
+  job_type?: string
+  upwork_account?: string
+  link_url?: string
+}
