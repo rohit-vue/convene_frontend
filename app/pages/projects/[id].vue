@@ -62,10 +62,12 @@
           <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label :class="labelClass">Upwork account</label>
-              <select v-model="form.upwork_account" :class="inputClass">
-                <option value="">Select…</option>
-                <option v-for="opt in upworkAccountOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-              </select>
+              <AppSelect
+                v-model="form.upwork_account"
+                :options="upworkAccountOptions"
+                placeholder="Select…"
+                :input-class="inputClass"
+              />
             </div>
             <div>
               <label :class="labelClass">Upwork link</label>
@@ -73,17 +75,21 @@
             </div>
             <div>
               <label :class="labelClass">Job type</label>
-              <select v-model="form.job_type" :class="inputClass">
-                <option value="">Select…</option>
-                <option v-for="opt in jobTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-              </select>
+              <AppSelect
+                v-model="form.job_type"
+                :options="jobTypeOptions"
+                placeholder="Select…"
+                :input-class="inputClass"
+              />
             </div>
             <div>
               <label :class="labelClass">Job category</label>
-              <select v-model="form.job_category" :class="inputClass">
-                <option value="">Select…</option>
-                <option v-for="opt in jobCategoryOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-              </select>
+              <AppSelect
+                v-model="form.job_category"
+                :options="jobCategoryOptions"
+                placeholder="Select…"
+                :input-class="inputClass"
+              />
             </div>
           </div>
         </div>
