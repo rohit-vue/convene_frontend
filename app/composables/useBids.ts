@@ -9,5 +9,11 @@ export const useBids = () => {
   const create = (body: UpworkBidInput) =>
     apiFetch<UpworkBid>('/api/bids', { method: 'POST', body })
 
-  return { list, create }
+  const update = (id: string, body: UpworkBidInput) =>
+    apiFetch<UpworkBid>(`/api/bids/${id}`, { method: 'PATCH', body })
+
+  const remove = (id: string) =>
+    apiFetch<void>(`/api/bids/${id}`, { method: 'DELETE' })
+
+  return { list, create, update, remove }
 }
