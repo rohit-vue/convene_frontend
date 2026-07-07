@@ -42,6 +42,11 @@
           </select>
         </div>
 
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Upwork Link</label>
+          <input v-model="form.link_url" type="url" placeholder="https://www.upwork.com/…" :class="inputClass" />
+        </div>
+
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Date <span class="text-red-500">*</span></label>
@@ -100,6 +105,7 @@ function blankForm() {
     project_name: '',
     client_name: '',
     upwork_account: '',
+    link_url: '',
     date: '',
     time: '',
   }
@@ -129,6 +135,7 @@ async function save() {
       project_name: form.project_name,
       client_name: form.client_name,
       upwork_account: form.upwork_account || undefined,
+      link_url: form.link_url || undefined,
       meeting_at: combineDateTime(form.date, form.time),
     })
     Object.assign(form, blankForm())
