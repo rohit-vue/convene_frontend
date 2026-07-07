@@ -30,17 +30,21 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Project type</label>
-            <select v-model="form.project_type" :class="inputClass">
-              <option value="">Select…</option>
-              <option v-for="opt in projectTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
+            <AppSelect
+              v-model="form.project_type"
+              :options="projectTypeOptions"
+              placeholder="Select…"
+              :input-class="inputClass"
+            />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Upwork account</label>
-            <select v-model="form.upwork_account" :class="inputClass">
-              <option value="">Select…</option>
-              <option v-for="opt in upworkAccountOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
+            <AppSelect
+              v-model="form.upwork_account"
+              :options="upworkAccountOptions"
+              placeholder="Select…"
+              :input-class="inputClass"
+            />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Upwork Link</label>
@@ -65,10 +69,12 @@
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Meeting outcome <span class="text-red-500">*</span></label>
-            <select v-model="form.meeting_outcome" required :class="inputClass">
-              <option value="">Select…</option>
-              <option v-for="opt in meetingOutcomeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
+            <AppSelect
+              v-model="form.meeting_outcome"
+              :options="meetingOutcomeOptions"
+              placeholder="Select…"
+              :input-class="inputClass"
+            />
           </div>
         </div>
 
@@ -76,7 +82,7 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Budget discussed</label>
-            <input v-model="form.budget_discussed" type="text" placeholder="e.g. $10,000" :class="inputClass" />
+            <BudgetInput v-model="form.budget_discussed" :input-class="inputClass" />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Deadline / expected timeline</label>
@@ -175,6 +181,8 @@ function reset() {
     for (const key of Object.keys(next)) {
       if (key === 'meeting_at') {
         next[key] = toLocalInput(props.meeting.meeting_at)
+      } else if (key === 'budget_discussed') {
+        next[key] = normalizeBudgetValue(props.meeting[key])
       } else if (props.meeting[key] !== null && props.meeting[key] !== undefined) {
         next[key] = props.meeting[key]
       }
@@ -204,6 +212,7 @@ async function save() {
     const body = {
       ...form,
       meeting_at: new Date(form.meeting_at).toISOString(),
+      budget_discussed: sanitizeBudgetInput(form.budget_discussed) || undefined,
     }
     if (isEdit.value) {
       await update(props.meeting.id, body)

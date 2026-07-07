@@ -26,20 +26,55 @@
 
     <!-- Admin table view -->
     <template v-if="isAdmin">
-      <div v-if="projects && projects.length" class="mb-6 flex flex-wrap gap-2">
-        <button
-          v-for="f in filters"
-          :key="f.value"
-          class="rounded-full px-3 py-1.5 text-xs font-medium transition"
-          :class="activeFilter === f.value ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'"
-          @click="activeFilter = f.value"
-        >
-          {{ f.label }}
-          <span :class="activeFilter === f.value ? 'text-white/70' : 'text-slate-400'">{{ countFor(f.value) }}</span>
-        </button>
-      </div>
-
       <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+        <div class="border-b border-slate-100 bg-slate-50 px-6 py-4">
+          <div class="flex flex-wrap items-end gap-4">
+            <div>
+              <label :class="filterLabelClass">Date</label>
+              <DateFilterPicker v-model="filterDate" :marked-dates="markedDates" :input-class="filterInputClass" />
+            </div>
+            <div>
+              <label :class="filterLabelClass">Sort by date</label>
+              <AppSelect
+                v-model="dateSortOrder"
+                :options="dateSortOptions"
+                :input-class="filterInputClass"
+                :full-width="false"
+              />
+            </div>
+            <div>
+              <label :class="filterLabelClass">Employee</label>
+              <AppSelect
+                v-model="filterEmployeeId"
+                :options="employeeFilterOptions"
+                placeholder="All employees"
+                :input-class="filterInputClass"
+                :full-width="false"
+              />
+            </div>
+            <div>
+              <label :class="filterLabelClass">Status</label>
+              <AppSelect
+                v-model="filterStatus"
+                :options="statusFilterOptions"
+                placeholder="All statuses"
+                :input-class="filterInputClass"
+                :full-width="false"
+              />
+            </div>
+            <div>
+              <label :class="filterLabelClass">Project type</label>
+              <AppSelect
+                v-model="filterProjectType"
+                :options="projectTypeFilterOptions"
+                placeholder="All types"
+                :input-class="filterInputClass"
+                :full-width="false"
+              />
+            </div>
+          </div>
+        </div>
+
         <table class="w-full text-sm">
           <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
             <tr>
@@ -48,12 +83,12 @@
               <th class="px-6 py-4 font-medium">Employee</th>
               <th class="px-6 py-4 font-medium">Status</th>
               <th class="px-6 py-4 font-medium">Start date</th>
-              <th class="px-6 py-4 font-medium">Category</th>
+              <th class="px-6 py-4 font-medium">Project type</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
             <tr
-              v-for="p in filteredProjects"
+              v-for="p in adminFilteredProjects"
               :key="p.id"
               class="cursor-pointer transition hover:bg-slate-50"
               @click="openProject(p)"
@@ -70,11 +105,11 @@
                 </span>
               </td>
               <td class="px-6 py-4 text-slate-600">{{ formatDate(p.start_date) }}</td>
-              <td class="px-6 py-4 text-slate-600">{{ jobCategoryLabel(p.job_category) }}</td>
+              <td class="px-6 py-4 text-slate-600">{{ jobTypeLabel(p.job_type) }}</td>
             </tr>
-            <tr v-if="projects && filteredProjects.length === 0">
+            <tr v-if="projects && adminFilteredProjects.length === 0">
               <td colspan="6" class="px-6 py-12 text-center text-sm text-slate-400">
-                {{ activeFilter === 'all' ? 'No projects yet.' : 'No projects in this status.' }}
+                {{ adminEmptyMessage }}
               </td>
             </tr>
           </tbody>
@@ -130,15 +165,6 @@
               Due {{ formatDate(p.due_date) }}
             </span>
           </div>
-
-          <div class="mt-5 flex items-center justify-end gap-2 border-t border-slate-100 pt-4" @click.stop>
-            <button
-              class="rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50"
-              @click="openEdit(p)"
-            >
-              Edit
-            </button>
-          </div>
         </div>
       </div>
 
@@ -158,7 +184,7 @@
         </button>
       </div>
 
-      <ProjectFormModal :open="showModal" :project="editing" @close="closeModal" @saved="onSaved" />
+      <ProjectFormModal :open="showModal" @close="closeModal" @saved="onSaved" />
     </template>
   </div>
 </template>
@@ -176,9 +202,33 @@ if (!isAdmin.value && !isEmployee.value) {
 }
 
 const showModal = ref(false)
-const editing = ref(null)
 const activeFilter = ref('all')
 const exporting = ref(false)
+
+const filterDate = ref('')
+const dateSortOrder = ref('desc')
+const filterEmployeeId = ref('')
+const filterStatus = ref('')
+const filterProjectType = ref('')
+
+const filterLabelClass = 'mb-1 block text-xs font-medium text-slate-500'
+const filterInputClass =
+  'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
+
+const dateSortOptions = [
+  { value: 'desc', label: 'Newest first' },
+  { value: 'asc', label: 'Oldest first' },
+]
+
+const statusFilterOptions = computed(() => [
+  { value: '', label: 'All statuses' },
+  ...projectStatusOptions,
+])
+
+const projectTypeFilterOptions = computed(() => [
+  { value: '', label: 'All types' },
+  ...jobTypeOptions,
+])
 
 const { data: projects, refresh } = await useAsyncData(
   'projects',
@@ -207,6 +257,59 @@ const filters = [
   ...statuses,
 ]
 
+const employeeOptions = computed(() => {
+  const seen = new Map()
+  for (const p of projects.value || []) {
+    if (p.assigned_to && p.assignee_name) {
+      seen.set(p.assigned_to, p.assignee_name)
+    }
+  }
+  return [...seen.entries()]
+    .map(([value, label]) => ({ value, label }))
+    .sort((a, b) => a.label.localeCompare(b.label))
+})
+
+const employeeFilterOptions = computed(() => [
+  { value: '', label: 'All employees' },
+  ...employeeOptions.value,
+])
+
+const markedDates = computed(() => collectDateKeys((projects.value || []).map((p) => p.start_date)))
+
+const hasAdminFilters = computed(() =>
+  Boolean(filterDate.value || filterEmployeeId.value || filterStatus.value || filterProjectType.value),
+)
+
+const adminFilteredProjects = computed(() => {
+  let items = [...(projects.value || [])]
+
+  if (filterDate.value) {
+    items = items.filter((p) => p.start_date?.slice(0, 10) === filterDate.value)
+  }
+  if (filterEmployeeId.value) {
+    items = items.filter((p) => p.assigned_to === filterEmployeeId.value)
+  }
+  if (filterStatus.value) {
+    items = items.filter((p) => p.status === filterStatus.value)
+  }
+  if (filterProjectType.value) {
+    items = items.filter((p) => p.job_type === filterProjectType.value)
+  }
+
+  items.sort((a, b) => {
+    const aTime = a.start_date ? new Date(a.start_date).getTime() : 0
+    const bTime = b.start_date ? new Date(b.start_date).getTime() : 0
+    return dateSortOrder.value === 'asc' ? aTime - bTime : bTime - aTime
+  })
+
+  return items
+})
+
+const adminEmptyMessage = computed(() => {
+  if (hasAdminFilters.value) return 'No projects match the selected filters.'
+  return 'No projects yet.'
+})
+
 const filteredProjects = computed(() => {
   const items = projects.value || []
   if (activeFilter.value === 'all') return items
@@ -228,18 +331,11 @@ function openProject(p) {
 }
 
 function openCreate() {
-  editing.value = null
-  showModal.value = true
-}
-
-function openEdit(project) {
-  editing.value = project
   showModal.value = true
 }
 
 function closeModal() {
   showModal.value = false
-  editing.value = null
 }
 
 async function onSaved() {

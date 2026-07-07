@@ -49,3 +49,15 @@ export function jobCategoryLabel(value?: string | null): string {
 export function projectStatusLabel(value?: string | null): string {
   return (value && statusLabelMap[value]) || '—'
 }
+
+export function formatHourlyRateLabel(value?: number | string | null): string {
+  const digits = String(value ?? '').replace(/\D/g, '')
+  if (!digits) return '—'
+  return `${Number(digits).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}/hr`
+}
+
+export function formatMilestoneCostLabel(value?: number | string | null): string {
+  const digits = String(value ?? '').replace(/\D/g, '')
+  if (!digits) return '—'
+  return Number(digits).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+}

@@ -27,9 +27,7 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div v-if="!isEdit">
             <label class="mb-1 block text-sm font-medium text-slate-700">Status</label>
-            <select v-model="form.status" :class="inputClass">
-              <option v-for="s in projectStatusOptions" :key="s.value" :value="s.value">{{ s.label }}</option>
-            </select>
+            <AppSelect v-model="form.status" :options="projectStatusOptions" :input-class="inputClass" />
           </div>
           <div :class="isEdit ? 'sm:col-span-2' : ''">
             <label class="mb-1 block text-sm font-medium text-slate-700">Start date</label>
@@ -40,27 +38,33 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Job category</label>
-            <select v-model="form.job_category" :class="inputClass">
-              <option value="">Select…</option>
-              <option v-for="opt in jobCategoryOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
+            <AppSelect
+              v-model="form.job_category"
+              :options="jobCategoryOptions"
+              placeholder="Select…"
+              :input-class="inputClass"
+            />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Job type</label>
-            <select v-model="form.job_type" :class="inputClass">
-              <option value="">Select…</option>
-              <option v-for="opt in jobTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
+            <AppSelect
+              v-model="form.job_type"
+              :options="jobTypeOptions"
+              placeholder="Select…"
+              :input-class="inputClass"
+            />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Upwork account</label>
-            <select v-model="form.upwork_account" :class="inputClass">
-              <option value="">Select…</option>
-              <option v-for="opt in upworkAccountOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
+            <AppSelect
+              v-model="form.upwork_account"
+              :options="upworkAccountOptions"
+              placeholder="Select…"
+              :input-class="inputClass"
+            />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Upwork link</label>
