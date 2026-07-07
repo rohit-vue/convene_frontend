@@ -69,10 +69,12 @@
             </div>
             <div>
               <label :class="labelClass">Meeting outcome <span class="text-red-500">*</span></label>
-              <select v-model="createForm.meeting_outcome" required :class="inputClass">
-                <option value="">Select…</option>
-                <option v-for="opt in meetingOutcomeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-              </select>
+              <AppSelect
+                v-model="createForm.meeting_outcome"
+                :options="meetingOutcomeOptions"
+                placeholder="Select…"
+                :input-class="inputClass"
+              />
             </div>
             <div>
               <label :class="labelClass">Duration (min)</label>

@@ -13,17 +13,12 @@
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label class="mb-1 block text-sm font-medium text-slate-700">New status</label>
-          <select v-model="newStatus" :class="inputClass">
-            <option value="">Select…</option>
-            <option
-              v-for="s in projectStatusOptions"
-              :key="s.value"
-              :value="s.value"
-              :disabled="s.value === currentStatus"
-            >
-              {{ s.label }}
-            </option>
-          </select>
+          <AppSelect
+            v-model="newStatus"
+            :options="statusSelectOptions"
+            placeholder="Select…"
+            :input-class="inputClass"
+          />
         </div>
       </div>
       <div>
@@ -107,6 +102,13 @@ const statusMeta = {
   completed: { label: 'Completed', badge: 'bg-emerald-50 text-emerald-700', dot: 'bg-emerald-500' },
   cancelled: { label: 'Cancelled', badge: 'bg-red-50 text-red-600', dot: 'bg-red-500' },
 }
+
+const statusSelectOptions = computed(() =>
+  projectStatusOptions.map((s) => ({
+    ...s,
+    disabled: s.value === props.currentStatus,
+  })),
+)
 
 const newStatus = ref('')
 const comment = ref('')

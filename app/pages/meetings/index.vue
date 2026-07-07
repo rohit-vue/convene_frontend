@@ -24,6 +24,54 @@
     </div>
 
     <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+      <div v-if="isAdmin" class="border-b border-slate-100 bg-slate-50 px-6 py-4">
+        <div class="flex flex-wrap items-end gap-4">
+          <div>
+            <label :class="filterLabelClass">Date</label>
+            <DateFilterPicker v-model="filterDate" :marked-dates="markedDates" :input-class="filterInputClass" />
+          </div>
+          <div>
+            <label :class="filterLabelClass">Sort by date</label>
+            <AppSelect
+              v-model="dateSortOrder"
+              :options="dateSortOptions"
+              :input-class="filterInputClass"
+              :full-width="false"
+            />
+          </div>
+          <div>
+            <label :class="filterLabelClass">Upwork account</label>
+            <AppSelect
+              v-model="filterUpworkAccount"
+              :options="upworkFilterOptions"
+              placeholder="All accounts"
+              :input-class="filterInputClass"
+              :full-width="false"
+            />
+          </div>
+          <div>
+            <label :class="filterLabelClass">Employee</label>
+            <AppSelect
+              v-model="filterEmployeeId"
+              :options="employeeFilterOptions"
+              placeholder="All employees"
+              :input-class="filterInputClass"
+              :full-width="false"
+            />
+          </div>
+          <div>
+            <label :class="filterLabelClass">Status</label>
+            <AppSelect
+              v-model="filterStatus"
+              :options="statusFilterOptions"
+              placeholder="All statuses"
+              :input-class="filterInputClass"
+              :full-width="false"
+            />
+          </div>
+        </div>
+      </div>
+
       <table class="w-full text-sm">
         <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
           <tr>
@@ -39,7 +87,7 @@
         </thead>
         <tbody class="divide-y divide-slate-100">
           <tr
-            v-for="m in meetings"
+            v-for="m in displayedMeetings"
             :key="m.id"
             class="cursor-pointer transition hover:bg-slate-50"
             @click="openMeeting(m)"
@@ -61,9 +109,9 @@
             <td v-if="!isAdmin" class="px-6 py-4 text-slate-600">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
           </tr>
 
-          <tr v-if="meetings && meetings.length === 0">
+          <tr v-if="meetings && displayedMeetings.length === 0">
             <td :colspan="isAdmin ? 6 : 6" class="px-6 py-12 text-center text-sm text-slate-400">
-              {{ isAdmin ? 'No meetings yet. Click "+ Assign Meeting" to add one.' : 'No meetings yet. Click "+ New Meeting" to add one.' }}
+              {{ emptyMeetingsMessage }}
             </td>
           </tr>
         </tbody>
@@ -88,11 +136,97 @@ if (!isAdmin.value && !isEmployee.value) {
 const showModal = ref(false)
 const showAssignModal = ref(false)
 
+const filterDate = ref('')
+const dateSortOrder = ref('desc')
+const filterUpworkAccount = ref('')
+const filterEmployeeId = ref('')
+const filterStatus = ref('')
+
+const filterLabelClass = 'mb-1 block text-xs font-medium text-slate-500'
+const filterInputClass =
+  'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
+
+const dateSortOptions = [
+  { value: 'desc', label: 'Newest first' },
+  { value: 'asc', label: 'Oldest first' },
+]
+
+const upworkFilterOptions = computed(() => [
+  { value: '', label: 'All accounts' },
+  ...upworkAccountOptions,
+])
+
+const statusFilterOptions = computed(() => [
+  { value: '', label: 'All statuses' },
+  ...assignmentStatusOptions,
+])
+
 const { data: meetings, refresh } = await useAsyncData(
   'meetings',
   () => list(),
   { server: false, default: () => [] },
 )
+
+const employeeOptions = computed(() => {
+  const seen = new Map()
+  for (const m of meetings.value || []) {
+    if (m.employee_id && m.employee_name) {
+      seen.set(m.employee_id, m.employee_name)
+    }
+  }
+  return [...seen.entries()]
+    .map(([value, label]) => ({ value, label }))
+    .sort((a, b) => a.label.localeCompare(b.label))
+})
+
+const employeeFilterOptions = computed(() => [
+  { value: '', label: 'All employees' },
+  ...employeeOptions.value,
+])
+
+const markedDates = computed(() => collectDateKeys((meetings.value || []).map((m) => m.meeting_at)))
+
+const hasActiveFilters = computed(() =>
+  Boolean(filterDate.value || filterUpworkAccount.value || filterEmployeeId.value || filterStatus.value),
+)
+
+const displayedMeetings = computed(() => {
+  const items = meetings.value || []
+  if (!isAdmin.value) return items
+
+  let filtered = [...items]
+
+  if (filterDate.value) {
+    filtered = filtered.filter((m) => m.meeting_at?.slice(0, 10) === filterDate.value)
+  }
+  if (filterUpworkAccount.value) {
+    filtered = filtered.filter((m) => m.upwork_account === filterUpworkAccount.value)
+  }
+  if (filterEmployeeId.value) {
+    filtered = filtered.filter((m) => m.employee_id === filterEmployeeId.value)
+  }
+  if (filterStatus.value) {
+    filtered = filtered.filter((m) => m.assignment_status === filterStatus.value)
+  }
+
+  filtered.sort((a, b) => {
+    const aTime = a.meeting_at ? new Date(a.meeting_at).getTime() : 0
+    const bTime = b.meeting_at ? new Date(b.meeting_at).getTime() : 0
+    return dateSortOrder.value === 'asc' ? aTime - bTime : bTime - aTime
+  })
+
+  return filtered
+})
+
+const emptyMeetingsMessage = computed(() => {
+  if (!isAdmin.value) {
+    return 'No meetings yet. Click "+ New Meeting" to add one.'
+  }
+  if (hasActiveFilters.value) {
+    return 'No meetings match the selected filters.'
+  }
+  return 'No meetings yet. Click "+ Assign Meeting" to add one.'
+})
 
 async function onSaved() {
   showModal.value = false

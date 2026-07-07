@@ -9,9 +9,20 @@
             : 'Record tasks completed for this project.' }}
         </p>
       </div>
-      <div v-if="isHourly && totalTrackerMinutes > 0" class="rounded-xl bg-indigo-50 px-3 py-2 text-right">
-        <p class="text-xs font-medium uppercase tracking-wide text-indigo-400">Total tracked</p>
-        <p class="text-sm font-semibold text-indigo-700">{{ formatTrackerMinutes(totalTrackerMinutes) }}</p>
+      <div class="flex flex-col items-end gap-3">
+        <div v-if="logs?.length">
+          <label class="mb-1 block text-right text-xs font-medium text-slate-500">Filter by date</label>
+          <DateFilterPicker
+            v-model="filterDate"
+            :marked-dates="markedDates"
+            placeholder="All dates"
+            :input-class="filterInputClass"
+          />
+        </div>
+        <div v-if="isHourly && totalTrackerMinutes > 0" class="rounded-xl bg-indigo-50 px-3 py-2 text-right">
+          <p class="text-xs font-medium uppercase tracking-wide text-indigo-400">Total tracked</p>
+          <p class="text-sm font-semibold text-indigo-700">{{ formatTrackerMinutes(totalTrackerMinutes) }}</p>
+        </div>
       </div>
     </div>
 
@@ -21,7 +32,10 @@
           <label class="mb-1 block text-sm font-medium text-slate-700">
             Date <span class="text-red-500">*</span>
           </label>
-          <input v-model="logDate" type="date" :class="inputClass" />
+          <input v-model="logDate" type="date" :max="maxLogDate" :class="inputClass" />
+          <p v-if="isFutureLogDate" class="mt-1 text-xs text-red-600">
+            You cannot add a log for a future date.
+          </p>
         </div>
         <div v-if="isHourly">
           <label class="mb-1 block text-sm font-medium text-slate-700">
@@ -79,12 +93,15 @@
       <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-400">Log history</h3>
       <div v-if="logsLoading" class="mt-3 text-sm text-slate-400">Loading logs…</div>
       <div v-else-if="!logs?.length" class="mt-3 text-sm text-slate-400">No daily logs yet.</div>
+      <div v-else-if="!displayedLogs.length" class="mt-3 text-sm text-slate-400">
+        No log for the selected date.
+      </div>
       <ol v-else class="mt-4 space-y-0">
         <li
-          v-for="(entry, index) in logs"
+          v-for="(entry, index) in displayedLogs"
           :key="entry.id"
           class="relative flex gap-4 pb-6 pl-6 ml-2"
-          :class="index < logs.length - 1 ? 'border-l border-slate-200' : ''"
+          :class="index < displayedLogs.length - 1 ? 'border-l border-slate-200' : ''"
         >
           <span class="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-indigo-500 ring-4 ring-white" />
           <div class="min-w-0 flex-1">
@@ -132,6 +149,9 @@ const { getDailyLogs, createDailyLog, updateDailyLog, getAdminDailyLogs } = useP
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
 
+const filterInputClass =
+  'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
+
 const isHourly = computed(() => props.jobType === 'hourly')
 
 const logsPathKey = computed(() =>
@@ -145,7 +165,8 @@ const fetchLogs = () =>
     ? getAdminDailyLogs(props.adminEmployeeId, props.projectId)
     : getDailyLogs(props.projectId)
 
-const logDate = ref(new Date().toISOString().slice(0, 10))
+const logDate = ref(todayDateKey())
+const filterDate = ref('')
 const tasksDone = ref('')
 const trackerHours = ref(0)
 const editingId = ref(null)
@@ -163,15 +184,27 @@ const totalTrackerMinutes = computed(() =>
   (logs.value || []).reduce((sum, entry) => sum + (entry.tracker_minutes || 0), 0),
 )
 
+const markedDates = computed(() => collectDateKeys((logs.value || []).map((entry) => entry.log_date)))
+
+const displayedLogs = computed(() => {
+  const items = logs.value || []
+  if (!filterDate.value) return items
+  return items.filter((entry) => entry.log_date?.slice(0, 10) === filterDate.value)
+})
+
+const maxLogDate = computed(() => todayDateKey())
+
+const isFutureLogDate = computed(() => isFutureDateKey(logDate.value))
+
 const canSubmit = computed(() => {
   const hasTasks = Boolean(logDate.value && tasksDone.value.trim())
-  if (!hasTasks) return false
+  if (!hasTasks || isFutureLogDate.value) return false
   if (!isHourly.value) return true
   return Number.isFinite(trackerHours.value) && trackerHours.value >= 0
 })
 
 function resetForm() {
-  logDate.value = new Date().toISOString().slice(0, 10)
+  logDate.value = todayDateKey()
   tasksDone.value = ''
   trackerHours.value = 0
   editingId.value = null
@@ -196,6 +229,10 @@ function cancelEdit() {
 
 async function submitLog() {
   if (!canSubmit.value) return
+  if (isFutureDateKey(logDate.value)) {
+    saveError.value = 'You cannot add a log for a future date.'
+    return
+  }
   saving.value = true
   saveError.value = ''
   saveOk.value = false

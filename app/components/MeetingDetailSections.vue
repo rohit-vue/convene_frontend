@@ -55,17 +55,21 @@
         </div>
         <div>
           <label :class="labelClass">Upwork account</label>
-          <select v-model="form.upwork_account" :class="inputClass">
-            <option value="">Select…</option>
-            <option v-for="opt in upworkAccountOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-          </select>
+          <AppSelect
+            v-model="form.upwork_account"
+            :options="upworkAccountOptions"
+            placeholder="Select…"
+            :input-class="inputClass"
+          />
         </div>
         <div>
           <label :class="labelClass">Upwork project type</label>
-          <select v-model="form.project_type" :class="inputClass">
-            <option value="">Select…</option>
-            <option v-for="opt in projectTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-          </select>
+          <AppSelect
+            v-model="form.project_type"
+            :options="projectTypeOptions"
+            placeholder="Select…"
+            :input-class="inputClass"
+          />
         </div>
         <div class="sm:col-span-2">
           <label :class="labelClass">Job description</label>

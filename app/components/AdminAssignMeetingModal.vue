@@ -18,10 +18,12 @@
       <form class="space-y-5 px-6 py-5" @submit.prevent="save">
         <div>
           <label class="mb-1 block text-sm font-medium text-slate-700">Assign to <span class="text-red-500">*</span></label>
-          <select v-model="form.employee_id" required :class="inputClass">
-            <option value="">Select employee…</option>
-            <option v-for="emp in employees" :key="emp.id" :value="emp.id">{{ emp.name }}</option>
-          </select>
+          <AppSelect
+            v-model="form.employee_id"
+            :options="employeeSelectOptions"
+            placeholder="Select employee…"
+            :input-class="inputClass"
+          />
         </div>
 
         <div>
@@ -36,10 +38,12 @@
 
         <div>
           <label class="mb-1 block text-sm font-medium text-slate-700">Upwork Account</label>
-          <select v-model="form.upwork_account" :class="inputClass">
-            <option value="">Select…</option>
-            <option v-for="opt in upworkAccountOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-          </select>
+          <AppSelect
+            v-model="form.upwork_account"
+            :options="upworkSelectOptions"
+            placeholder="Select…"
+            :input-class="inputClass"
+          />
         </div>
 
         <div>
@@ -95,6 +99,12 @@ const { data: employees } = await useAsyncData(
   () => getOptions(),
   { server: false, default: () => [] },
 )
+
+const employeeSelectOptions = computed(() =>
+  (employees.value || []).map((emp) => ({ value: emp.id, label: emp.name })),
+)
+
+const upworkSelectOptions = computed(() => upworkAccountOptions)
 
 const loading = ref(false)
 const error = ref('')
