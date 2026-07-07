@@ -1,4 +1,5 @@
 import type { Meeting } from '~/types/meetings'
+import type { Project } from '~/types/projects'
 
 export interface DashboardStats {
   meetings: number
@@ -13,6 +14,7 @@ export interface DashboardOverview {
   meetingOutcomeBreakdown: Record<string, number>
   activity: Array<{ at: string; text: string }>
   pendingMeetings?: Meeting[]
+  pendingProjects?: Project[]
 }
 
 export interface ActivityItem {

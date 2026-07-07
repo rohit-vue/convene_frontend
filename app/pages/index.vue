@@ -78,27 +78,51 @@
 
       <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
         <h2 class="text-lg font-semibold">
-          {{ isEmployee ? 'Meetings to Accept' : 'Quick Links' }}
+          {{ isEmployee ? 'Assignments to Accept' : 'Quick Links' }}
         </h2>
 
-        <!-- Employee: pending meetings -->
+        <!-- Employee: pending assignments -->
         <div v-if="isEmployee" class="mt-4 space-y-3">
           <div
             v-for="m in pendingMeetings"
-            :key="m.id"
+            :key="`meeting-${m.id}`"
             class="rounded-xl border border-amber-100 bg-amber-50/50 px-4 py-3"
           >
-            <p class="text-sm font-medium text-slate-800">{{ m.project_name }}</p>
+            <p class="text-xs font-medium uppercase tracking-wide text-amber-700">Meeting</p>
+            <p class="mt-1 text-sm font-medium text-slate-800">{{ m.project_name }}</p>
             <p class="mt-0.5 text-xs text-slate-500">{{ m.client_name }} · {{ formatMeetingTime(m.meeting_at) }}</p>
             <button
               class="mt-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
-              :disabled="acceptingId === m.id"
+              :disabled="acceptingMeetingId === m.id"
               @click="acceptMeeting(m.id)"
             >
-              {{ acceptingId === m.id ? 'Accepting…' : 'Accept' }}
+              {{ acceptingMeetingId === m.id ? 'Accepting…' : 'Accept' }}
             </button>
           </div>
-          <p v-if="!pendingMeetings.length" class="text-sm text-slate-400">No meetings awaiting acceptance.</p>
+
+          <div
+            v-for="p in pendingProjects"
+            :key="`project-${p.id}`"
+            class="rounded-xl border border-sky-100 bg-sky-50/50 px-4 py-3"
+          >
+            <p class="text-xs font-medium uppercase tracking-wide text-sky-700">Project</p>
+            <p class="mt-1 text-sm font-medium text-slate-800">{{ p.name }}</p>
+            <p class="mt-0.5 text-xs text-slate-500">
+              {{ p.client_name || 'No client' }}
+              <template v-if="p.start_date"> · Starts {{ formatProjectDate(p.start_date) }}</template>
+            </p>
+            <button
+              class="mt-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+              :disabled="acceptingProjectId === p.id"
+              @click="acceptProject(p.id)"
+            >
+              {{ acceptingProjectId === p.id ? 'Accepting…' : 'Accept' }}
+            </button>
+          </div>
+
+          <p v-if="!pendingMeetings.length && !pendingProjects.length" class="text-sm text-slate-400">
+            No assignments awaiting acceptance.
+          </p>
         </div>
 
         <!-- Admin: quick links -->
@@ -130,7 +154,8 @@
 <script setup>
 const { isAdmin, isEmployee } = useProfile()
 const { getOverview } = useDashboard()
-const { accept } = useMeetings()
+const { accept: acceptMeetingRequest } = useMeetings()
+const { accept: acceptProjectRequest } = useProjects()
 
 const { data: overview, refresh: refreshOverview } = await useAsyncData(
   'dashboard-overview',
@@ -139,17 +164,31 @@ const { data: overview, refresh: refreshOverview } = await useAsyncData(
 )
 
 const pendingMeetings = computed(() => overview.value?.pendingMeetings ?? [])
-const acceptingId = ref(null)
+const pendingProjects = computed(() => overview.value?.pendingProjects ?? [])
+const acceptingMeetingId = ref(null)
+const acceptingProjectId = ref(null)
 
 async function acceptMeeting(id) {
-  acceptingId.value = id
+  acceptingMeetingId.value = id
   try {
-    await accept(id)
+    await acceptMeetingRequest(id)
     await refreshOverview()
   } catch (e) {
     console.error(e)
   } finally {
-    acceptingId.value = null
+    acceptingMeetingId.value = null
+  }
+}
+
+async function acceptProject(id) {
+  acceptingProjectId.value = id
+  try {
+    await acceptProjectRequest(id)
+    await refreshOverview()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    acceptingProjectId.value = null
   }
 }
 
@@ -158,6 +197,15 @@ function formatMeetingTime(value) {
   return new Date(value).toLocaleString(undefined, {
     dateStyle: 'medium',
     timeStyle: 'short',
+  })
+}
+
+function formatProjectDate(value) {
+  if (!value) return '—'
+  return new Date(value).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
   })
 }
 

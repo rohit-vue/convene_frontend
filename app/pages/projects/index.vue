@@ -7,21 +7,30 @@
           {{ isAdmin ? 'View projects across the team.' : 'Create projects, set their status, and keep the details in one place.' }}
         </p>
       </div>
-      <button
-        v-if="isAdmin"
-        class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-        :disabled="exporting"
-        @click="exportAllProjects"
-      >
-        {{ exporting ? 'Exporting…' : 'Export' }}
-      </button>
-      <button
-        v-else-if="isEmployee"
-        class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
-        @click="openCreate"
-      >
-        + New Project
-      </button>
+      <div class="flex items-center gap-3">
+        <button
+          v-if="isAdmin"
+          class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+          @click="showAssignModal = true"
+        >
+          + Assign Project
+        </button>
+        <button
+          v-if="isAdmin"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          :disabled="exporting"
+          @click="exportAllProjects"
+        >
+          {{ exporting ? 'Exporting…' : 'Export' }}
+        </button>
+        <button
+          v-else-if="isEmployee"
+          class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+          @click="openCreate"
+        >
+          + New Project
+        </button>
+      </div>
     </div>
 
     <!-- Admin table view -->
@@ -81,6 +90,7 @@
               <th class="px-6 py-4 font-medium">Project</th>
               <th class="px-6 py-4 font-medium">Client</th>
               <th class="px-6 py-4 font-medium">Employee</th>
+              <th class="px-6 py-4 font-medium">Assignment</th>
               <th class="px-6 py-4 font-medium">Status</th>
               <th class="px-6 py-4 font-medium">Start date</th>
               <th class="px-6 py-4 font-medium">Project type</th>
@@ -99,6 +109,14 @@
               <td class="px-6 py-4">
                 <span
                   class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
+                  :class="assignmentBadgeClass(p.assignment_status)"
+                >
+                  {{ assignmentStatusLabel(p.assignment_status) }}
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <span
+                  class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
                   :class="statusMeta[p.status]?.badge || 'bg-slate-100 text-slate-600'"
                 >
                   {{ projectStatusLabel(p.status) }}
@@ -108,7 +126,7 @@
               <td class="px-6 py-4 text-slate-600">{{ jobTypeLabel(p.job_type) }}</td>
             </tr>
             <tr v-if="projects && adminFilteredProjects.length === 0">
-              <td colspan="6" class="px-6 py-12 text-center text-sm text-slate-400">
+              <td colspan="7" class="px-6 py-12 text-center text-sm text-slate-400">
                 {{ adminEmptyMessage }}
               </td>
             </tr>
@@ -186,6 +204,13 @@
 
       <ProjectFormModal :open="showModal" @close="closeModal" @saved="onSaved" />
     </template>
+
+    <AdminAssignProjectModal
+      v-if="isAdmin"
+      :open="showAssignModal"
+      @close="showAssignModal = false"
+      @saved="onAssignSaved"
+    />
   </div>
 </template>
 
@@ -202,6 +227,7 @@ if (!isAdmin.value && !isEmployee.value) {
 }
 
 const showModal = ref(false)
+const showAssignModal = ref(false)
 const activeFilter = ref('all')
 const exporting = ref(false)
 
@@ -341,6 +367,18 @@ function closeModal() {
 async function onSaved() {
   closeModal()
   await refresh()
+}
+
+async function onAssignSaved() {
+  showAssignModal.value = false
+  await refresh()
+}
+
+function assignmentBadgeClass(status) {
+  if (status === 'pending') return 'bg-amber-50 text-amber-700'
+  if (status === 'accepted') return 'bg-emerald-50 text-emerald-700'
+  if (status === 'declined') return 'bg-red-50 text-red-600'
+  return 'bg-slate-100 text-slate-600'
 }
 
 async function exportAllProjects() {

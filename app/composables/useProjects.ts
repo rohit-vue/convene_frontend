@@ -1,4 +1,5 @@
 import type {
+  AssignProjectInput,
   DailyLogInput,
   Project,
   ProjectDailyLog,
@@ -12,6 +13,11 @@ export const useProjects = () => {
   const { apiFetch } = useApi()
 
   const list = () => apiFetch<Project[]>('/api/projects')
+  const listPending = () => apiFetch<Project[]>('/api/projects/pending')
+  const assign = (body: AssignProjectInput) =>
+    apiFetch<Project>('/api/projects/assign', { method: 'POST', body })
+  const accept = (id: string) =>
+    apiFetch<Project>(`/api/projects/${id}/accept`, { method: 'PATCH' })
   const exportAll = () => apiFetch<ProjectExportRow[]>('/api/projects/export')
   const getById = (id: string) => apiFetch<Project>(`/api/projects/${id}`)
   const create = (body: ProjectInput) =>
@@ -60,6 +66,9 @@ export const useProjects = () => {
 
   return {
     list,
+    listPending,
+    assign,
+    accept,
     exportAll,
     getById,
     create,
