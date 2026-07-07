@@ -16,6 +16,7 @@ export const upworkAccountOptions: SelectOption[] = [
   { value: 'Vaibhav Srivastav', label: 'Vaibhav Srivastav' },
   { value: 'Gulshan Khera', label: 'Gulshan Khera' },
   { value: 'Ashutosh Pandey', label: 'Ashutosh Pandey' },
+  { value: 'Siddhart Srivastav', label: 'Siddhart Srivastav' },
 ]
 
 export const meetingOutcomeOptions: SelectOption[] = [

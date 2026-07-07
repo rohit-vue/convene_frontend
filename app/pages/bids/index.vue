@@ -9,7 +9,7 @@
       </div>
       <button
         class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
-        @click="showModal = true"
+        @click="openAdd"
       >
         + Add bid
       </button>
@@ -55,7 +55,7 @@
       </p>
       <button
         class="mt-5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
-        @click="showModal = true"
+        @click="openAdd"
       >
         + Add bid
       </button>
@@ -75,27 +75,32 @@
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full min-w-[1020px] table-fixed text-sm">
+          <table class="w-full min-w-[1080px] table-fixed text-sm">
           <thead class="bg-white text-left text-xs uppercase tracking-wide text-slate-500">
             <tr>
-              <th class="w-[12%] px-6 py-3 font-medium">Upwork account</th>
-              <th class="w-[22%] px-6 py-3 font-medium">Job link</th>
-              <th class="w-[9%] px-6 py-3 font-medium">Status</th>
-              <th class="w-[9%] px-6 py-3 font-medium">Project type</th>
-              <th class="w-[9%] px-6 py-3 font-medium">Amount</th>
-              <th class="w-[15%] px-6 py-3 font-medium">Notes</th>
-              <th class="w-[13%] px-6 py-3 font-medium">Added at</th>
-              <th class="w-[11%] px-6 py-3 font-medium text-right">Actions</th>
+              <th class="w-[11%] px-4 py-3 font-medium">Upwork account</th>
+              <th class="w-[21%] px-4 py-3 font-medium">Job link</th>
+              <th class="w-[9%] px-4 py-3 font-medium">Status</th>
+              <th class="w-[8%] px-4 py-3 font-medium">Project type</th>
+              <th class="w-[8%] px-4 py-3 font-medium">Amount</th>
+              <th class="w-[14%] px-4 py-3 font-medium">Notes</th>
+              <th class="w-[14%] px-4 py-3 font-medium">Added at</th>
+              <th class="w-[15%] min-w-[8.5rem] px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            <tr v-for="bid in group.bids" :key="bid.id" class="transition hover:bg-slate-50">
-              <td class="overflow-hidden px-6 py-4 font-medium text-slate-800">
+            <tr
+              v-for="bid in group.bids"
+              :key="bid.id"
+              class="cursor-pointer transition hover:bg-slate-50"
+              @click="openView(bid)"
+            >
+              <td class="overflow-hidden px-4 py-4 font-medium text-slate-800">
                 <span class="block truncate" :title="upworkAccountLabel(bid.upwork_account)">
                   {{ upworkAccountLabel(bid.upwork_account) }}
                 </span>
               </td>
-              <td class="overflow-hidden px-6 py-4">
+              <td class="overflow-hidden px-4 py-4" @click.stop>
                 <a
                   :href="bid.job_link"
                   target="_blank"
@@ -106,7 +111,7 @@
                   {{ bid.job_link }}
                 </a>
               </td>
-              <td class="px-6 py-4">
+              <td class="px-4 py-4">
                 <span
                   class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
                   :class="bidStatusBadgeClass(bid.status)"
@@ -114,24 +119,36 @@
                   {{ bidStatusLabel(bid.status) }}
                 </span>
               </td>
-              <td class="whitespace-nowrap px-6 py-4 text-slate-600">{{ bidJobTypeLabel(bid.job_type) }}</td>
-              <td class="whitespace-nowrap px-6 py-4 font-medium text-slate-800">
+              <td class="whitespace-nowrap px-4 py-4 text-slate-600">{{ bidJobTypeLabel(bid.job_type) }}</td>
+              <td class="whitespace-nowrap px-4 py-4 font-medium text-slate-800">
                 {{ formatBidAmount(bid) }}
               </td>
-              <td class="overflow-hidden px-6 py-4 text-slate-600">
+              <td class="overflow-hidden px-4 py-4 text-slate-600">
                 <span class="line-clamp-2 break-words" :title="bid.notes || undefined">{{ bid.notes || '—' }}</span>
               </td>
-              <td class="whitespace-nowrap px-6 py-4 text-slate-500">
-                {{ formatDateTime(bid.created_at) }}
+              <td class="overflow-hidden px-4 py-4 text-slate-500">
+                <span class="block truncate" :title="formatDateTime(bid.created_at)">
+                  {{ formatDateTime(bid.created_at) }}
+                </span>
               </td>
-              <td class="px-6 py-4 text-right">
-                <button
-                  type="button"
-                  class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-800"
-                  @click="openView(bid)"
-                >
-                  View
-                </button>
+              <td class="whitespace-nowrap px-4 py-4 text-right" @click.stop>
+                <div class="flex items-center justify-end gap-1.5">
+                  <button
+                    type="button"
+                    class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-800"
+                    @click="openEdit(bid)"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    class="rounded-lg border border-red-200 bg-white px-2.5 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+                    :disabled="deletingId === bid.id"
+                    @click="openDeleteModal(bid)"
+                  >
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -142,7 +159,8 @@
 
     <AdminAddBidModal
       :open="showModal"
-      @close="showModal = false"
+      :bid="editingBid"
+      @close="closeModal"
       @saved="onSaved"
     />
 
@@ -150,6 +168,16 @@
       :open="showViewModal"
       :bid="selectedBid"
       @close="closeView"
+      @edit="openEditFromView"
+    />
+
+    <AdminDeleteBidModal
+      :open="showDeleteModal"
+      :bid="bidToDelete"
+      :loading="Boolean(deletingId)"
+      :error="deleteError"
+      @close="closeDeleteModal"
+      @confirm="confirmDeleteBid"
     />
   </div>
 </template>
@@ -160,11 +188,16 @@ import { bidJobTypeLabel, bidStatusBadgeClass, bidStatusLabel, formatBidAmount, 
 
 definePageMeta({ middleware: 'admin' })
 
-const { list } = useBids()
+const { list, remove } = useBids()
 
 const showModal = ref(false)
 const showViewModal = ref(false)
+const showDeleteModal = ref(false)
 const selectedBid = ref<UpworkBid | null>(null)
+const editingBid = ref<UpworkBid | null>(null)
+const bidToDelete = ref<UpworkBid | null>(null)
+const deletingId = ref<string | null>(null)
+const deleteError = ref('')
 const filterDate = ref('')
 const filterUpworkAccount = ref('')
 
@@ -211,8 +244,30 @@ const emptyMessage = computed(() => {
 })
 
 async function onSaved() {
-  showModal.value = false
+  closeModal()
   await refresh()
+}
+
+function openAdd() {
+  editingBid.value = null
+  showModal.value = true
+}
+
+function openEdit(bid: UpworkBid) {
+  editingBid.value = bid
+  showModal.value = true
+}
+
+function openEditFromView() {
+  if (!selectedBid.value) return
+  const bid = selectedBid.value
+  closeView()
+  openEdit(bid)
+}
+
+function closeModal() {
+  showModal.value = false
+  editingBid.value = null
 }
 
 function openView(bid: UpworkBid) {
@@ -223,6 +278,38 @@ function openView(bid: UpworkBid) {
 function closeView() {
   showViewModal.value = false
   selectedBid.value = null
+}
+
+function openDeleteModal(bid: UpworkBid) {
+  bidToDelete.value = bid
+  deleteError.value = ''
+  showDeleteModal.value = true
+}
+
+function closeDeleteModal() {
+  if (deletingId.value) return
+  showDeleteModal.value = false
+  bidToDelete.value = null
+  deleteError.value = ''
+}
+
+async function confirmDeleteBid() {
+  const bid = bidToDelete.value
+  if (!bid || deletingId.value) return
+
+  deletingId.value = bid.id
+  deleteError.value = ''
+  try {
+    await remove(bid.id)
+    if (selectedBid.value?.id === bid.id) closeView()
+    showDeleteModal.value = false
+    bidToDelete.value = null
+    await refresh()
+  } catch (e: any) {
+    deleteError.value = e?.data?.error || e?.message || 'Failed to delete bid.'
+  } finally {
+    deletingId.value = null
+  }
 }
 
 function formatDateTime(value: string) {
