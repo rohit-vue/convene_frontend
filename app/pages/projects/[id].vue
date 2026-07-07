@@ -10,6 +10,15 @@
     </div>
 
     <div v-else-if="project" class="space-y-6">
+      <div
+        v-if="isShared"
+        class="rounded-2xl border border-violet-100 bg-violet-50 px-4 py-3 text-sm text-violet-800"
+      >
+        <span class="font-medium">Shared with you</span>
+        <span v-if="!canEditLogs"> · view only (you can see project details and logs, but cannot add or edit logs)</span>
+        <span v-else> · you can view project details and add your own daily logs</span>
+      </div>
+
       <form class="space-y-6" @submit.prevent="save">
         <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
           <div class="flex flex-wrap items-start justify-between gap-4">
@@ -22,6 +31,7 @@
                 {{ statusMeta[project.status]?.label }}
               </span>
               <button
+                v-if="canEditProject"
                 type="submit"
                 :disabled="loading"
                 class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60"
@@ -39,20 +49,20 @@
           <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Overview</h2>
           <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
-              <label :class="labelClass">Project name <span class="text-red-500">*</span></label>
-              <input v-model="form.name" required type="text" placeholder="e.g. Website Redesign" :class="inputClass" />
+              <label :class="labelClass">Project name <span v-if="canEditProject" class="text-red-500">*</span></label>
+              <input v-model="form.name" :required="canEditProject" :disabled="!canEditProject" type="text" placeholder="e.g. Website Redesign" :class="inputClass" />
             </div>
             <div>
               <label :class="labelClass">Client name</label>
-              <input v-model="form.client_name" type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
+              <input v-model="form.client_name" :disabled="!canEditProject" type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
             </div>
             <div>
               <label :class="labelClass">Start date</label>
-              <input v-model="form.start_date" type="date" :class="inputClass" />
+              <input v-model="form.start_date" :disabled="!canEditProject" type="date" :class="inputClass" />
             </div>
             <div class="sm:col-span-3">
               <label :class="labelClass">Job description</label>
-              <textarea v-model="form.job_description" rows="5" placeholder="Role / scope of work…" :class="inputClass" />
+              <textarea v-model="form.job_description" :disabled="!canEditProject" rows="5" placeholder="Role / scope of work…" :class="inputClass" />
             </div>
           </div>
         </div>
@@ -67,11 +77,12 @@
                 :options="upworkAccountOptions"
                 placeholder="Select…"
                 :input-class="inputClass"
+                :disabled="!canEditProject"
               />
             </div>
             <div>
               <label :class="labelClass">Upwork link</label>
-              <input v-model="form.link_url" type="url" placeholder="https://www.upwork.com/…" :class="inputClass" />
+              <input v-model="form.link_url" :disabled="!canEditProject" type="url" placeholder="https://www.upwork.com/…" :class="inputClass" />
             </div>
             <div>
               <label :class="labelClass">Job type</label>
@@ -80,6 +91,7 @@
                 :options="jobTypeOptions"
                 placeholder="Select…"
                 :input-class="inputClass"
+                :disabled="!canEditProject"
               />
             </div>
             <div>
@@ -89,11 +101,13 @@
                 :options="jobCategoryOptions"
                 placeholder="Select…"
                 :input-class="inputClass"
+                :disabled="!canEditProject"
               />
             </div>
             <div v-if="form.job_type === 'hourly'">
               <label :class="labelClass">Hourly rate</label>
-              <BudgetInput v-model="form.hourly_rate" :input-class="inputClass" placeholder="50" />
+              <BudgetInput v-if="canEditProject" v-model="form.hourly_rate" :input-class="inputClass" placeholder="50" />
+              <input v-else :value="form.hourly_rate" disabled type="text" :class="inputClass" />
             </div>
           </div>
         </div>
@@ -102,28 +116,39 @@
           v-if="form.job_type === 'contract'"
           :project-id="route.params.id as string"
           :project-status="project.status"
+          :read-only="!canEditProject"
           @updated="onPricingUpdated"
         />
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
             <label :class="labelClass">Requirements</label>
-            <textarea v-model="form.requirements" rows="5" placeholder="Client requirements, deliverables…" :class="inputClass" />
+            <textarea v-model="form.requirements" :disabled="!canEditProject" rows="5" placeholder="Client requirements, deliverables…" :class="inputClass" />
           </div>
 
           <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
             <label :class="labelClass">Notes</label>
-            <textarea v-model="form.notes" rows="5" placeholder="Internal notes, context, follow-ups…" :class="inputClass" />
+            <textarea v-model="form.notes" :disabled="!canEditProject" rows="5" placeholder="Internal notes, context, follow-ups…" :class="inputClass" />
           </div>
         </div>
+
+        <ProjectShareSection
+          v-if="isOwner"
+          :project-id="route.params.id as string"
+        />
 
         <ProjectStatusSection
           :project-id="route.params.id"
           :current-status="project.status"
+          :read-only="!canEditProject"
           @updated="onStatusUpdated"
         />
 
-        <ProjectDailyLogsSection :project-id="route.params.id" :job-type="form.job_type" />
+        <ProjectDailyLogsSection
+          :project-id="route.params.id"
+          :job-type="form.job_type"
+          :can-edit-logs="canEditLogs"
+        />
       </form>
     </div>
 
@@ -194,6 +219,11 @@ function fill(p) {
 
 watch(project, (p) => { if (p) fill(p) }, { immediate: true })
 
+const isOwner = computed(() => project.value?.access?.role === 'owner')
+const isShared = computed(() => Boolean(project.value?.access?.is_shared))
+const canEditProject = computed(() => project.value?.access?.can_edit_project ?? true)
+const canEditLogs = computed(() => project.value?.access?.can_edit_logs ?? true)
+
 async function onStatusUpdated() {
   await refresh()
 }
@@ -203,6 +233,7 @@ async function onPricingUpdated() {
 }
 
 async function save() {
+  if (!canEditProject.value) return
   if (!form.name.trim()) {
     saveError.value = 'Project name is required.'
     saveOk.value = false

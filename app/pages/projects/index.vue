@@ -157,14 +157,22 @@
           class="flex cursor-pointer flex-col rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:border-indigo-100 hover:shadow-md"
           @click="openProject(p)"
         >
-          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
               <h3 class="truncate font-semibold text-slate-800">{{ p.name }}</h3>
               <p v-if="p.client_name" class="mt-0.5 truncate text-sm text-slate-500">{{ p.client_name }}</p>
             </div>
-            <span class="shrink-0 rounded-full px-3 py-1 text-xs font-medium" :class="statusMeta[p.status].badge">
-              {{ statusMeta[p.status].label }}
-            </span>
+            <div class="flex shrink-0 flex-col items-end gap-1.5">
+              <span class="rounded-full px-3 py-1 text-xs font-medium" :class="statusMeta[p.status].badge">
+                {{ statusMeta[p.status].label }}
+              </span>
+              <span
+                v-if="p.is_shared"
+                class="rounded-full bg-violet-50 px-2.5 py-0.5 text-xs font-medium text-violet-700"
+              >
+                {{ p.can_edit_logs ? 'Shared' : 'Shared · view only' }}
+              </span>
+            </div>
           </div>
 
           <p class="mt-3 line-clamp-3 flex-1 text-sm text-slate-600">

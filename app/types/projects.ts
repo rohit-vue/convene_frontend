@@ -6,6 +6,28 @@ export interface DailyLogInput {
 
 export type AssignmentStatus = 'pending' | 'accepted' | 'declined'
 
+export type ProjectAccessRole = 'owner' | 'shared_editor' | 'shared_viewer' | 'admin'
+
+export interface ProjectAccess {
+  role: ProjectAccessRole
+  can_edit_project: boolean
+  can_edit_logs: boolean
+  is_shared: boolean
+  share_id?: string | null
+}
+
+export interface ProjectShare {
+  id: string
+  project_id: string
+  shared_with: string
+  shared_by: string
+  can_edit_logs: boolean
+  created_at: string
+  revoked_at?: string | null
+  shared_with_name?: string | null
+  shared_by_name?: string | null
+}
+
 export interface Project {
   id: string
   name: string
@@ -31,6 +53,10 @@ export interface Project {
   created_by?: string
   created_at?: string
   updated_at?: string
+  is_shared?: boolean
+  can_edit_logs?: boolean
+  share_id?: string | null
+  access?: ProjectAccess
 }
 
 export interface ProjectStatusHistoryEntry {
