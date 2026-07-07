@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto max-w-5xl">
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold tracking-tight">Profile</h1>
+    <div class="mb-6 sm:mb-8">
+      <h1 class="text-xl font-bold tracking-tight sm:text-2xl">Profile</h1>
       <p class="mt-1 text-sm text-slate-500">Manage your personal details and how you appear in Convene.</p>
     </div>
 

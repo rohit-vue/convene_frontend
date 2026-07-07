@@ -6,7 +6,7 @@
       :disabled="disabled"
       :class="[
         inputClass,
-        fullWidth ? 'w-full' : 'min-w-[10.5rem]',
+        fullWidth ? 'w-full' : 'w-full min-w-0 sm:w-auto sm:min-w-[10.5rem]',
         'flex items-center justify-between gap-2 text-left',
         disabled ? 'cursor-not-allowed opacity-60' : '',
         open ? 'border-indigo-500 ring-2 ring-indigo-500/20' : '',

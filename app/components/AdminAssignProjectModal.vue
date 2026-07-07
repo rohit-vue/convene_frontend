@@ -38,7 +38,12 @@
 
         <div>
           <label class="mb-1 block text-sm font-medium text-slate-700">Start date</label>
-          <input v-model="form.start_date" type="date" :class="inputClass" />
+          <DatePicker
+            v-model="form.start_date"
+            placeholder="Select date"
+            :input-class="inputClass"
+            full-width
+          />
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -54,11 +54,21 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Date <span class="text-red-500">*</span></label>
-            <input v-model="form.date" required type="date" :class="inputClass" />
+            <DatePicker
+              v-model="form.date"
+              placeholder="Select date"
+              :input-class="inputClass"
+              full-width
+            />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-slate-700">Time <span class="text-red-500">*</span></label>
-            <input v-model="form.time" required type="time" :class="inputClass" />
+            <TimePicker
+              v-model="form.time"
+              placeholder="Select time"
+              :input-class="inputClass"
+              full-width
+            />
           </div>
         </div>
 

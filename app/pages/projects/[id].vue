@@ -20,32 +20,32 @@
       </div>
 
       <form class="space-y-6" @submit.prevent="save">
-        <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          <div class="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h1 class="text-2xl font-bold tracking-tight">{{ form.name || 'Untitled project' }}</h1>
+        <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <h1 class="text-xl font-bold tracking-tight sm:text-2xl">{{ form.name || 'Untitled project' }}</h1>
               <p class="mt-1 text-sm text-slate-500">{{ form.client_name || 'No client set' }}</p>
             </div>
-            <div class="flex items-center gap-3">
-              <span class="rounded-full px-3 py-1 text-xs font-medium" :class="statusMeta[project.status]?.badge">
-                {{ statusMeta[project.status]?.label }}
-              </span>
-              <button
-                v-if="canEditProject"
-                type="submit"
-                :disabled="loading"
-                class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60"
-              >
-                {{ loading ? 'Saving…' : 'Save changes' }}
-              </button>
-            </div>
+            <span class="shrink-0 rounded-full px-3 py-1 text-xs font-medium" :class="statusMeta[project.status]?.badge">
+              {{ statusMeta[project.status]?.label }}
+            </span>
+          </div>
+
+          <div v-if="canEditProject" class="mt-4 flex justify-end">
+            <button
+              type="submit"
+              :disabled="loading"
+              class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60"
+            >
+              {{ loading ? 'Saving…' : 'Save changes' }}
+            </button>
           </div>
 
           <p v-if="saveError" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ saveError }}</p>
           <p v-else-if="saveOk" class="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Changes saved.</p>
         </div>
 
-        <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
           <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Overview</h2>
           <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
@@ -58,7 +58,13 @@
             </div>
             <div>
               <label :class="labelClass">Start date</label>
-              <input v-model="form.start_date" :disabled="!canEditProject" type="date" :class="inputClass" />
+              <DatePicker
+                v-model="form.start_date"
+                :disabled="!canEditProject"
+                placeholder="Select date"
+                :input-class="inputClass"
+                full-width
+              />
             </div>
             <div class="sm:col-span-3">
               <label :class="labelClass">Job description</label>
@@ -67,7 +73,7 @@
           </div>
         </div>
 
-        <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
           <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Upwork</h2>
           <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
@@ -121,12 +127,12 @@
         />
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+          <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
             <label :class="labelClass">Requirements</label>
             <textarea v-model="form.requirements" :disabled="!canEditProject" rows="5" placeholder="Client requirements, deliverables…" :class="inputClass" />
           </div>
 
-          <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+          <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
             <label :class="labelClass">Notes</label>
             <textarea v-model="form.notes" :disabled="!canEditProject" rows="5" placeholder="Internal notes, context, follow-ups…" :class="inputClass" />
           </div>

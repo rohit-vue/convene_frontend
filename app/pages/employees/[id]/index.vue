@@ -10,13 +10,13 @@
     </div>
 
     <div v-else-if="employee" class="space-y-6">
-      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-wrap items-center gap-5">
           <div class="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-lg font-semibold text-white">
             {{ initials(employee.name) }}
           </div>
           <div class="min-w-0 flex-1">
-            <h1 class="text-2xl font-bold tracking-tight text-slate-800">{{ employee.name }}</h1>
+            <h1 class="text-xl font-bold tracking-tight sm:text-2xl">{{ employee.name }}</h1>
             <p class="mt-1 text-sm text-slate-500">{{ employee.email || 'No email' }}</p>
           </div>
           <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium capitalize text-emerald-700">
@@ -28,24 +28,24 @@
 
       <div class="flex flex-col gap-6">
         <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-          <div class="border-b border-slate-100 px-6 py-4">
+          <div class="border-b border-slate-100 px-4 py-4 sm:px-6">
             <h2 class="text-lg font-semibold text-slate-800">Meetings</h2>
             <p class="mt-0.5 text-sm text-slate-500">{{ employee.meetings.length }} total</p>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+            <table class="w-full min-w-[900px] text-sm">
               <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th class="px-6 py-3 font-medium">Project</th>
-                  <th class="px-6 py-3 font-medium">Client</th>
-                  <th class="px-6 py-3 font-medium">Upwork type</th>
-                  <th class="px-6 py-3 font-medium">Upwork account</th>
-                  <th class="px-6 py-3 font-medium">Date &amp; time</th>
-                  <th class="px-6 py-3 font-medium">Duration</th>
-                  <th class="px-6 py-3 font-medium">Budget</th>
-                  <th class="px-6 py-3 font-medium">Timeline</th>
-                  <th class="px-6 py-3 font-medium">Status</th>
-                  <th class="px-6 py-3 font-medium">Outcome</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Project</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Client</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Upwork type</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Upwork account</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Date &amp; time</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Duration</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Budget</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Timeline</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Status</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Outcome</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
@@ -55,17 +55,17 @@
                   class="cursor-pointer transition hover:bg-slate-50"
                   @click="navigateTo(`/employees/${route.params.id}/meetings/${m.id}`)"
                 >
-                  <td class="px-6 py-3 font-medium text-slate-800">{{ m.project_name }}</td>
-                  <td class="px-6 py-3 text-slate-600">{{ m.client_name || '—' }}</td>
-                  <td class="px-6 py-3 text-slate-600">{{ projectTypeLabel(m.project_type) }}</td>
-                  <td class="max-w-[10rem] truncate px-6 py-3 text-slate-600" :title="m.upwork_account || undefined">
+                  <td class="px-4 py-3 font-medium text-slate-800 sm:px-6">{{ m.project_name }}</td>
+                  <td class="px-4 py-3 text-slate-600 sm:px-6">{{ m.client_name || '—' }}</td>
+                  <td class="px-4 py-3 text-slate-600 sm:px-6">{{ projectTypeLabel(m.project_type) }}</td>
+                  <td class="max-w-[10rem] truncate px-4 py-3 text-slate-600 sm:px-6" :title="m.upwork_account || undefined">
                     {{ upworkAccountLabel(m.upwork_account) }}
                   </td>
-                  <td class="whitespace-nowrap px-6 py-3 text-slate-600">{{ formatDateTime(m.meeting_at) }}</td>
-                  <td class="px-6 py-3 text-slate-600">{{ m.duration_minutes ? `${m.duration_minutes} min` : '—' }}</td>
-                  <td class="px-6 py-3 text-slate-600">{{ formatBudgetLabel(m.budget_discussed) }}</td>
-                  <td class="px-6 py-3 text-slate-600">{{ m.deadline || '—' }}</td>
-                  <td class="px-6 py-3">
+                  <td class="whitespace-nowrap px-4 py-3 text-slate-600 sm:px-6">{{ formatDateTime(m.meeting_at) }}</td>
+                  <td class="px-4 py-3 text-slate-600 sm:px-6">{{ m.duration_minutes ? `${m.duration_minutes} min` : '—' }}</td>
+                  <td class="px-4 py-3 text-slate-600 sm:px-6">{{ formatBudgetLabel(m.budget_discussed) }}</td>
+                  <td class="px-4 py-3 text-slate-600 sm:px-6">{{ m.deadline || '—' }}</td>
+                  <td class="px-4 py-3 sm:px-6">
                     <span
                       class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
                       :class="statusBadgeClass(m.assignment_status)"
@@ -73,10 +73,10 @@
                       {{ assignmentStatusLabel(m.assignment_status) }}
                     </span>
                   </td>
-                  <td class="px-6 py-3 text-slate-600">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
+                  <td class="px-4 py-3 text-slate-600 sm:px-6">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
                 </tr>
                 <tr v-if="employee.meetings.length === 0">
-                  <td colspan="10" class="px-6 py-10 text-center text-slate-400">No meetings assigned yet.</td>
+                  <td colspan="10" class="px-4 py-10 text-center text-slate-400 sm:px-6">No meetings assigned yet.</td>
                 </tr>
               </tbody>
             </table>
@@ -84,22 +84,22 @@
         </div>
 
         <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-          <div class="border-b border-slate-100 px-6 py-4">
+          <div class="border-b border-slate-100 px-4 py-4 sm:px-6">
             <h2 class="text-lg font-semibold text-slate-800">Projects</h2>
             <p class="mt-0.5 text-sm text-slate-500">{{ employee.projects.length }} total</p>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+            <table class="w-full min-w-[720px] text-sm">
               <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th class="px-6 py-3 font-medium">Project</th>
-                  <th class="px-6 py-3 font-medium">Client</th>
-                  <th class="px-6 py-3 font-medium">Status</th>
-                  <th class="px-6 py-3 font-medium">Job type</th>
-                  <th class="px-6 py-3 font-medium">Category</th>
-                  <th class="px-6 py-3 font-medium">Upwork account</th>
-                  <th class="px-6 py-3 font-medium">Start</th>
-                  <th class="px-6 py-3 font-medium">Created</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Project</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Client</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Status</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Job type</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Category</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Upwork account</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Start</th>
+                  <th class="px-4 py-3 font-medium sm:px-6">Created</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
@@ -109,9 +109,9 @@
                   class="cursor-pointer transition hover:bg-slate-50"
                   @click="navigateTo(`/employees/${route.params.id}/projects/${p.id}`)"
                 >
-                  <td class="px-6 py-3 font-medium text-slate-800">{{ p.name }}</td>
-                  <td class="px-6 py-3 text-slate-600">{{ p.client_name || '—' }}</td>
-                  <td class="px-6 py-3">
+                  <td class="px-4 py-3 font-medium text-slate-800 sm:px-6">{{ p.name }}</td>
+                  <td class="px-4 py-3 text-slate-600 sm:px-6">{{ p.client_name || '—' }}</td>
+                  <td class="px-4 py-3 sm:px-6">
                     <span
                       class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
                       :class="statusMeta[p.status]?.badge || 'bg-slate-100 text-slate-600'"
@@ -119,16 +119,16 @@
                       {{ projectStatusLabel(p.status) }}
                     </span>
                   </td>
-                  <td class="px-6 py-3 text-slate-600">{{ jobTypeLabel(p.job_type) }}</td>
-                  <td class="px-6 py-3 text-slate-600">{{ jobCategoryLabel(p.job_category) }}</td>
-                  <td class="max-w-[10rem] truncate px-6 py-3 text-slate-600" :title="p.upwork_account || undefined">
+                  <td class="px-4 py-3 text-slate-600 sm:px-6">{{ jobTypeLabel(p.job_type) }}</td>
+                  <td class="px-4 py-3 text-slate-600 sm:px-6">{{ jobCategoryLabel(p.job_category) }}</td>
+                  <td class="max-w-[10rem] truncate px-4 py-3 text-slate-600 sm:px-6" :title="p.upwork_account || undefined">
                     {{ upworkAccountLabel(p.upwork_account) }}
                   </td>
-                  <td class="whitespace-nowrap px-6 py-3 text-slate-600">{{ formatDate(p.start_date) }}</td>
-                  <td class="whitespace-nowrap px-6 py-3 text-slate-600">{{ formatDate(p.created_at) }}</td>
+                  <td class="whitespace-nowrap px-4 py-3 text-slate-600 sm:px-6">{{ formatDate(p.start_date) }}</td>
+                  <td class="whitespace-nowrap px-4 py-3 text-slate-600 sm:px-6">{{ formatDate(p.created_at) }}</td>
                 </tr>
                 <tr v-if="employee.projects.length === 0">
-                  <td colspan="8" class="px-6 py-10 text-center text-slate-400">No projects assigned yet.</td>
+                  <td colspan="8" class="px-4 py-10 text-center text-slate-400 sm:px-6">No projects assigned yet.</td>
                 </tr>
               </tbody>
             </table>

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold tracking-tight">Employees</h1>
+    <div class="mb-6 sm:mb-8">
+      <h1 class="text-xl font-bold tracking-tight sm:text-2xl">Employees</h1>
       <p class="mt-1 text-sm text-slate-500">All users with an employee account in Convene.</p>
     </div>
 

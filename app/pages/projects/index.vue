@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="mb-8 flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold tracking-tight">Projects</h1>
+    <div class="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
+      <div class="min-w-0">
+        <h1 class="text-xl font-bold tracking-tight sm:text-2xl">Projects</h1>
         <p class="mt-1 text-sm text-slate-500">
           {{ isAdmin ? 'View projects across the team.' : 'Create projects, set their status, and keep the details in one place.' }}
         </p>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
         <button
           v-if="isAdmin"
           class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
@@ -36,13 +36,13 @@
     <!-- Admin table view -->
     <template v-if="isAdmin">
       <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-        <div class="border-b border-slate-100 bg-slate-50 px-6 py-4">
-          <div class="flex flex-wrap items-end gap-4">
-            <div>
+        <div class="border-b border-slate-100 bg-slate-50 px-4 py-4 sm:px-6">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
+            <div class="w-full sm:w-auto">
               <label :class="filterLabelClass">Date</label>
               <DateFilterPicker v-model="filterDate" :marked-dates="markedDates" :input-class="filterInputClass" />
             </div>
-            <div>
+            <div class="w-full sm:w-auto">
               <label :class="filterLabelClass">Sort by date</label>
               <AppSelect
                 v-model="dateSortOrder"
@@ -51,7 +51,7 @@
                 :full-width="false"
               />
             </div>
-            <div>
+            <div class="w-full sm:w-auto">
               <label :class="filterLabelClass">Employee</label>
               <AppSelect
                 v-model="filterEmployeeId"
@@ -61,7 +61,7 @@
                 :full-width="false"
               />
             </div>
-            <div>
+            <div class="w-full sm:w-auto">
               <label :class="filterLabelClass">Status</label>
               <AppSelect
                 v-model="filterStatus"
@@ -71,7 +71,7 @@
                 :full-width="false"
               />
             </div>
-            <div>
+            <div class="w-full sm:w-auto">
               <label :class="filterLabelClass">Project type</label>
               <AppSelect
                 v-model="filterProjectType"
@@ -84,16 +84,17 @@
           </div>
         </div>
 
-        <table class="w-full text-sm">
+        <div class="overflow-x-auto">
+        <table class="w-full min-w-[720px] text-sm">
           <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
             <tr>
-              <th class="px-6 py-4 font-medium">Project</th>
-              <th class="px-6 py-4 font-medium">Client</th>
-              <th class="px-6 py-4 font-medium">Employee</th>
-              <th class="px-6 py-4 font-medium">Assignment</th>
-              <th class="px-6 py-4 font-medium">Status</th>
-              <th class="px-6 py-4 font-medium">Start date</th>
-              <th class="px-6 py-4 font-medium">Project type</th>
+              <th class="px-4 py-4 font-medium sm:px-6">Project</th>
+              <th class="px-4 py-4 font-medium sm:px-6">Client</th>
+              <th class="px-4 py-4 font-medium sm:px-6">Employee</th>
+              <th class="px-4 py-4 font-medium sm:px-6">Assignment</th>
+              <th class="px-4 py-4 font-medium sm:px-6">Status</th>
+              <th class="px-4 py-4 font-medium sm:px-6">Start date</th>
+              <th class="px-4 py-4 font-medium sm:px-6">Project type</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
@@ -103,10 +104,10 @@
               class="cursor-pointer transition hover:bg-slate-50"
               @click="openProject(p)"
             >
-              <td class="px-6 py-4 font-medium text-slate-800">{{ p.name }}</td>
-              <td class="px-6 py-4 text-slate-600">{{ p.client_name || '—' }}</td>
-              <td class="px-6 py-4 text-slate-600">{{ p.assignee_name || '—' }}</td>
-              <td class="px-6 py-4">
+              <td class="px-4 py-4 font-medium text-slate-800 sm:px-6">{{ p.name }}</td>
+              <td class="px-4 py-4 text-slate-600 sm:px-6">{{ p.client_name || '—' }}</td>
+              <td class="px-4 py-4 text-slate-600 sm:px-6">{{ p.assignee_name || '—' }}</td>
+              <td class="px-4 py-4 sm:px-6">
                 <span
                   class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
                   :class="assignmentBadgeClass(p.assignment_status)"
@@ -114,7 +115,7 @@
                   {{ assignmentStatusLabel(p.assignment_status) }}
                 </span>
               </td>
-              <td class="px-6 py-4">
+              <td class="px-4 py-4 sm:px-6">
                 <span
                   class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
                   :class="statusMeta[p.status]?.badge || 'bg-slate-100 text-slate-600'"
@@ -122,26 +123,27 @@
                   {{ projectStatusLabel(p.status) }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-slate-600">{{ formatDate(p.start_date) }}</td>
-              <td class="px-6 py-4 text-slate-600">{{ jobTypeLabel(p.job_type) }}</td>
+              <td class="px-4 py-4 text-slate-600 sm:px-6">{{ formatDate(p.start_date) }}</td>
+              <td class="px-4 py-4 text-slate-600 sm:px-6">{{ jobTypeLabel(p.job_type) }}</td>
             </tr>
             <tr v-if="projects && adminFilteredProjects.length === 0">
-              <td colspan="7" class="px-6 py-12 text-center text-sm text-slate-400">
+              <td colspan="7" class="px-4 py-12 text-center text-sm text-slate-400 sm:px-6">
                 {{ adminEmptyMessage }}
               </td>
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
     </template>
 
     <!-- Employee card view -->
     <template v-else>
-      <div v-if="projects && projects.length" class="mb-6 flex flex-wrap gap-2">
+      <div v-if="projects && projects.length" class="mb-6 flex flex-nowrap items-center gap-2 overflow-x-auto pb-1">
         <button
           v-for="f in filters"
           :key="f.value"
-          class="rounded-full px-3 py-1.5 text-xs font-medium transition"
+          class="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition"
           :class="activeFilter === f.value ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'"
           @click="activeFilter = f.value"
         >

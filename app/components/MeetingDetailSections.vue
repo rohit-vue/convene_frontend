@@ -168,12 +168,12 @@
             <div v-else-if="selectedUpdate" class="mt-6 grid grid-cols-1 gap-4">
               <div>
                 <label :class="labelClass">Date &amp; time <span class="text-red-500">*</span></label>
-                <input
-                  :value="logisticsForm.meeting_at"
-                  required
-                  type="datetime-local"
-                  :class="inputClass"
-                  @input="updateLogisticsField('meeting_at', ($event.target as HTMLInputElement).value)"
+                <DateTimePicker
+                  :model-value="logisticsForm.meeting_at"
+                  placeholder="Select date & time"
+                  :input-class="inputClass"
+                  full-width
+                  @update:model-value="updateLogisticsField('meeting_at', $event)"
                 />
               </div>
               <div>
