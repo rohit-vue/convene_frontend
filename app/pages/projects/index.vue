@@ -350,7 +350,7 @@ function countFor(value) {
 
 function openProject(p) {
   if (isAdmin.value && p.assigned_to) {
-    navigateTo(`/employees/${p.assigned_to}/projects/${p.id}`)
+    navigateTo(`/employees/${p.assigned_to}/projects/${p.id}?from=projects`)
   } else if (!isAdmin.value) {
     navigateTo(`/projects/${p.id}`)
   }

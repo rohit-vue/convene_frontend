@@ -1,11 +1,11 @@
 <template>
   <div>
     <NuxtLink
-      :to="`/employees/${route.params.id}`"
+      :to="backTarget.to"
       class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-800"
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-      Back to employee
+      {{ backTarget.label }}
     </NuxtLink>
 
     <div v-if="error" class="rounded-2xl border border-red-100 bg-red-50 p-6 text-sm text-red-600">
@@ -169,6 +169,19 @@ definePageMeta({ middleware: 'admin' })
 
 const route = useRoute()
 const { getAdminProject, getAdminStatusHistory, getAdminMilestones } = useProjects()
+
+const backTarget = computed(() => {
+  if (route.query.from === 'meetings') {
+    return { to: '/meetings', label: 'Back to meetings' }
+  }
+  if (route.query.from === 'projects') {
+    return { to: '/projects', label: 'Back to projects' }
+  }
+  return {
+    to: `/employees/${route.params.id}`,
+    label: 'Back to employee',
+  }
+})
 
 const { data: project, error } = await useAsyncData(
   `admin-project-${route.params.id}-${route.params.projectId}`,
