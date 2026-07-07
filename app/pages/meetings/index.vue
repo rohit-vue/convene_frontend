@@ -264,7 +264,7 @@ async function downloadAllMeetings() {
 
 function openMeeting(m) {
   if (isAdmin.value && m.employee_id) {
-    navigateTo(`/employees/${m.employee_id}/meetings/${m.id}`)
+    navigateTo(`/employees/${m.employee_id}/meetings/${m.id}?from=meetings`)
   } else {
     navigateTo(`/meetings/${m.id}`)
   }

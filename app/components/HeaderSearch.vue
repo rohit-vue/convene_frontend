@@ -203,7 +203,7 @@ function selectHighlighted() {
 function meetingPath(m) {
   const employeeId = m.employee_id || m.created_by
   if (isAdmin.value && employeeId) {
-    return `/employees/${employeeId}/meetings/${m.id}`
+    return `/employees/${employeeId}/meetings/${m.id}?from=meetings`
   }
   return `/meetings/${m.id}`
 }
@@ -211,7 +211,7 @@ function meetingPath(m) {
 function projectPath(p) {
   const employeeId = p.assigned_to || p.created_by
   if (isAdmin.value && employeeId) {
-    return `/employees/${employeeId}/projects/${p.id}`
+    return `/employees/${employeeId}/projects/${p.id}?from=projects`
   }
   return `/projects/${p.id}`
 }
