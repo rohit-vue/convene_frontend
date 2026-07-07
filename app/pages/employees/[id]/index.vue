@@ -44,6 +44,7 @@
                   <th class="px-6 py-3 font-medium">Duration</th>
                   <th class="px-6 py-3 font-medium">Budget</th>
                   <th class="px-6 py-3 font-medium">Timeline</th>
+                  <th class="px-6 py-3 font-medium">Status</th>
                   <th class="px-6 py-3 font-medium">Outcome</th>
                 </tr>
               </thead>
@@ -64,10 +65,18 @@
                   <td class="px-6 py-3 text-slate-600">{{ m.duration_minutes ? `${m.duration_minutes} min` : '—' }}</td>
                   <td class="px-6 py-3 text-slate-600">{{ m.budget_discussed || '—' }}</td>
                   <td class="px-6 py-3 text-slate-600">{{ m.deadline || '—' }}</td>
+                  <td class="px-6 py-3">
+                    <span
+                      class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+                      :class="statusBadgeClass(m.assignment_status)"
+                    >
+                      {{ assignmentStatusLabel(m.assignment_status) }}
+                    </span>
+                  </td>
                   <td class="px-6 py-3 text-slate-600">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
                 </tr>
                 <tr v-if="employee.meetings.length === 0">
-                  <td colspan="9" class="px-6 py-10 text-center text-slate-400">No meetings assigned yet.</td>
+                  <td colspan="10" class="px-6 py-10 text-center text-slate-400">No meetings assigned yet.</td>
                 </tr>
               </tbody>
             </table>
@@ -178,5 +187,12 @@ function formatDate(value) {
     month: 'short',
     day: 'numeric',
   })
+}
+
+function statusBadgeClass(status) {
+  if (status === 'accepted') return 'bg-emerald-50 text-emerald-700'
+  if (status === 'pending') return 'bg-amber-50 text-amber-700'
+  if (status === 'declined') return 'bg-red-50 text-red-700'
+  return 'bg-slate-100 text-slate-600'
 }
 </script>

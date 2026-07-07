@@ -39,129 +39,12 @@
         <p v-else-if="saveOk" class="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Changes saved.</p>
       </div>
 
-      <section class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <h2 class="text-lg font-semibold text-slate-900">Project & account details</h2>
-            <p class="mt-1 text-sm text-slate-500">Core meeting context and project information.</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label :class="labelClass">Project name <span class="text-red-500">*</span></label>
-            <input v-model="form.project_name" required type="text" placeholder="e.g. Website Redesign" :class="inputClass" />
-          </div>
-          <div>
-            <label :class="labelClass">Client name <span class="text-red-500">*</span></label>
-            <input v-model="form.client_name" required type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
-          </div>
-          <div>
-            <label :class="labelClass">Upwork account</label>
-            <select v-model="form.upwork_account" :class="inputClass">
-              <option value="">Select…</option>
-              <option v-for="opt in upworkAccountOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
-          </div>
-          <div>
-            <label :class="labelClass">Upwork project type</label>
-            <select v-model="form.project_type" :class="inputClass">
-              <option value="">Select…</option>
-              <option v-for="opt in projectTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
-          </div>
-
-          <div class="sm:col-span-2">
-            <label :class="labelClass">Job description</label>
-            <textarea v-model="form.job_description" rows="3" placeholder="Role / scope of work…" :class="inputClass" />
-          </div>
-          <div class="sm:col-span-2">
-            <label :class="labelClass">Upwork link</label>
-            <input v-model="form.link_url" type="url" placeholder="https://…" :class="inputClass" />
-          </div>
-        </div>
-      </section>
-
-      <section class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-        <div class="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 class="text-lg font-semibold text-slate-900">Update timeline</h2>
-            <p class="mt-1 text-sm text-slate-500">Review every saved meeting update for this project and open any version to inspect its logistics.</p>
-          </div>
-        </div>
-
-        <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <div class="space-y-2">
-            <button
-              v-for="item in meetingUpdates"
-              :key="item.id"
-              type="button"
-              class="w-full rounded-xl border px-4 py-3 text-left transition"
-              :class="item.id === selectedUpdateId ? 'border-indigo-200 bg-indigo-50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'"
-              @click="selectedUpdateId = item.id"
-            >
-              <div class="flex items-center justify-between gap-3">
-                <span class="text-sm font-semibold text-slate-800">{{ formatTimelineLabel(item.meeting_at) }}</span>
-                <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">{{ meetingOutcomeLabel(item.meeting_outcome) }}</span>
-              </div>
-              <p class="mt-1 text-sm text-slate-500">{{ form.project_name || 'Untitled meeting' }}</p>
-            </button>
-
-            <div v-if="meetingUpdates.length === 0" class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-sm text-slate-500">
-              No updates yet for this project.
-            </div>
-          </div>
-
-          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-            <div class="flex items-center justify-between gap-3">
-              <div>
-                <p class="text-sm font-semibold text-slate-800">{{ form.project_name || 'Untitled meeting' }}</p>
-                <p class="mt-1 text-sm text-slate-500">{{ form.client_name || '—' }}</p>
-              </div>
-              <span v-if="selectedUpdate" class="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
-                {{ formatTimelineLabel(selectedUpdate.meeting_at) }}
-              </span>
-            </div>
-
-            <section class="mt-5 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-              <div class="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <h3 class="text-sm font-semibold text-slate-800">Meeting logistics</h3>
-                </div>
-              </div>
-
-              <div v-if="selectedUpdate" class="mt-6 grid grid-cols-1 gap-4">
-                <div>
-                  <label :class="labelClass">Date &amp; time <span class="text-red-500">*</span></label>
-                  <input :value="logisticsForm.meeting_at" required type="datetime-local" :class="inputClass" @input="updateLogisticsField('meeting_at', $event.target.value)" />
-                </div>
-                <div>
-                  <label :class="labelClass">Duration (min)</label>
-                  <input :value="logisticsForm.duration_minutes" type="number" min="0" placeholder="30" :class="inputClass" @input="updateLogisticsField('duration_minutes', $event.target.value)" />
-                </div>
-                <div>
-                  <label :class="labelClass">Budget discussed</label>
-                  <input :value="logisticsForm.budget_discussed" type="text" placeholder="e.g. $10,000" :class="inputClass" @input="updateLogisticsField('budget_discussed', $event.target.value)" />
-                </div>
-                <div>
-                  <label :class="labelClass">Deadline / expected timeline</label>
-                  <input :value="logisticsForm.deadline" type="text" placeholder="e.g. 6 weeks" :class="inputClass" @input="updateLogisticsField('deadline', $event.target.value)" />
-                </div>
-                <div>
-                  <label :class="labelClass">Notes / meeting summary</label>
-                  <textarea :value="logisticsForm.notes" rows="4" placeholder="What was discussed…" :class="inputClass" @input="updateLogisticsField('notes', $event.target.value)" />
-                </div>
-                <div>
-                  <label :class="labelClass">Requirements discussed</label>
-                  <textarea :value="logisticsForm.requirements_discussed" rows="4" placeholder="Client requirements…" :class="inputClass" @input="updateLogisticsField('requirements_discussed', $event.target.value)" />
-                </div>
-              </div>
-
-              <p v-else class="mt-6 text-sm text-slate-500">Choose a timeline entry to review its logistics.</p>
-            </section>
-          </div>
-        </div>
-      </section>
+      <MeetingDetailSections
+        v-model:selected-update-id="selectedUpdateId"
+        :form="form"
+        :logistics-form="logisticsForm"
+        :meeting-updates="meetingUpdates || []"
+      />
     </form>
 
     <div v-else class="text-sm text-slate-400">Loading…</div>
@@ -331,10 +214,6 @@ function syncLogisticsForm(source) {
   Object.assign(logisticsForm, next)
 }
 
-function updateLogisticsField(key, value) {
-  logisticsForm[key] = value
-}
-
 function resetCreateForm() {
   const latest = meetingUpdates.value?.[0]
   Object.assign(createForm, {
@@ -354,15 +233,6 @@ function openCreateModal() {
   showCreateModal.value = true
 }
 
-function formatTimelineLabel(value) {
-  if (!value) return '—'
-  return new Date(value).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
-
 const selectedUpdate = computed(() => {
   if (!meetingUpdates.value?.length) return null
   if (!selectedUpdateId.value) return meetingUpdates.value[0]
@@ -373,12 +243,6 @@ watch(meeting, (m) => { if (m) fillProject(m) }, { immediate: true })
 
 watch(selectedUpdate, (item) => {
   syncLogisticsForm(item)
-}, { immediate: true })
-
-watch(meetingUpdates, (items) => {
-  if (items?.length && !items.some((item) => item.id === selectedUpdateId.value)) {
-    selectedUpdateId.value = items[0].id
-  }
 }, { immediate: true })
 
 function buildUpdateBody(includeOutcome = true) {

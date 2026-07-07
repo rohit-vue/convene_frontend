@@ -45,3 +45,15 @@ export function upworkAccountLabel(value?: string | null): string {
 export function meetingOutcomeLabel(value?: string | null): string {
   return (value && outcomeLabelMap[value]) || '—'
 }
+
+export const assignmentStatusOptions: SelectOption[] = [
+  { value: 'pending', label: 'Pending' },
+  { value: 'accepted', label: 'Accepted' },
+  { value: 'declined', label: 'Declined' },
+]
+
+const assignmentStatusLabelMap = toLabelMap(assignmentStatusOptions)
+
+export function assignmentStatusLabel(value?: string | null): string {
+  return (value && assignmentStatusLabelMap[value]) || '—'
+}

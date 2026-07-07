@@ -1,12 +1,17 @@
-import type { Meeting, MeetingInput, MeetingUpdate } from '~/types/meetings'
+import type { AssignMeetingInput, Meeting, MeetingInput, MeetingUpdate } from '~/types/meetings'
 
 export const useMeetings = () => {
   const { apiFetch } = useApi()
 
   const list = () => apiFetch<Meeting[]>('/api/meetings')
+  const listPending = () => apiFetch<Meeting[]>('/api/meetings/pending')
   const getById = (id: string) => apiFetch<Meeting>(`/api/meetings/${id}`)
   const create = (body: MeetingInput) =>
     apiFetch<Meeting>('/api/meetings', { method: 'POST', body })
+  const assign = (body: AssignMeetingInput) =>
+    apiFetch<Meeting>('/api/meetings/assign', { method: 'POST', body })
+  const accept = (id: string) =>
+    apiFetch<Meeting>(`/api/meetings/${id}/accept`, { method: 'PATCH' })
   const update = (id: string, body: MeetingInput) =>
     apiFetch<Meeting>(`/api/meetings/${id}`, { method: 'PUT', body })
   const listUpdates = (id: string) =>
@@ -21,8 +26,11 @@ export const useMeetings = () => {
 
   return {
     list,
+    listPending,
     getById,
     create,
+    assign,
+    accept,
     update,
     listUpdates,
     createUpdate,

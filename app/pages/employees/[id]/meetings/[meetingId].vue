@@ -17,81 +17,27 @@
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p class="text-xs font-medium uppercase tracking-wide text-slate-400">Meeting</p>
-            <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-800">{{ meeting.project_name }}</h1>
-            <p class="mt-1 text-sm text-slate-500">{{ meeting.client_name || '—' }}</p>
+            <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-800">{{ form.project_name || 'Untitled meeting' }}</h1>
+            <p class="mt-1 text-sm text-slate-500">{{ form.client_name || '—' }}</p>
+            <p v-if="meeting.employee_name" class="mt-2 text-sm text-slate-500">
+              Employee: <span class="font-medium text-slate-700">{{ meeting.employee_name }}</span>
+            </p>
           </div>
-          <span class="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
-            {{ meetingOutcomeLabel(meeting.meeting_outcome) }}
+          <span
+            v-if="currentOutcome"
+            class="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700"
+          >
+            {{ meetingOutcomeLabel(currentOutcome) }}
           </span>
         </div>
       </div>
 
-      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Details</h2>
-        <dl class="mt-4 grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Employee</dt>
-            <dd class="mt-1 text-sm text-slate-800">{{ meeting.employee_name || '—' }}</dd>
-          </div>
-          <div>
-            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Upwork project type</dt>
-            <dd class="mt-1 text-sm text-slate-800">{{ projectTypeLabel(meeting.project_type) }}</dd>
-          </div>
-          <div>
-            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Upwork account</dt>
-            <dd class="mt-1 text-sm text-slate-800">{{ upworkAccountLabel(meeting.upwork_account) }}</dd>
-          </div>
-          <div>
-            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Date &amp; time</dt>
-            <dd class="mt-1 text-sm text-slate-800">{{ formatDateTime(meeting.meeting_at) }}</dd>
-          </div>
-          <div>
-            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Duration</dt>
-            <dd class="mt-1 text-sm text-slate-800">{{ meeting.duration_minutes ? `${meeting.duration_minutes} min` : '—' }}</dd>
-          </div>
-          <div>
-            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Budget discussed</dt>
-            <dd class="mt-1 text-sm text-slate-800">{{ meeting.budget_discussed || '—' }}</dd>
-          </div>
-          <div>
-            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Timeline</dt>
-            <dd class="mt-1 text-sm text-slate-800">{{ meeting.deadline || '—' }}</dd>
-          </div>
-        </dl>
-      </div>
-
-      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Job description</h2>
-        <p class="mt-3 whitespace-pre-wrap text-sm text-slate-700">{{ meeting.job_description || '—' }}</p>
-      </div>
-
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Upwork link</h2>
-          <p class="mt-3 text-sm">
-            <a
-              v-if="meeting.link_url"
-              :href="meeting.link_url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="break-all font-medium text-indigo-600 hover:text-indigo-700"
-            >
-              {{ meeting.link_url }}
-            </a>
-            <span v-else class="text-slate-700">—</span>
-          </p>
-        </div>
-
-        <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Notes / meeting summary</h2>
-          <p class="mt-3 whitespace-pre-wrap text-sm text-slate-700">{{ meeting.notes || '—' }}</p>
-        </div>
-
-        <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm lg:col-span-2">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Requirements discussed</h2>
-          <p class="mt-3 whitespace-pre-wrap text-sm text-slate-700">{{ meeting.requirements_discussed || '—' }}</p>
-        </div>
-      </div>
+      <MeetingDetailSections
+        v-model:selected-update-id="selectedUpdateId"
+        read-only
+        :form="form"
+        :meeting-updates="meetingUpdates || []"
+      />
     </div>
 
     <div v-else class="text-sm text-slate-400">Loading…</div>
@@ -102,19 +48,53 @@
 definePageMeta({ middleware: 'admin' })
 
 const route = useRoute()
-const { getMeeting } = useEmployees()
+const { getMeeting, getMeetingUpdates } = useEmployees()
+
+const employeeId = computed(() => String(route.params.id))
+const meetingId = computed(() => String(route.params.meetingId))
 
 const { data: meeting, error } = await useAsyncData(
-  `admin-meeting-${route.params.id}-${route.params.meetingId}`,
-  () => getMeeting(route.params.id as string, route.params.meetingId as string),
+  () => `admin-meeting-${employeeId.value}-${meetingId.value}`,
+  () => getMeeting(employeeId.value, meetingId.value),
   { server: false },
 )
 
-function formatDateTime(value) {
-  if (!value) return '—'
-  return new Date(value).toLocaleString(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  })
+const { data: meetingUpdates } = await useAsyncData(
+  () => `admin-meeting-updates-${employeeId.value}-${meetingId.value}`,
+  () => getMeetingUpdates(employeeId.value, meetingId.value),
+  { server: false, default: () => [] },
+)
+
+const selectedUpdateId = ref<string | null>(null)
+
+function blankProjectForm() {
+  return {
+    project_name: '',
+    client_name: '',
+    project_type: '',
+    upwork_account: '',
+    job_description: '',
+    link_url: '',
+  }
 }
+
+const form = reactive(blankProjectForm())
+
+function fillProject(m: typeof meeting.value) {
+  const next = blankProjectForm()
+  if (m) {
+    for (const key of Object.keys(next) as (keyof typeof next)[]) {
+      if (m[key] !== null && m[key] !== undefined) next[key] = m[key] as string
+    }
+  }
+  Object.assign(form, next)
+}
+
+watch(meeting, (m) => { if (m) fillProject(m) }, { immediate: true })
+
+const currentOutcome = computed(() => {
+  const updates = meetingUpdates.value || []
+  const selected = updates.find((item) => item.id === selectedUpdateId.value) || updates[0]
+  return selected?.meeting_outcome || meeting.value?.meeting_outcome || null
+})
 </script>

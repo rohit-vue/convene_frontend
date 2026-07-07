@@ -77,24 +77,39 @@
       </div>
 
       <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-        <h2 class="text-lg font-semibold">Quick Links</h2>
-        <div class="mt-4 space-y-3">
+        <h2 class="text-lg font-semibold">
+          {{ isEmployee ? 'Meetings to Accept' : 'Quick Links' }}
+        </h2>
+
+        <!-- Employee: pending meetings -->
+        <div v-if="isEmployee" class="mt-4 space-y-3">
+          <div
+            v-for="m in pendingMeetings"
+            :key="m.id"
+            class="rounded-xl border border-amber-100 bg-amber-50/50 px-4 py-3"
+          >
+            <p class="text-sm font-medium text-slate-800">{{ m.project_name }}</p>
+            <p class="mt-0.5 text-xs text-slate-500">{{ m.client_name }} · {{ formatMeetingTime(m.meeting_at) }}</p>
+            <button
+              class="mt-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+              :disabled="acceptingId === m.id"
+              @click="acceptMeeting(m.id)"
+            >
+              {{ acceptingId === m.id ? 'Accepting…' : 'Accept' }}
+            </button>
+          </div>
+          <p v-if="!pendingMeetings.length" class="text-sm text-slate-400">No meetings awaiting acceptance.</p>
+        </div>
+
+        <!-- Admin: quick links -->
+        <div v-else class="mt-4 space-y-3">
           <NuxtLink
-            v-if="isEmployee"
             to="/meetings"
             class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
           >
             View all meetings <span>&rarr;</span>
           </NuxtLink>
           <NuxtLink
-            v-if="isEmployee"
-            to="/projects"
-            class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-          >
-            View all projects <span>&rarr;</span>
-          </NuxtLink>
-          <NuxtLink
-            v-if="isAdmin"
             to="/employees"
             class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
           >
@@ -109,12 +124,36 @@
 <script setup>
 const { isAdmin, isEmployee } = useProfile()
 const { getOverview } = useDashboard()
+const { accept } = useMeetings()
 
-const { data: overview } = await useAsyncData(
+const { data: overview, refresh: refreshOverview } = await useAsyncData(
   'dashboard-overview',
   () => getOverview(),
   { server: false },
 )
+
+const pendingMeetings = computed(() => overview.value?.pendingMeetings ?? [])
+const acceptingId = ref(null)
+
+async function acceptMeeting(id) {
+  acceptingId.value = id
+  try {
+    await accept(id)
+    await refreshOverview()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    acceptingId.value = null
+  }
+}
+
+function formatMeetingTime(value) {
+  if (!value) return '—'
+  return new Date(value).toLocaleString(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+}
 
 const scopeLabel = computed(() => (isAdmin.value ? 'All' : 'Your'))
 
