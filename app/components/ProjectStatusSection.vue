@@ -9,7 +9,7 @@
       </span>
     </div>
 
-    <div class="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+    <div v-if="!readOnly" class="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label class="mb-1 block text-sm font-medium text-slate-700">New status</label>
@@ -87,6 +87,7 @@
 const props = defineProps({
   projectId: { type: String, required: true },
   currentStatus: { type: String, required: true },
+  readOnly: { type: Boolean, default: false },
 })
 const emit = defineEmits(['updated'])
 

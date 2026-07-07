@@ -5,6 +5,7 @@ import type {
   ProjectDailyLog,
   ProjectInput,
   ProjectMilestone,
+  ProjectShare,
   ProjectStatusHistoryEntry,
 } from '~/types/projects'
 import type { ProjectExportRow } from '~/utils/exportProjectsExcel'
@@ -46,6 +47,14 @@ export const useProjects = () => {
       method: 'PUT',
       body,
     })
+  const listShares = (id: string) =>
+    apiFetch<ProjectShare[]>(`/api/projects/${id}/shares`)
+  const shareProject = (id: string, body: { employee_id: string }) =>
+    apiFetch<ProjectShare>(`/api/projects/${id}/shares`, { method: 'POST', body })
+  const revokeShare = (id: string, shareId: string) =>
+    apiFetch<ProjectShare>(`/api/projects/${id}/shares/${shareId}/revoke`, {
+      method: 'PATCH',
+    })
 
   const getAdminProject = (employeeId: string, projectId: string) =>
     apiFetch<Project>(`/api/employees/${employeeId}/projects/${projectId}`)
@@ -83,6 +92,9 @@ export const useProjects = () => {
     getDailyLogs,
     createDailyLog,
     updateDailyLog,
+    listShares,
+    shareProject,
+    revokeShare,
     getAdminProject,
     getAdminStatusHistory,
     getAdminMilestoneCostHistory,

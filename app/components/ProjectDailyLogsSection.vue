@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <div v-if="!readOnly" class="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+    <div v-if="canEditLogs && !readOnly" class="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
       <div class="grid grid-cols-1 gap-4" :class="isHourly ? 'sm:grid-cols-2' : ''">
         <div>
           <label class="mb-1 block text-sm font-medium text-slate-700">
@@ -122,7 +122,7 @@
               by {{ entry.logged_by_name }}
             </p>
             <button
-              v-if="!readOnly"
+              v-if="canEditLogs && !readOnly && entry.created_by === currentUserId"
               type="button"
               class="mt-2 text-xs font-medium text-indigo-600 transition hover:text-indigo-700"
               @click="startEdit(entry)"
@@ -141,8 +141,12 @@ const props = defineProps({
   projectId: { type: String, required: true },
   jobType: { type: String, default: '' },
   readOnly: { type: Boolean, default: false },
+  canEditLogs: { type: Boolean, default: true },
   adminEmployeeId: { type: String, default: '' },
 })
+
+const user = useSupabaseUser()
+const currentUserId = computed(() => user.value?.id ?? '')
 
 const { getDailyLogs, createDailyLog, updateDailyLog, getAdminDailyLogs } = useProjects()
 
