@@ -5,11 +5,13 @@ import type {
   ProjectInput,
   ProjectStatusHistoryEntry,
 } from '~/types/projects'
+import type { ProjectExportRow } from '~/utils/exportProjectsExcel'
 
 export const useProjects = () => {
   const { apiFetch } = useApi()
 
   const list = () => apiFetch<Project[]>('/api/projects')
+  const exportAll = () => apiFetch<ProjectExportRow[]>('/api/projects/export')
   const getById = (id: string) => apiFetch<Project>(`/api/projects/${id}`)
   const create = (body: ProjectInput) =>
     apiFetch<Project>('/api/projects', { method: 'POST', body })
@@ -44,6 +46,7 @@ export const useProjects = () => {
 
   return {
     list,
+    exportAll,
     getById,
     create,
     update,

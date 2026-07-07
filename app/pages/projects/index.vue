@@ -8,7 +8,15 @@
         </p>
       </div>
       <button
-        v-if="isEmployee"
+        v-if="isAdmin"
+        class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+        :disabled="exporting"
+        @click="exportAllProjects"
+      >
+        {{ exporting ? 'Exporting…' : 'Export' }}
+      </button>
+      <button
+        v-else-if="isEmployee"
         class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
         @click="openCreate"
       >
@@ -156,8 +164,10 @@
 </template>
 
 <script setup>
+import { downloadProjectsExcel } from '~/utils/exportProjectsExcel'
+
 const { isAdmin, isEmployee, fetchProfile } = useProfile()
-const { list } = useProjects()
+const { list, exportAll } = useProjects()
 
 await fetchProfile()
 
@@ -168,6 +178,7 @@ if (!isAdmin.value && !isEmployee.value) {
 const showModal = ref(false)
 const editing = ref(null)
 const activeFilter = ref('all')
+const exporting = ref(false)
 
 const { data: projects, refresh } = await useAsyncData(
   'projects',
@@ -234,6 +245,19 @@ function closeModal() {
 async function onSaved() {
   closeModal()
   await refresh()
+}
+
+async function exportAllProjects() {
+  if (exporting.value) return
+  exporting.value = true
+  try {
+    const rows = await exportAll()
+    downloadProjectsExcel(rows)
+  } catch (err) {
+    console.error('Failed to export projects:', err)
+  } finally {
+    exporting.value = false
+  }
 }
 
 function formatDate(value) {
