@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx'
 import { upworkAccountLabel } from '~/utils/meetings'
 import {
+  formatMilestoneCostLabel,
   jobCategoryLabel,
   jobTypeLabel,
   projectStatusLabel,
@@ -12,6 +13,7 @@ export interface ProjectExportRow {
   client_name?: string | null
   upwork_account?: string | null
   job_type?: string | null
+  price?: number | null
   job_category?: string | null
   link_url?: string | null
   status?: string | null
@@ -28,18 +30,23 @@ function formatDate(value?: string | null) {
   })
 }
 
+function formatPriceForExcel(value?: number | null) {
+  const formatted = formatMilestoneCostLabel(value)
+  return formatted === '—' ? '' : formatted
+}
+
 function toSheetRow(row: ProjectExportRow) {
   return {
     Employee: row.employee_name || '',
     'Project Name': row.project_name || '',
     'Client Name': row.client_name || '',
     'Upwork Account': upworkAccountLabel(row.upwork_account),
-    'Job Type': jobTypeLabel(row.job_type),
-    'Job Category': jobCategoryLabel(row.job_category),
     'Upwork Link': row.link_url || '',
+    'Job Type': jobTypeLabel(row.job_type),
+    Price: formatPriceForExcel(row.price),
+    'Job Category': jobCategoryLabel(row.job_category),
     Status: projectStatusLabel(row.status),
     'Start Date': formatDate(row.start_date),
-    'Due Date': formatDate(row.due_date),
   }
 }
 
