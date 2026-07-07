@@ -1,3 +1,5 @@
+export type AssignmentStatus = 'pending' | 'accepted' | 'declined'
+
 export interface Meeting {
   id: string
   project_name: string
@@ -15,6 +17,8 @@ export interface Meeting {
   deadline?: string | null
   notes?: string | null
   requirements_discussed?: string | null
+  assignment_status?: AssignmentStatus | null
+  accepted_at?: string | null
   latest_update_id?: string | null
   created_at?: string
   updated_at?: string
@@ -35,3 +39,11 @@ export interface MeetingUpdate {
 }
 
 export type MeetingInput = Partial<Meeting>
+
+export interface AssignMeetingInput {
+  employee_id: string
+  project_name: string
+  client_name: string
+  upwork_account?: string
+  meeting_at: string
+}

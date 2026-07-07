@@ -3,9 +3,19 @@
     <div class="mb-8 flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold tracking-tight">Meetings</h1>
-        <p class="mt-1 text-sm text-slate-500">Track and manage all your meetings.</p>
+        <p class="mt-1 text-sm text-slate-500">
+          {{ isAdmin ? 'View and assign meetings across the team.' : 'Track and manage all your meetings.' }}
+        </p>
       </div>
       <button
+        v-if="isAdmin"
+        class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+        @click="showAssignModal = true"
+      >
+        + Assign Meeting
+      </button>
+      <button
+        v-else
         class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
         @click="showModal = true"
       >
@@ -19,10 +29,12 @@
           <tr>
             <th class="px-6 py-4 font-medium">Project</th>
             <th class="px-6 py-4 font-medium">Client</th>
-            <th class="px-6 py-4 font-medium">Upwork type</th>
+            <th v-if="isAdmin" class="px-6 py-4 font-medium">Employee</th>
+            <th v-if="!isAdmin" class="px-6 py-4 font-medium">Upwork type</th>
             <th class="px-6 py-4 font-medium">Upwork account</th>
             <th class="px-6 py-4 font-medium">Date &amp; time</th>
-            <th class="px-6 py-4 font-medium">Outcome</th>
+            <th v-if="isAdmin" class="px-6 py-4 font-medium">Status</th>
+            <th v-if="!isAdmin" class="px-6 py-4 font-medium">Outcome</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -30,35 +42,51 @@
             v-for="m in meetings"
             :key="m.id"
             class="cursor-pointer transition hover:bg-slate-50"
-            @click="navigateTo(`/meetings/${m.id}`)"
+            @click="openMeeting(m)"
           >
             <td class="px-6 py-4 font-medium text-slate-800">{{ m.project_name }}</td>
             <td class="px-6 py-4 text-slate-600">{{ m.client_name || '—' }}</td>
-            <td class="px-6 py-4 text-slate-600">{{ projectTypeLabel(m.project_type) }}</td>
+            <td v-if="isAdmin" class="px-6 py-4 text-slate-600">{{ m.employee_name || '—' }}</td>
+            <td v-if="!isAdmin" class="px-6 py-4 text-slate-600">{{ projectTypeLabel(m.project_type) }}</td>
             <td class="px-6 py-4 text-slate-600">{{ upworkAccountLabel(m.upwork_account) }}</td>
             <td class="px-6 py-4 text-slate-600">{{ formatDate(m.meeting_at) }}</td>
-            <td class="px-6 py-4 text-slate-600">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
+            <td v-if="isAdmin" class="px-6 py-4">
+              <span
+                class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
+                :class="statusBadgeClass(m.assignment_status)"
+              >
+                {{ assignmentStatusLabel(m.assignment_status) }}
+              </span>
+            </td>
+            <td v-if="!isAdmin" class="px-6 py-4 text-slate-600">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
           </tr>
 
           <tr v-if="meetings && meetings.length === 0">
-            <td colspan="6" class="px-6 py-12 text-center text-sm text-slate-400">
-              No meetings yet. Click “+ New Meeting” to add one.
+            <td :colspan="isAdmin ? 6 : 6" class="px-6 py-12 text-center text-sm text-slate-400">
+              {{ isAdmin ? 'No meetings yet. Click "+ Assign Meeting" to add one.' : 'No meetings yet. Click "+ New Meeting" to add one.' }}
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <MeetingFormModal :open="showModal" @close="showModal = false" @saved="onSaved" />
+    <MeetingFormModal v-if="isEmployee" :open="showModal" @close="showModal = false" @saved="onSaved" />
+    <AdminAssignMeetingModal v-if="isAdmin" :open="showAssignModal" @close="showAssignModal = false" @saved="onAssignSaved" />
   </div>
 </template>
 
 <script setup>
-definePageMeta({ middleware: 'employee' })
-
+const { isAdmin, isEmployee, fetchProfile } = useProfile()
 const { list } = useMeetings()
 
+await fetchProfile()
+
+if (!isAdmin.value && !isEmployee.value) {
+  await navigateTo('/')
+}
+
 const showModal = ref(false)
+const showAssignModal = ref(false)
 
 const { data: meetings, refresh } = await useAsyncData(
   'meetings',
@@ -71,11 +99,31 @@ async function onSaved() {
   await refresh()
 }
 
+async function onAssignSaved() {
+  showAssignModal.value = false
+  await refresh()
+}
+
+function openMeeting(m) {
+  if (isAdmin.value && m.employee_id) {
+    navigateTo(`/employees/${m.employee_id}/meetings/${m.id}`)
+  } else {
+    navigateTo(`/meetings/${m.id}`)
+  }
+}
+
 function formatDate(value) {
   if (!value) return '—'
   return new Date(value).toLocaleString(undefined, {
     dateStyle: 'medium',
     timeStyle: 'short',
   })
+}
+
+function statusBadgeClass(status) {
+  if (status === 'accepted') return 'bg-emerald-50 text-emerald-700'
+  if (status === 'pending') return 'bg-amber-50 text-amber-700'
+  if (status === 'declined') return 'bg-red-50 text-red-700'
+  return 'bg-slate-100 text-slate-600'
 }
 </script>
