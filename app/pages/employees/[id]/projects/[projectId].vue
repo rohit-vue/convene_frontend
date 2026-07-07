@@ -66,6 +66,19 @@
             <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Job category</dt>
             <dd class="mt-1 text-sm text-slate-800">{{ jobCategoryLabel(project.job_category) }}</dd>
           </div>
+          <div v-if="project.job_type === 'hourly'">
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Hourly rate</dt>
+            <dd class="mt-1 text-sm text-slate-800">{{ formatHourlyRateLabel(project.hourly_rate) }}</dd>
+          </div>
+          <div v-if="project.job_type === 'contract'">
+            <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Current milestone</dt>
+            <dd class="mt-1 text-sm text-slate-800">
+              <template v-if="activeMilestone">
+                Milestone {{ activeMilestone.milestone_number }} · {{ formatMilestoneCostLabel(activeMilestone.amount) }}
+              </template>
+              <template v-else>—</template>
+            </dd>
+          </div>
           <div>
             <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Upwork link</dt>
             <dd class="mt-1 text-sm">
@@ -83,6 +96,14 @@
           </div>
         </dl>
       </div>
+
+      <ProjectMilestoneCostSection
+        v-if="project.job_type === 'contract'"
+        :project-id="route.params.projectId as string"
+        :project-status="project.status"
+        :admin-employee-id="route.params.id as string"
+        read-only
+      />
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
@@ -147,12 +168,22 @@
 definePageMeta({ middleware: 'admin' })
 
 const route = useRoute()
-const { getAdminProject, getAdminStatusHistory } = useProjects()
+const { getAdminProject, getAdminStatusHistory, getAdminMilestones } = useProjects()
 
 const { data: project, error } = await useAsyncData(
   `admin-project-${route.params.id}-${route.params.projectId}`,
   () => getAdminProject(route.params.id as string, route.params.projectId as string),
   { server: false },
+)
+
+const { data: milestones } = await useAsyncData(
+  `admin-project-milestones-${route.params.id}-${route.params.projectId}`,
+  () => getAdminMilestones(route.params.id as string, route.params.projectId as string),
+  { server: false, default: () => [] },
+)
+
+const activeMilestone = computed(() =>
+  (milestones.value || []).find((entry) => entry.status === 'active') || null,
 )
 
 const { data: history, pending: historyLoading } = await useAsyncData(

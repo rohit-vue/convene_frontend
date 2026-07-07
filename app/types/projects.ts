@@ -17,6 +17,8 @@ export interface Project {
   requirements?: string | null
   job_category?: string | null
   job_type?: string | null
+  hourly_rate?: number | null
+  milestone_cost?: number | null
   upwork_account?: string | null
   link_url?: string | null
   notes?: string | null
@@ -36,6 +38,22 @@ export interface ProjectStatusHistoryEntry {
   changed_by_name?: string | null
   created_at: string
 }
+
+export interface ProjectMilestone {
+  id: string
+  project_id: string
+  milestone_number: number
+  amount: number
+  comment: string
+  status: 'active' | 'completed'
+  created_by: string
+  created_by_name?: string | null
+  created_at: string
+  completed_at?: string | null
+}
+
+/** @deprecated Use ProjectMilestone */
+export type ProjectMilestoneCostHistoryEntry = ProjectMilestone
 
 export interface ProjectDailyLog {
   id: string

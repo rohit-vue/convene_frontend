@@ -149,7 +149,7 @@
               </div>
               <div>
                 <dt :class="readOnlyLabelClass">Budget discussed</dt>
-                <dd class="mt-1 text-sm text-slate-800">{{ selectedUpdate.budget_discussed || '—' }}</dd>
+                <dd class="mt-1 text-sm text-slate-800">{{ formatBudgetLabel(selectedUpdate.budget_discussed) }}</dd>
               </div>
               <div class="sm:col-span-2">
                 <dt :class="readOnlyLabelClass">Deadline / expected timeline</dt>
@@ -189,12 +189,10 @@
               </div>
               <div>
                 <label :class="labelClass">Budget discussed</label>
-                <input
-                  :value="logisticsForm.budget_discussed"
-                  type="text"
-                  placeholder="e.g. $10,000"
-                  :class="inputClass"
-                  @input="updateLogisticsField('budget_discussed', ($event.target as HTMLInputElement).value)"
+                <BudgetInput
+                  :model-value="logisticsForm.budget_discussed"
+                  :input-class="inputClass"
+                  @update:model-value="updateLogisticsField('budget_discussed', $event)"
                 />
               </div>
               <div>

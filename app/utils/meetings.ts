@@ -57,3 +57,18 @@ const assignmentStatusLabelMap = toLabelMap(assignmentStatusOptions)
 export function assignmentStatusLabel(value?: string | null): string {
   return (value && assignmentStatusLabelMap[value]) || '—'
 }
+
+/** Keep digits only for USD budget amounts. */
+export function sanitizeBudgetInput(value?: string | null): string {
+  return String(value ?? '').replace(/\D/g, '')
+}
+
+export function normalizeBudgetValue(value?: string | null): string {
+  return sanitizeBudgetInput(value)
+}
+
+export function formatBudgetLabel(value?: string | null): string {
+  const digits = sanitizeBudgetInput(value)
+  if (!digits) return '—'
+  return `$${Number(digits).toLocaleString('en-US')}`
+}
