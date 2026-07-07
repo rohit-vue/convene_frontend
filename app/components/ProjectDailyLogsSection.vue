@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+  <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
     <div class="flex flex-wrap items-start justify-between gap-3">
       <div>
         <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Daily logs</h2>
@@ -9,9 +9,9 @@
             : 'Record tasks completed for this project.' }}
         </p>
       </div>
-      <div class="flex flex-col items-end gap-3">
-        <div v-if="logs?.length">
-          <label class="mb-1 block text-right text-xs font-medium text-slate-500">Filter by date</label>
+      <div class="flex flex-col items-stretch gap-3 sm:items-end">
+        <div v-if="logs?.length" class="w-full sm:w-auto">
+          <label class="mb-1 block text-xs font-medium text-slate-500 sm:text-right">Filter by date</label>
           <DateFilterPicker
             v-model="filterDate"
             :marked-dates="markedDates"
@@ -19,7 +19,7 @@
             :input-class="filterInputClass"
           />
         </div>
-        <div v-if="isHourly && totalTrackerMinutes > 0" class="rounded-xl bg-indigo-50 px-3 py-2 text-right">
+        <div v-if="isHourly && totalTrackerMinutes > 0" class="w-full rounded-xl bg-indigo-50 px-3 py-2 text-left sm:w-auto sm:text-right">
           <p class="text-xs font-medium uppercase tracking-wide text-indigo-400">Total tracked</p>
           <p class="text-sm font-semibold text-indigo-700">{{ formatTrackerMinutes(totalTrackerMinutes) }}</p>
         </div>
@@ -32,7 +32,13 @@
           <label class="mb-1 block text-sm font-medium text-slate-700">
             Date <span class="text-red-500">*</span>
           </label>
-          <input v-model="logDate" type="date" :max="maxLogDate" :class="inputClass" />
+          <DatePicker
+            v-model="logDate"
+            :max="maxLogDate"
+            placeholder="Select date"
+            :input-class="inputClass"
+            full-width
+          />
           <p v-if="isFutureLogDate" class="mt-1 text-xs text-red-600">
             You cannot add a log for a future date.
           </p>

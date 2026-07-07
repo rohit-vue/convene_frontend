@@ -11,13 +11,13 @@
 
     <form v-else-if="meeting" class="space-y-6" @submit.prevent="save">
       <!-- Header -->
-      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 class="text-2xl font-bold tracking-tight">{{ form.project_name || 'Untitled meeting' }}</h1>
+          <div class="min-w-0">
+            <h1 class="text-xl font-bold tracking-tight sm:text-2xl">{{ form.project_name || 'Untitled meeting' }}</h1>
             <p class="mt-1 text-sm text-slate-500">{{ form.client_name || '—' }}</p>
           </div>
-          <div class="flex items-center gap-3">
+          <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:gap-3">
             <button
               type="button"
               class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
@@ -65,7 +65,12 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label :class="labelClass">Date &amp; time <span class="text-red-500">*</span></label>
-              <input v-model="createForm.meeting_at" required type="datetime-local" :class="inputClass" />
+              <DateTimePicker
+                v-model="createForm.meeting_at"
+                placeholder="Select date & time"
+                :input-class="inputClass"
+                full-width
+              />
             </div>
             <div>
               <label :class="labelClass">Meeting outcome <span class="text-red-500">*</span></label>
@@ -117,6 +122,8 @@
 </template>
 
 <script setup lang="ts">
+import { toLocalDateTimeInput } from '~/utils/dates'
+
 definePageMeta({ middleware: 'employee' })
 
 const route = useRoute()
@@ -176,14 +183,6 @@ function blankProjectForm() {
 
 const form = reactive(blankProjectForm())
 
-function toLocalInput(iso) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  const pad = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
-
 function fillProject(m) {
   const next = blankProjectForm()
   if (m) {
@@ -205,7 +204,7 @@ function syncLogisticsForm(source) {
   }
 
   if (source) {
-    next.meeting_at = source.meeting_at ? toLocalInput(source.meeting_at) : ''
+    next.meeting_at = source.meeting_at ? toLocalDateTimeInput(source.meeting_at) : ''
     next.duration_minutes = source.duration_minutes ?? ''
     next.budget_discussed = normalizeBudgetValue(source.budget_discussed)
     next.deadline = source.deadline ?? ''

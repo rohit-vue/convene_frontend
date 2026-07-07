@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="mb-8 flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold tracking-tight">Meetings</h1>
+    <div class="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
+      <div class="min-w-0">
+        <h1 class="text-xl font-bold tracking-tight sm:text-2xl">Meetings</h1>
         <p class="mt-1 text-sm text-slate-500">
           {{ isAdmin ? 'View and assign meetings across the team.' : 'Track and manage all your meetings.' }}
         </p>
       </div>
-      <div v-if="isAdmin" class="flex items-center gap-3">
+      <div v-if="isAdmin" class="flex flex-wrap items-center gap-2 sm:gap-3">
         <button
           class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="downloading"
@@ -24,7 +24,7 @@
       </div>
       <button
         v-else
-        class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+        class="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 sm:w-auto"
         @click="showModal = true"
       >
         + New Meeting
@@ -32,13 +32,13 @@
     </div>
 
     <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-      <div v-if="isAdmin" class="border-b border-slate-100 bg-slate-50 px-6 py-4">
-        <div class="flex flex-wrap items-end gap-4">
-          <div>
+      <div v-if="isAdmin" class="border-b border-slate-100 bg-slate-50 px-4 py-4 sm:px-6">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
+          <div class="w-full sm:w-auto">
             <label :class="filterLabelClass">Date</label>
             <DateFilterPicker v-model="filterDate" :marked-dates="markedDates" :input-class="filterInputClass" />
           </div>
-          <div>
+          <div class="w-full sm:w-auto">
             <label :class="filterLabelClass">Sort by date</label>
             <AppSelect
               v-model="dateSortOrder"
@@ -47,7 +47,7 @@
               :full-width="false"
             />
           </div>
-          <div>
+          <div class="w-full sm:w-auto">
             <label :class="filterLabelClass">Upwork account</label>
             <AppSelect
               v-model="filterUpworkAccount"
@@ -57,7 +57,7 @@
               :full-width="false"
             />
           </div>
-          <div>
+          <div class="w-full sm:w-auto">
             <label :class="filterLabelClass">Employee</label>
             <AppSelect
               v-model="filterEmployeeId"
@@ -67,7 +67,7 @@
               :full-width="false"
             />
           </div>
-          <div>
+          <div class="w-full sm:w-auto">
             <label :class="filterLabelClass">Status</label>
             <AppSelect
               v-model="filterStatus"
@@ -80,17 +80,18 @@
         </div>
       </div>
 
-      <table class="w-full text-sm">
+      <div class="overflow-x-auto">
+      <table class="w-full min-w-[640px] text-sm">
         <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
           <tr>
-            <th class="px-6 py-4 font-medium">Project</th>
-            <th class="px-6 py-4 font-medium">Client</th>
-            <th v-if="isAdmin" class="px-6 py-4 font-medium">Employee</th>
-            <th v-if="!isAdmin" class="px-6 py-4 font-medium">Upwork type</th>
-            <th class="px-6 py-4 font-medium">Upwork account</th>
-            <th class="px-6 py-4 font-medium">Date &amp; time</th>
-            <th v-if="isAdmin" class="px-6 py-4 font-medium">Status</th>
-            <th v-if="!isAdmin" class="px-6 py-4 font-medium">Outcome</th>
+            <th class="px-4 py-4 font-medium sm:px-6">Project</th>
+            <th class="px-4 py-4 font-medium sm:px-6">Client</th>
+            <th v-if="isAdmin" class="px-4 py-4 font-medium sm:px-6">Employee</th>
+            <th v-if="!isAdmin" class="px-4 py-4 font-medium sm:px-6">Upwork type</th>
+            <th class="px-4 py-4 font-medium sm:px-6">Upwork account</th>
+            <th class="px-4 py-4 font-medium sm:px-6">Date &amp; time</th>
+            <th v-if="isAdmin" class="px-4 py-4 font-medium sm:px-6">Status</th>
+            <th v-if="!isAdmin" class="px-4 py-4 font-medium sm:px-6">Outcome</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -100,13 +101,13 @@
             class="cursor-pointer transition hover:bg-slate-50"
             @click="openMeeting(m)"
           >
-            <td class="px-6 py-4 font-medium text-slate-800">{{ m.project_name }}</td>
-            <td class="px-6 py-4 text-slate-600">{{ m.client_name || '—' }}</td>
-            <td v-if="isAdmin" class="px-6 py-4 text-slate-600">{{ m.employee_name || '—' }}</td>
-            <td v-if="!isAdmin" class="px-6 py-4 text-slate-600">{{ projectTypeLabel(m.project_type) }}</td>
-            <td class="px-6 py-4 text-slate-600">{{ upworkAccountLabel(m.upwork_account) }}</td>
-            <td class="px-6 py-4 text-slate-600">{{ formatDate(m.meeting_at) }}</td>
-            <td v-if="isAdmin" class="px-6 py-4">
+            <td class="px-4 py-4 font-medium text-slate-800 sm:px-6">{{ m.project_name }}</td>
+            <td class="px-4 py-4 text-slate-600 sm:px-6">{{ m.client_name || '—' }}</td>
+            <td v-if="isAdmin" class="px-4 py-4 text-slate-600 sm:px-6">{{ m.employee_name || '—' }}</td>
+            <td v-if="!isAdmin" class="px-4 py-4 text-slate-600 sm:px-6">{{ projectTypeLabel(m.project_type) }}</td>
+            <td class="px-4 py-4 text-slate-600 sm:px-6">{{ upworkAccountLabel(m.upwork_account) }}</td>
+            <td class="whitespace-nowrap px-4 py-4 text-slate-600 sm:px-6">{{ formatDate(m.meeting_at) }}</td>
+            <td v-if="isAdmin" class="px-4 py-4 sm:px-6">
               <span
                 class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
                 :class="statusBadgeClass(m.assignment_status)"
@@ -114,16 +115,17 @@
                 {{ assignmentStatusLabel(m.assignment_status) }}
               </span>
             </td>
-            <td v-if="!isAdmin" class="px-6 py-4 text-slate-600">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
+            <td v-if="!isAdmin" class="px-4 py-4 text-slate-600 sm:px-6">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
           </tr>
 
           <tr v-if="meetings && displayedMeetings.length === 0">
-            <td :colspan="isAdmin ? 6 : 6" class="px-6 py-12 text-center text-sm text-slate-400">
+            <td :colspan="isAdmin ? 6 : 6" class="px-4 py-12 text-center text-sm text-slate-400 sm:px-6">
               {{ emptyMeetingsMessage }}
             </td>
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
 
     <MeetingFormModal v-if="isEmployee" :open="showModal" @close="showModal = false" @saved="onSaved" />

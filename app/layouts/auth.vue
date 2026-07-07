@@ -43,7 +43,7 @@
     </div>
 
     <!-- Form panel -->
-    <div class="flex w-full items-center justify-center px-6 py-10 lg:w-1/2">
+    <div class="flex w-full items-center justify-center px-4 py-8 sm:px-6 sm:py-10 lg:w-1/2">
       <div class="w-full max-w-sm">
         <div class="mb-8 flex justify-center lg:hidden">
           <img src="/convenelogo.png" alt="Convene" class="h-20 w-auto object-contain" />

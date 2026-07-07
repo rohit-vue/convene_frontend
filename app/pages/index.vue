@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold tracking-tight">Dashboard</h1>
+    <div class="mb-6 sm:mb-8">
+      <h1 class="text-xl font-bold tracking-tight sm:text-2xl">Dashboard</h1>
       <p class="mt-1 text-sm text-slate-500">Welcome back, here's what's happening today.</p>
     </div>
 
@@ -10,7 +10,7 @@
       <div
         v-for="card in primaryCards"
         :key="card.label"
-        class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:shadow-md"
+        class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition hover:shadow-md sm:p-6"
       >
         <div class="flex items-center justify-between">
           <p class="text-sm font-medium text-slate-500">{{ card.label }}</p>
@@ -23,12 +23,12 @@
 
     <!-- Breakdowns -->
     <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
         <h2 class="text-lg font-semibold text-slate-800">Project status</h2>
         <p class="mt-0.5 text-sm text-slate-500">{{ scopeLabel }} projects by status</p>
         <div class="mt-4 space-y-3">
-          <div v-for="item in projectBreakdown" :key="item.key" class="flex items-center gap-3">
-            <span class="w-24 shrink-0 text-sm text-slate-600">{{ item.label }}</span>
+          <div v-for="item in projectBreakdown" :key="item.key" class="flex items-center gap-2 sm:gap-3">
+            <span class="w-16 shrink-0 text-xs text-slate-600 sm:w-24 sm:text-sm">{{ item.label }}</span>
             <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
               <div
                 class="h-full rounded-full transition-all"
@@ -41,12 +41,12 @@
         </div>
       </div>
 
-      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
         <h2 class="text-lg font-semibold text-slate-800">Meeting outcomes</h2>
         <p class="mt-0.5 text-sm text-slate-500">{{ scopeLabel }} meetings by outcome</p>
         <div class="mt-4 space-y-3">
-          <div v-for="item in meetingBreakdown" :key="item.key" class="flex items-center gap-3">
-            <span class="w-32 shrink-0 text-sm text-slate-600">{{ item.label }}</span>
+          <div v-for="item in meetingBreakdown" :key="item.key" class="flex items-center gap-2 sm:gap-3">
+            <span class="min-w-0 w-20 shrink-0 text-xs leading-tight text-slate-600 sm:w-32 sm:text-sm">{{ item.label }}</span>
             <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
               <div
                 class="h-full rounded-full transition-all"
@@ -62,7 +62,7 @@
 
     <!-- Activity & quick links -->
     <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm lg:col-span-2">
+      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6 lg:col-span-2">
         <h2 class="text-lg font-semibold">Recent Activity</h2>
         <ul v-if="overview?.activity?.length" class="mt-4 space-y-4">
           <li v-for="(a, i) in overview.activity" :key="`${a.at}-${i}`" class="flex items-start gap-3">
@@ -76,7 +76,7 @@
         <p v-else class="mt-4 text-sm text-slate-400">No recent activity yet.</p>
       </div>
 
-      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
         <h2 class="text-lg font-semibold">
           {{ isEmployee ? 'Assignments to Accept' : 'Quick Links' }}
         </h2>

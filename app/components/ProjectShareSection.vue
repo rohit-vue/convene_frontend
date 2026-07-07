@@ -1,12 +1,12 @@
 <template>
-  <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+  <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
     <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Share project</h2>
     <p class="mt-1 text-sm text-slate-500">
       Grant another employee access to view this project and add their own daily logs.
     </p>
 
     <div class="mt-5 flex flex-wrap items-end gap-3 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
-      <div class="min-w-[200px] flex-1">
+      <div class="min-w-0 w-full flex-1 sm:min-w-[200px]">
         <label class="mb-1 block text-sm font-medium text-slate-700">Employee</label>
         <AppSelect
           v-model="selectedEmployeeId"
@@ -18,7 +18,7 @@
       <button
         type="button"
         :disabled="!selectedEmployeeId || sharing"
-        class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+        class="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         @click="grantShare"
       >
         {{ sharing ? 'Sharing…' : 'Share access' }}
