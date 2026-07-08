@@ -49,8 +49,6 @@
             </button>
           </div>
 
-          <p v-if="saveError" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ saveError }}</p>
-          <p v-else-if="saveOk" class="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Changes saved.</p>
         </div>
 
         <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
@@ -218,9 +216,8 @@ const statusMeta = {
 const loading = ref(false)
 const deleting = ref(false)
 const showDeleteModal = ref(false)
-const saveError = ref('')
 const deleteError = ref('')
-const saveOk = ref(false)
+const toast = useToast()
 
 function blankForm() {
   return {
@@ -275,13 +272,10 @@ async function onPricingUpdated() {
 async function save() {
   if (!canEditProject.value) return
   if (!form.name.trim()) {
-    saveError.value = 'Project name is required.'
-    saveOk.value = false
+    toast.error('Project name is required.')
     return
   }
   loading.value = true
-  saveError.value = ''
-  saveOk.value = false
   try {
     const { hourly_rate: _hourlyRate, ...rest } = form
     const payload = {
@@ -295,10 +289,10 @@ async function save() {
         : {}),
     }
     await update(route.params.id as string, payload)
-    saveOk.value = true
+    toast.success('Changes saved.')
     await refresh()
   } catch (e) {
-    saveError.value = e?.data?.error || e?.message || 'Failed to save changes.'
+    toast.error(toastErrorMessage(e, 'Failed to save changes.'))
   } finally {
     loading.value = false
   }
@@ -325,7 +319,8 @@ async function confirmDeleteProject() {
     showDeleteModal.value = false
     await router.push('/projects')
   } catch (e) {
-    deleteError.value = e?.data?.error || e?.message || 'Failed to delete project.'
+    deleteError.value = toastErrorMessage(e, 'Failed to delete project.')
+    toast.error(deleteError.value)
   } finally {
     deleting.value = false
   }

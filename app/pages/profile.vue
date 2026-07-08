@@ -46,7 +46,6 @@
             </button>
           </div>
           <p v-if="avatarBusy" class="mt-4 text-xs text-white/80">Uploading photo…</p>
-          <p v-if="avatarError" class="mt-3 rounded-lg bg-white/15 px-3 py-2 text-xs text-white">{{ avatarError }}</p>
         </div>
 
         <div class="px-6 pb-6 pt-4 text-center">
@@ -154,11 +153,6 @@
             <p class="mt-1.5 text-xs text-slate-400">Email cannot be changed here.</p>
           </div>
 
-          <p v-if="saveError" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ saveError }}</p>
-          <p v-if="saved" class="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-            Profile updated successfully.
-          </p>
-
           <div class="flex items-center gap-3 border-t border-slate-100 pt-5">
             <button
               type="submit"
@@ -186,18 +180,16 @@
 const { get, update: updateProfile } = useProfileApi()
 const { displayName, role, isAdmin, initials, fetchProfile } = useProfile()
 const { uploadAvatar, removeAvatar } = useAvatarUpload()
+const toast = useToast()
 
 const avatarInput = ref(null)
 const avatarBusy = ref(false)
-const avatarError = ref('')
 
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-4 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
 
 const profileData = ref(null)
 const loadError = ref('')
-const saveError = ref('')
-const saved = ref(false)
 const saving = ref(false)
 
 const form = reactive({
@@ -231,14 +223,10 @@ function resetForm() {
   form.job_title = profileData.value.job_title || ''
   form.member_since = profileData.value.member_since || ''
   snapshot.value = serializeForm()
-  saveError.value = ''
-  saved.value = false
 }
 
 async function save() {
   saving.value = true
-  saveError.value = ''
-  saved.value = false
 
   try {
     await updateProfile({
@@ -249,9 +237,9 @@ async function save() {
     })
     await loadProfile()
     await fetchProfile()
-    saved.value = true
+    toast.success('Profile updated successfully.')
   } catch (e) {
-    saveError.value = e?.data?.error || e?.message || 'Failed to save profile.'
+    toast.error(toastErrorMessage(e, 'Failed to save profile.'))
   } finally {
     saving.value = false
   }
@@ -263,7 +251,8 @@ async function loadProfile() {
     profileData.value = await get()
     resetForm()
   } catch (e) {
-    loadError.value = e?.data?.error || e?.message || 'Failed to load profile.'
+    loadError.value = toastErrorMessage(e, 'Failed to load profile.')
+    toast.error(loadError.value)
   }
 }
 
@@ -273,14 +262,14 @@ async function onAvatarSelected(event) {
   if (!file) return
 
   avatarBusy.value = true
-  avatarError.value = ''
 
   try {
     const avatarUrl = await uploadAvatar(file)
     if (profileData.value) profileData.value.avatar_url = avatarUrl
     await fetchProfile()
+    toast.success('Profile photo updated.')
   } catch (e) {
-    avatarError.value = e?.message || 'Failed to upload photo.'
+    toast.error(toastErrorMessage(e, 'Failed to upload photo.'))
   } finally {
     avatarBusy.value = false
   }
@@ -288,14 +277,14 @@ async function onAvatarSelected(event) {
 
 async function removePhoto() {
   avatarBusy.value = true
-  avatarError.value = ''
 
   try {
     await removeAvatar()
     if (profileData.value) profileData.value.avatar_url = null
     await fetchProfile()
+    toast.success('Profile photo removed.')
   } catch (e) {
-    avatarError.value = e?.message || 'Failed to remove photo.'
+    toast.error(toastErrorMessage(e, 'Failed to remove photo.'))
   } finally {
     avatarBusy.value = false
   }

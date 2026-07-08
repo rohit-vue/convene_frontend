@@ -118,6 +118,7 @@ const upworkSelectOptions = computed(() => upworkAccountOptions)
 
 const loading = ref(false)
 const error = ref('')
+const toast = useToast()
 
 function blankForm() {
   return {
@@ -144,6 +145,7 @@ function combineDateTime(date, time) {
 async function save() {
   if (!form.employee_id || !form.project_name || !form.client_name || !form.date || !form.time) {
     error.value = 'Please fill in all required (*) fields.'
+    toast.error(error.value)
     return
   }
 
@@ -159,9 +161,11 @@ async function save() {
       meeting_at: combineDateTime(form.date, form.time),
     })
     Object.assign(form, blankForm())
+    toast.success('Meeting assigned.')
     emit('saved')
   } catch (e) {
-    error.value = e?.data?.error || e?.message || 'Failed to assign meeting.'
+    error.value = toastErrorMessage(e, 'Failed to assign meeting.')
+    toast.error(error.value)
   } finally {
     loading.value = false
   }

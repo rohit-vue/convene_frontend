@@ -229,6 +229,7 @@ import { downloadProjectsExcel } from '~/utils/exportProjectsExcel'
 
 const { isAdmin, isEmployee, fetchProfile } = useProfile()
 const { list, exportAll } = useProjects()
+const toast = useToast()
 
 await fetchProfile()
 
@@ -397,8 +398,9 @@ async function exportAllProjects() {
   try {
     const rows = await exportAll()
     downloadProjectsExcel(rows)
+    toast.success('Projects exported.')
   } catch (err) {
-    console.error('Failed to export projects:', err)
+    toast.error(toastErrorMessage(err, 'Failed to export projects.'))
   } finally {
     exporting.value = false
   }

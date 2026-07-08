@@ -132,23 +132,13 @@
                 </span>
               </td>
               <td class="whitespace-nowrap px-4 py-4 text-right" @click.stop>
-                <div class="flex items-center justify-end gap-1.5">
-                  <button
-                    type="button"
-                    class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-800"
-                    @click="openEdit(bid)"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    class="rounded-lg border border-red-200 bg-white px-2.5 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
-                    :disabled="deletingId === bid.id"
-                    @click="openDeleteModal(bid)"
-                  >
-                    Delete
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-800"
+                  @click="openEdit(bid)"
+                >
+                  Edit
+                </button>
               </td>
             </tr>
           </tbody>
@@ -171,22 +161,6 @@
       @edit="openEditFromView"
     />
 
-    <ConfirmDeleteModal
-      :open="showDeleteModal"
-      title="Delete this bid?"
-      message="This action cannot be undone. The bid will be permanently removed."
-      confirm-label="Delete bid"
-      :loading="Boolean(deletingId)"
-      :error="deleteError"
-      @close="closeDeleteModal"
-      @confirm="confirmDeleteBid"
-    >
-      <div v-if="bidToDelete" class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
-        <p class="font-medium text-slate-800">{{ upworkAccountLabel(bidToDelete.upwork_account) }}</p>
-        <p class="mt-1 truncate text-slate-500" :title="bidToDelete.job_link">{{ bidToDelete.job_link }}</p>
-        <p class="mt-1 text-slate-600">{{ formatBidAmount(bidToDelete) }} · {{ bidJobTypeLabel(bidToDelete.job_type) }}</p>
-      </div>
-    </ConfirmDeleteModal>
   </div>
 </template>
 
@@ -196,16 +170,12 @@ import { bidJobTypeLabel, bidStatusBadgeClass, bidStatusLabel, formatBidAmount, 
 
 definePageMeta({ middleware: 'admin' })
 
-const { list, remove } = useBids()
+const { list } = useBids()
 
 const showModal = ref(false)
 const showViewModal = ref(false)
-const showDeleteModal = ref(false)
 const selectedBid = ref<UpworkBid | null>(null)
 const editingBid = ref<UpworkBid | null>(null)
-const bidToDelete = ref<UpworkBid | null>(null)
-const deletingId = ref<string | null>(null)
-const deleteError = ref('')
 const filterDate = ref('')
 const filterUpworkAccount = ref('')
 
@@ -286,38 +256,6 @@ function openView(bid: UpworkBid) {
 function closeView() {
   showViewModal.value = false
   selectedBid.value = null
-}
-
-function openDeleteModal(bid: UpworkBid) {
-  bidToDelete.value = bid
-  deleteError.value = ''
-  showDeleteModal.value = true
-}
-
-function closeDeleteModal() {
-  if (deletingId.value) return
-  showDeleteModal.value = false
-  bidToDelete.value = null
-  deleteError.value = ''
-}
-
-async function confirmDeleteBid() {
-  const bid = bidToDelete.value
-  if (!bid || deletingId.value) return
-
-  deletingId.value = bid.id
-  deleteError.value = ''
-  try {
-    await remove(bid.id)
-    if (selectedBid.value?.id === bid.id) closeView()
-    showDeleteModal.value = false
-    bidToDelete.value = null
-    await refresh()
-  } catch (e: any) {
-    deleteError.value = e?.data?.error || e?.message || 'Failed to delete bid.'
-  } finally {
-    deletingId.value = null
-  }
 }
 
 function formatDateTime(value: string) {

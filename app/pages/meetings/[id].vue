@@ -43,8 +43,6 @@
           </div>
         </div>
 
-        <p v-if="saveError" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ saveError }}</p>
-        <p v-else-if="saveOk" class="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Changes saved.</p>
       </div>
 
       <MeetingDetailSections
@@ -175,9 +173,8 @@ const inputClass =
 const loading = ref(false)
 const deleting = ref(false)
 const showDeleteModal = ref(false)
-const saveError = ref('')
 const deleteError = ref('')
-const saveOk = ref(false)
+const toast = useToast()
 const showCreateModal = ref(false)
 const createLoading = ref(false)
 const createError = ref('')
@@ -293,26 +290,21 @@ function buildUpdateBody(includeOutcome = true) {
 
 async function save() {
   if (!form.project_name || !form.client_name) {
-    saveError.value = 'Please fill in all required (*) project fields.'
-    saveOk.value = false
+    toast.error('Please fill in all required (*) project fields.')
     return
   }
 
   if (!selectedUpdate.value) {
-    saveError.value = 'No meeting update selected to save.'
-    saveOk.value = false
+    toast.error('No meeting update selected to save.')
     return
   }
 
   if (!logisticsForm.meeting_at) {
-    saveError.value = 'Please provide a date & time for the meeting.'
-    saveOk.value = false
+    toast.error('Please provide a date & time for the meeting.')
     return
   }
 
   loading.value = true
-  saveError.value = ''
-  saveOk.value = false
   try {
     await update(route.params.id as string, {
       project_name: form.project_name,
@@ -329,11 +321,11 @@ async function save() {
       buildUpdateBody(),
     )
 
-    saveOk.value = true
+    toast.success('Changes saved.')
     await refresh()
     await refreshUpdates()
   } catch (e) {
-    saveError.value = e?.data?.error || e?.message || 'Failed to save changes.'
+    toast.error(toastErrorMessage(e, 'Failed to save changes.'))
   } finally {
     loading.value = false
   }
@@ -342,6 +334,7 @@ async function save() {
 async function saveFollowUpMeeting() {
   if (!createForm.meeting_at || !createForm.meeting_outcome) {
     createError.value = 'Please fill in the required fields.'
+    toast.error(createError.value)
     return
   }
 
@@ -365,8 +358,10 @@ async function saveFollowUpMeeting() {
     await refreshUpdates()
     selectedUpdateId.value = created.id
     resetCreateForm()
+    toast.success('Follow-up meeting saved.')
   } catch (e) {
-    createError.value = e?.data?.error || e?.message || 'Failed to create follow-up meeting.'
+    createError.value = toastErrorMessage(e, 'Failed to create follow-up meeting.')
+    toast.error(createError.value)
   } finally {
     createLoading.value = false
   }
@@ -392,7 +387,8 @@ async function confirmDeleteMeeting() {
     showDeleteModal.value = false
     await router.push('/meetings')
   } catch (e) {
-    deleteError.value = e?.data?.error || e?.message || 'Failed to delete meeting.'
+    deleteError.value = toastErrorMessage(e, 'Failed to delete meeting.')
+    toast.error(deleteError.value)
   } finally {
     deleting.value = false
   }

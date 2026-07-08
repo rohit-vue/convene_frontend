@@ -100,6 +100,7 @@
 definePageMeta({ layout: 'auth' })
 
 const supabase = useSupabaseClient()
+const toast = useToast()
 const fullName = ref('')
 const email = ref('')
 const password = ref('')
@@ -124,15 +125,18 @@ async function signup() {
 
   if (err) {
     error.value = err.message
+    toast.error(err.message)
     return
   }
 
   // If email confirmation is disabled, a session is returned and the user is logged in.
   if (data.session) {
+    toast.success('Account created.')
     await navigateTo('/')
   } else {
     // Email confirmation is enabled: prompt the user to check their inbox.
     emailSent.value = true
+    toast.success('Confirmation email sent.')
   }
 }
 </script>

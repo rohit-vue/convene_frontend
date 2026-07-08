@@ -47,8 +47,6 @@
         >
           {{ saving ? 'Saving…' : submitLabel }}
         </button>
-        <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-        <p v-else-if="ok" class="text-sm text-emerald-700">{{ ok }}</p>
       </div>
     </div>
 
@@ -96,8 +94,6 @@
         >
           Cancel
         </button>
-        <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-        <p v-else-if="ok" class="text-sm text-emerald-700">Milestone updated.</p>
       </div>
     </div>
 
@@ -210,8 +206,7 @@ const editingId = ref<string | null>(null)
 const editingMilestoneNumber = ref(0)
 const editAmount = ref('')
 const saving = ref(false)
-const error = ref('')
-const ok = ref('')
+const toast = useToast()
 const showDeleteModal = ref(false)
 const milestoneToDelete = ref<ProjectMilestone | null>(null)
 const deleting = ref(false)
@@ -297,8 +292,6 @@ function cancelEdit() {
   editingMilestoneNumber.value = 0
   editAmount.value = ''
   comment.value = ''
-  error.value = ''
-  ok.value = ''
 }
 
 function startEdit(entry: ProjectMilestone) {
@@ -307,8 +300,6 @@ function startEdit(entry: ProjectMilestone) {
   editingMilestoneNumber.value = entry.milestone_number
   editAmount.value = entry.amount != null ? String(entry.amount) : ''
   comment.value = entry.comment
-  error.value = ''
-  ok.value = ''
   nextTick(() => {
     formSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   })
@@ -317,8 +308,6 @@ function startEdit(entry: ProjectMilestone) {
 async function submitMilestone() {
   if (!canSubmit.value) return
   saving.value = true
-  error.value = ''
-  ok.value = ''
   const completedNumber = activeMilestone.value?.milestone_number ?? null
   const addedNumber = nextMilestoneNumber.value
   try {
@@ -326,14 +315,16 @@ async function submitMilestone() {
       amount: sanitizeBudgetInput(newAmount.value),
       comment: comment.value.trim(),
     })
-    ok.value = completedNumber
-      ? `Milestone ${completedNumber} completed. Milestone ${addedNumber} is now active.`
-      : 'Milestone 1 added.'
+    toast.success(
+      completedNumber
+        ? `Milestone ${completedNumber} completed. Milestone ${addedNumber} is now active.`
+        : 'Milestone 1 added.',
+    )
     resetAddForm()
     await refreshMilestones()
     emit('updated')
   } catch (e) {
-    error.value = e?.data?.error || e?.message || 'Failed to add milestone.'
+    toast.error(toastErrorMessage(e, 'Failed to add milestone.'))
   } finally {
     saving.value = false
   }
@@ -342,19 +333,17 @@ async function submitMilestone() {
 async function submitEdit() {
   if (!editingId.value || !canEditSubmit.value) return
   saving.value = true
-  error.value = ''
-  ok.value = ''
   try {
     await updateMilestone(props.projectId, editingId.value, {
       amount: sanitizeBudgetInput(editAmount.value),
       comment: comment.value.trim(),
     })
-    ok.value = 'Milestone updated.'
+    toast.success('Milestone updated.')
     cancelEdit()
     await refreshMilestones()
     emit('updated')
   } catch (e) {
-    error.value = e?.data?.error || e?.message || 'Failed to update milestone.'
+    toast.error(toastErrorMessage(e, 'Failed to update milestone.'))
   } finally {
     saving.value = false
   }
@@ -385,7 +374,8 @@ async function confirmDeleteMilestone() {
     await refreshMilestones()
     emit('updated')
   } catch (e) {
-    deleteError.value = e?.data?.error || e?.message || 'Failed to delete milestone.'
+    deleteError.value = toastErrorMessage(e, 'Failed to delete milestone.')
+    toast.error(deleteError.value)
   } finally {
     deleting.value = false
   }

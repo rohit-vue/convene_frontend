@@ -128,6 +128,7 @@ const upworkSelectOptions = computed(() => upworkAccountOptions)
 
 const loading = ref(false)
 const error = ref('')
+const toast = useToast()
 
 function blankForm() {
   return {
@@ -151,6 +152,7 @@ function close() {
 async function save() {
   if (!form.employee_id || !form.name.trim() || !form.client_name.trim()) {
     error.value = 'Please fill in all required (*) fields.'
+    toast.error(error.value)
     return
   }
 
@@ -168,9 +170,11 @@ async function save() {
       link_url: form.link_url || undefined,
     })
     Object.assign(form, blankForm())
+    toast.success('Project assigned.')
     emit('saved')
   } catch (e) {
-    error.value = e?.data?.error || e?.message || 'Failed to assign project.'
+    error.value = toastErrorMessage(e, 'Failed to assign project.')
+    toast.error(error.value)
   } finally {
     loading.value = false
   }

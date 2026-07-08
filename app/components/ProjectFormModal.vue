@@ -152,6 +152,7 @@ const inputClass =
   'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
 
 const { create, update, remove: deleteProject } = useProjects()
+const toast = useToast()
 
 const loading = ref(false)
 const deleting = ref(false)
@@ -207,6 +208,7 @@ function close() {
 async function save() {
   if (!form.name.trim()) {
     error.value = 'Project name is required.'
+    toast.error(error.value)
     return
   }
   loading.value = true
@@ -215,12 +217,15 @@ async function save() {
     if (isEdit.value) {
       const { status, ...body } = form
       await update(props.project.id, body)
+      toast.success('Project updated.')
     } else {
       await create({ ...form })
+      toast.success('Project created.')
     }
     emit('saved')
   } catch (e) {
-    error.value = e?.data?.error || e?.message || 'Failed to save project.'
+    error.value = toastErrorMessage(e, 'Failed to save project.')
+    toast.error(error.value)
   } finally {
     loading.value = false
   }
@@ -247,7 +252,8 @@ async function confirmDelete() {
     showDeleteModal.value = false
     emit('saved')
   } catch (e) {
-    deleteError.value = e?.data?.error || e?.message || 'Failed to delete project.'
+    deleteError.value = toastErrorMessage(e, 'Failed to delete project.')
+    toast.error(deleteError.value)
   } finally {
     deleting.value = false
   }
