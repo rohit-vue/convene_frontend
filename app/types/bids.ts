@@ -1,4 +1,4 @@
-export type BidStatus = 'applied' | 'canceled' | 'accepted'
+export type BidStatus = 'applied' | 'canceled' | 'accepted' | 'invited'
 export type BidJobType = 'fixed' | 'hourly'
 
 export interface UpworkBid {
