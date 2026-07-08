@@ -9,6 +9,7 @@ export interface SelectOption {
 
 export const bidStatusOptions: SelectOption[] = [
   { value: 'applied', label: 'Applied' },
+  { value: 'invited', label: 'Invited' },
   { value: 'canceled', label: 'Canceled' },
   { value: 'accepted', label: 'Accepted' },
 ]
@@ -31,6 +32,7 @@ export function bidJobTypeLabel(value?: string | null): string {
 
 export function bidStatusBadgeClass(value?: string | null): string {
   if (value === 'accepted') return 'bg-emerald-50 text-emerald-700'
+  if (value === 'invited') return 'bg-amber-50 text-amber-700'
   if (value === 'canceled') return 'bg-red-50 text-red-600'
   return 'bg-indigo-50 text-indigo-700'
 }
