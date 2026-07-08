@@ -102,6 +102,7 @@
 <script setup>
 const { search } = useSearch()
 const { isAdmin } = useProfile()
+const { openExclusive, closeExclusive } = useExclusiveDropdown()
 
 const root = ref(null)
 const query = ref('')
@@ -146,7 +147,7 @@ watch(query, (value) => {
   if (term.length < 2) {
     results.value = { meetings: [], projects: [], employees: [] }
     searched.value = false
-    open.value = false
+    close()
     return
   }
 
@@ -155,6 +156,7 @@ watch(query, (value) => {
 
 async function runSearch(term) {
   loading.value = true
+  openExclusive(close)
   open.value = true
   searched.value = false
 
@@ -177,12 +179,20 @@ function flatIndex(section, index) {
 }
 
 function onFocus() {
-  if (query.value.trim().length >= 2) open.value = true
+  if (query.value.trim().length >= 2) {
+    openExclusive(close)
+    open.value = true
+  }
 }
 
 function close() {
+  if (!open.value) {
+    highlightIndex.value = -1
+    return
+  }
   open.value = false
   highlightIndex.value = -1
+  closeExclusive(close)
 }
 
 function moveHighlight(delta) {
@@ -237,6 +247,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearTimeout(debounceTimer)
+  closeExclusive(close)
   document.removeEventListener('click', onDocumentClick)
 })
 </script>

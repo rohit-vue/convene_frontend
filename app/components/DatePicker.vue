@@ -144,6 +144,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
+const { openExclusive, closeExclusive } = useExclusiveDropdown()
+
 const root = ref(null)
 const trigger = ref(null)
 const panel = ref(null)
@@ -222,13 +224,22 @@ function syncViewToSelection() {
   viewMonth.value = now.getMonth()
 }
 
+function close() {
+  if (!open.value) return
+  open.value = false
+  closeExclusive(close)
+}
+
 function toggle() {
   if (props.disabled) return
-  open.value = !open.value
   if (open.value) {
-    syncViewToSelection()
-    nextTick(() => updatePosition())
+    close()
+    return
   }
+  openExclusive(close)
+  open.value = true
+  syncViewToSelection()
+  nextTick(() => updatePosition())
 }
 
 function prevMonth() {
@@ -252,18 +263,18 @@ function nextMonth() {
 function selectDate(dateKey) {
   if (isDateKeyDisabled(dateKey, props.min, props.max)) return
   emit('update:modelValue', dateKey)
-  open.value = false
+  close()
 }
 
 function clear() {
   emit('update:modelValue', '')
-  open.value = false
+  close()
 }
 
 function onDocumentClick(e) {
   if (!open.value) return
   if (root.value?.contains(e.target) || panel.value?.contains(e.target)) return
-  open.value = false
+  close()
 }
 
 function onViewportChange() {
@@ -276,6 +287,7 @@ onMounted(() => {
   window.addEventListener('resize', onViewportChange)
   window.addEventListener('scroll', onViewportChange, true)
   onUnmounted(() => {
+    closeExclusive(close)
     document.removeEventListener('click', onDocumentClick)
     window.removeEventListener('resize', onViewportChange)
     window.removeEventListener('scroll', onViewportChange, true)

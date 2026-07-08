@@ -61,3 +61,49 @@ export function formatMilestoneCostLabel(value?: number | string | null): string
   if (!digits) return '—'
   return Number(digits).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 }
+
+type StatusHistoryEntry = {
+  id: string
+  to_status: string
+  created_at: string
+}
+
+export function isFirstActiveStatusEntry(
+  entry: StatusHistoryEntry,
+  history: StatusHistoryEntry[],
+): boolean {
+  const activeEntries = history.filter((row) => row.to_status === 'active')
+  if (!activeEntries.length) return false
+  const first = [...activeEntries].sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+  )[0]
+  return first.id === entry.id
+}
+
+export function formatStatusHistoryWhen(
+  entry: StatusHistoryEntry,
+  history: StatusHistoryEntry[],
+  startDate?: string | null,
+): string {
+  if (
+    entry.to_status === 'active' &&
+    startDate &&
+    isFirstActiveStatusEntry(entry, history)
+  ) {
+    const dateKey = String(startDate).slice(0, 10)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) {
+      const date = new Date(`${dateKey}T12:00:00`)
+      return date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    }
+  }
+
+  if (!entry.created_at) return '—'
+  return new Date(entry.created_at).toLocaleString(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+}

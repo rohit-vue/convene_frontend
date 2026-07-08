@@ -70,7 +70,7 @@
               <span class="text-sm font-semibold text-slate-800">
                 {{ projectStatusLabel(entry.to_status) }}
               </span>
-              <span class="text-xs text-slate-400">{{ formatDateTime(entry.created_at) }}</span>
+              <span class="text-xs text-slate-400">{{ formatStatusHistoryWhen(entry, history || [], startDate) }}</span>
             </div>
             <p class="mt-1 text-sm text-slate-600">{{ entry.comment }}</p>
             <p v-if="entry.changed_by_name" class="mt-1 text-xs text-slate-400">
@@ -87,6 +87,7 @@
 const props = defineProps({
   projectId: { type: String, required: true },
   currentStatus: { type: String, required: true },
+  startDate: { type: String, default: '' },
   readOnly: { type: Boolean, default: false },
 })
 const emit = defineEmits(['updated'])
@@ -151,13 +152,5 @@ async function submitStatusChange() {
   } finally {
     statusLoading.value = false
   }
-}
-
-function formatDateTime(value) {
-  if (!value) return '—'
-  return new Date(value).toLocaleString(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  })
 }
 </script>

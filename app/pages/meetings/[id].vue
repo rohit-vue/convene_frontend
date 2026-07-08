@@ -20,6 +20,14 @@
           <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:gap-3">
             <button
               type="button"
+              :disabled="deleting || loading"
+              class="rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-60"
+              @click="openDeleteModal"
+            >
+              {{ deleting ? 'Deleting…' : 'Delete meeting' }}
+            </button>
+            <button
+              type="button"
               class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
               @click="openCreateModal"
             >
@@ -27,7 +35,7 @@
             </button>
             <button
               type="submit"
-              :disabled="loading"
+              :disabled="loading || deleting"
               class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60"
             >
               {{ loading ? 'Saving…' : 'Save changes' }}
@@ -118,6 +126,24 @@
         </div>
       </div>
     </div>
+
+    <ConfirmDeleteModal
+      :open="showDeleteModal"
+      title="Delete this meeting?"
+      message="This action cannot be undone. All meeting updates will be permanently removed."
+      confirm-label="Delete meeting"
+      :loading="deleting"
+      :error="deleteError"
+      @close="closeDeleteModal"
+      @confirm="confirmDeleteMeeting"
+    >
+      <div v-if="meeting" class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
+        <p class="font-medium text-slate-800">{{ form.project_name || meeting.project_name }}</p>
+        <p v-if="form.client_name || meeting.client_name" class="mt-1 text-slate-500">
+          {{ form.client_name || meeting.client_name }}
+        </p>
+      </div>
+    </ConfirmDeleteModal>
   </div>
 </template>
 
@@ -127,7 +153,8 @@ import { toLocalDateTimeInput } from '~/utils/dates'
 definePageMeta({ middleware: 'employee' })
 
 const route = useRoute()
-const { getById, update, listUpdates, createUpdate, updateUpdate } = useMeetings()
+const router = useRouter()
+const { getById, update, listUpdates, createUpdate, updateUpdate, remove } = useMeetings()
 
 const { data: meeting, error, refresh } = await useAsyncData(
   `meeting-${route.params.id}`,
@@ -146,7 +173,10 @@ const inputClass =
   'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
 
 const loading = ref(false)
+const deleting = ref(false)
+const showDeleteModal = ref(false)
 const saveError = ref('')
+const deleteError = ref('')
 const saveOk = ref(false)
 const showCreateModal = ref(false)
 const createLoading = ref(false)
@@ -339,6 +369,32 @@ async function saveFollowUpMeeting() {
     createError.value = e?.data?.error || e?.message || 'Failed to create follow-up meeting.'
   } finally {
     createLoading.value = false
+  }
+}
+
+function openDeleteModal() {
+  deleteError.value = ''
+  showDeleteModal.value = true
+}
+
+function closeDeleteModal() {
+  if (deleting.value) return
+  showDeleteModal.value = false
+  deleteError.value = ''
+}
+
+async function confirmDeleteMeeting() {
+  if (deleting.value) return
+  deleting.value = true
+  deleteError.value = ''
+  try {
+    await remove(route.params.id as string)
+    showDeleteModal.value = false
+    await router.push('/meetings')
+  } catch (e) {
+    deleteError.value = e?.data?.error || e?.message || 'Failed to delete meeting.'
+  } finally {
+    deleting.value = false
   }
 }
 </script>

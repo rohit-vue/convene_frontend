@@ -45,7 +45,7 @@
               </span>
               <div>
                 <p class="text-xs text-slate-400">Member since</p>
-                <p class="font-medium text-slate-700">{{ formatDate(profileData?.created_at) }}</p>
+                <p class="font-medium text-slate-700">{{ formatDate(displayMemberSince) }}</p>
               </div>
             </div>
             <div v-if="form.employee_code" class="flex items-center gap-3 text-sm">
@@ -99,6 +99,17 @@
               :class="inputClass"
             />
             <p class="mt-1.5 text-xs text-slate-400">Your job title as shown on your profile.</p>
+          </div>
+
+          <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Member since</label>
+            <DatePicker
+              v-model="form.member_since"
+              placeholder="Select date"
+              :input-class="inputClass"
+              full-width
+            />
+            <p class="mt-1.5 text-xs text-slate-400">When you joined the team or started in this role.</p>
           </div>
 
           <div>
@@ -157,7 +168,12 @@ const form = reactive({
   full_name: '',
   employee_code: '',
   job_title: '',
+  member_since: '',
 })
+
+const displayMemberSince = computed(
+  () => profileData.value?.member_since || profileData.value?.created_at || null,
+)
 
 const snapshot = ref('')
 
@@ -166,6 +182,7 @@ function serializeForm() {
     full_name: form.full_name.trim(),
     employee_code: form.employee_code.trim(),
     job_title: form.job_title.trim(),
+    member_since: form.member_since || '',
   })
 }
 
@@ -176,6 +193,7 @@ function resetForm() {
   form.full_name = profileData.value.full_name || ''
   form.employee_code = profileData.value.employee_code || ''
   form.job_title = profileData.value.job_title || ''
+  form.member_since = profileData.value.member_since || ''
   snapshot.value = serializeForm()
   saveError.value = ''
   saved.value = false
@@ -201,6 +219,7 @@ async function save() {
       full_name: form.full_name.trim(),
       employee_code: form.employee_code.trim(),
       job_title: form.job_title.trim(),
+      member_since: form.member_since || null,
     })
     await loadProfile()
     await fetchProfile()

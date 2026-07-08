@@ -141,7 +141,7 @@
                 <span class="text-sm font-semibold text-slate-800">
                   {{ projectStatusLabel(entry.to_status) }}
                 </span>
-                <span class="text-xs text-slate-400">{{ formatDateTime(entry.created_at) }}</span>
+                <span class="text-xs text-slate-400">{{ formatStatusHistoryWhen(entry, history || [], project.start_date) }}</span>
               </div>
               <p class="mt-1 text-sm text-slate-600">{{ entry.comment }}</p>
               <p v-if="entry.changed_by_name" class="mt-1 text-xs text-slate-400">
@@ -219,14 +219,6 @@ function formatDate(value) {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  })
-}
-
-function formatDateTime(value) {
-  if (!value) return '—'
-  return new Date(value).toLocaleString(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
   })
 }
 </script>
