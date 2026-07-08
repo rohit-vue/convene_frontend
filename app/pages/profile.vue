@@ -13,9 +13,40 @@
       <!-- Sidebar card -->
       <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm lg:sticky lg:top-24 lg:self-start">
         <div class="bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 px-6 pb-10 pt-8 text-center">
-          <div class="mx-auto grid h-24 w-24 place-items-center rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-3xl font-bold text-white shadow-lg ring-4 ring-white">
-            {{ initials }}
+          <div class="relative mx-auto w-fit">
+            <ProfileAvatar
+              :src="profileData?.avatar_url"
+              :initials="initials"
+              size="lg"
+              ring
+            />
+            <label
+              class="absolute -bottom-1 -right-1 grid h-6 w-6 cursor-pointer place-items-center rounded-full bg-white text-slate-500 shadow ring-1 ring-white transition hover:bg-slate-50 hover:text-indigo-600"
+              :class="{ 'pointer-events-none opacity-60': avatarBusy }"
+              title="Change photo"
+            >
+              <input
+                ref="avatarInput"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                class="sr-only"
+                :disabled="avatarBusy"
+                @change="onAvatarSelected"
+              />
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </label>
+            <button
+              v-if="profileData?.avatar_url && !avatarBusy"
+              type="button"
+              class="absolute -right-1 -top-1 grid h-6 w-6 place-items-center rounded-full bg-white text-slate-500 shadow ring-1 ring-white transition hover:bg-red-50 hover:text-red-600"
+              title="Remove photo"
+              @click="removePhoto"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
           </div>
+          <p v-if="avatarBusy" class="mt-4 text-xs text-white/80">Uploading photo…</p>
+          <p v-if="avatarError" class="mt-3 rounded-lg bg-white/15 px-3 py-2 text-xs text-white">{{ avatarError }}</p>
         </div>
 
         <div class="px-6 pb-6 pt-4 text-center">
@@ -154,6 +185,11 @@
 <script setup>
 const { get, update: updateProfile } = useProfileApi()
 const { displayName, role, isAdmin, initials, fetchProfile } = useProfile()
+const { uploadAvatar, removeAvatar } = useAvatarUpload()
+
+const avatarInput = ref(null)
+const avatarBusy = ref(false)
+const avatarError = ref('')
 
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-4 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
@@ -199,16 +235,6 @@ function resetForm() {
   saved.value = false
 }
 
-async function loadProfile() {
-  loadError.value = ''
-  try {
-    profileData.value = await get()
-    resetForm()
-  } catch (e) {
-    loadError.value = e?.data?.error || e?.message || 'Failed to load profile.'
-  }
-}
-
 async function save() {
   saving.value = true
   saveError.value = ''
@@ -228,6 +254,50 @@ async function save() {
     saveError.value = e?.data?.error || e?.message || 'Failed to save profile.'
   } finally {
     saving.value = false
+  }
+}
+
+async function loadProfile() {
+  loadError.value = ''
+  try {
+    profileData.value = await get()
+    resetForm()
+  } catch (e) {
+    loadError.value = e?.data?.error || e?.message || 'Failed to load profile.'
+  }
+}
+
+async function onAvatarSelected(event) {
+  const file = event.target.files?.[0]
+  event.target.value = ''
+  if (!file) return
+
+  avatarBusy.value = true
+  avatarError.value = ''
+
+  try {
+    const avatarUrl = await uploadAvatar(file)
+    if (profileData.value) profileData.value.avatar_url = avatarUrl
+    await fetchProfile()
+  } catch (e) {
+    avatarError.value = e?.message || 'Failed to upload photo.'
+  } finally {
+    avatarBusy.value = false
+  }
+}
+
+async function removePhoto() {
+  avatarBusy.value = true
+  avatarError.value = ''
+
+  try {
+    await removeAvatar()
+    if (profileData.value) profileData.value.avatar_url = null
+    await fetchProfile()
+  } catch (e) {
+    avatarError.value = e?.message || 'Failed to remove photo.'
+  } finally {
+    avatarBusy.value = false
   }
 }
 
