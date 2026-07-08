@@ -80,7 +80,9 @@
         </div>
       </div>
 
-      <div class="overflow-x-auto">
+      <ContentLoader v-if="isLoading" variant="table" :rows="6" :columns="5" />
+
+      <div v-else class="overflow-x-auto">
       <table class="w-full min-w-[640px] text-sm">
         <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
           <tr>
@@ -118,7 +120,7 @@
             <td v-if="!isAdmin" class="px-4 py-4 text-slate-600 sm:px-6">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
           </tr>
 
-          <tr v-if="meetings && displayedMeetings.length === 0">
+          <tr v-if="displayedMeetings.length === 0">
             <td :colspan="isAdmin ? 6 : 6" class="px-4 py-12 text-center text-sm text-slate-400 sm:px-6">
               {{ emptyMeetingsMessage }}
             </td>
@@ -175,11 +177,13 @@ const statusFilterOptions = computed(() => [
   ...assignmentStatusOptions,
 ])
 
-const { data: meetings, refresh } = await useAsyncData(
+const { data: meetings, status, refresh } = await useAsyncData(
   'meetings',
   () => list(),
   { server: false, default: () => [] },
 )
+
+const isLoading = computed(() => status.value !== 'success' && status.value !== 'error')
 
 const employeeOptions = computed(() => {
   const seen = new Map()

@@ -137,7 +137,29 @@
       </div>
     </div>
 
-    <div v-else class="text-sm text-slate-400">Loading…</div>
+    <div v-else class="space-y-6">
+      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+        <div class="flex items-center gap-5">
+          <div class="h-16 w-16 animate-pulse rounded-full bg-slate-100" />
+          <div class="flex-1 space-y-2">
+            <div class="h-6 w-48 animate-pulse rounded bg-slate-100" />
+            <div class="h-4 w-56 animate-pulse rounded bg-slate-100" />
+          </div>
+        </div>
+      </div>
+      <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+        <div class="border-b border-slate-100 px-4 py-4 sm:px-6">
+          <div class="h-5 w-24 animate-pulse rounded bg-slate-100" />
+        </div>
+        <ContentLoader variant="table" :rows="4" :columns="5" />
+      </div>
+      <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+        <div class="border-b border-slate-100 px-4 py-4 sm:px-6">
+          <div class="h-5 w-24 animate-pulse rounded bg-slate-100" />
+        </div>
+        <ContentLoader variant="table" :rows="4" :columns="5" />
+      </div>
+    </div>
   </div>
 </template>
 

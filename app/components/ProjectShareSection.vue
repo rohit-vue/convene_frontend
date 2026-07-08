@@ -27,7 +27,9 @@
 
     <div class="mt-6">
       <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-400">People with access</h3>
-      <div v-if="sharesLoading" class="mt-3 text-sm text-slate-400">Loading…</div>
+      <div v-if="sharesLoading" class="mt-3">
+        <ContentLoader variant="table" :rows="2" :columns="3" />
+      </div>
       <div v-else-if="!shares?.length" class="mt-3 text-sm text-slate-400">Not shared with anyone yet.</div>
       <ul v-else class="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-100">
         <li

@@ -108,7 +108,9 @@
 
     <div class="mt-6">
       <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-400">Log history</h3>
-      <div v-if="logsLoading" class="mt-3 text-sm text-slate-400">Loading logs…</div>
+      <div v-if="logsLoading" class="mt-3">
+        <ContentLoader variant="table" :rows="3" :columns="3" />
+      </div>
       <div v-else-if="!logs?.length" class="mt-3 text-sm text-slate-400">No daily logs yet.</div>
       <div v-else-if="!displayedLogs.length" class="mt-3 text-sm text-slate-400">
         No log for the selected date.

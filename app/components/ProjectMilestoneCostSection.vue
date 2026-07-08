@@ -106,7 +106,9 @@
 
     <div class="mt-6">
       <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-400">All milestones</h3>
-      <div v-if="milestonesLoading" class="mt-3 text-sm text-slate-400">Loading milestones…</div>
+      <div v-if="milestonesLoading" class="mt-3">
+        <ContentLoader variant="table" :rows="3" :columns="3" />
+      </div>
       <div v-else-if="!milestones?.length" class="mt-3 text-sm text-slate-400">No milestones yet.</div>
       <ol v-else class="mt-4 space-y-0">
         <li

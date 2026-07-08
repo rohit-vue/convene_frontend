@@ -9,6 +9,8 @@
       {{ loadError }}
     </div>
 
+    <ContentLoader v-else-if="loading" variant="profile" />
+
     <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
       <!-- Sidebar card -->
       <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm lg:sticky lg:top-24 lg:self-start">
@@ -190,6 +192,7 @@ const inputClass =
 
 const profileData = ref(null)
 const loadError = ref('')
+const loading = ref(true)
 const saving = ref(false)
 
 const form = reactive({
@@ -235,7 +238,7 @@ async function save() {
       job_title: form.job_title.trim(),
       member_since: form.member_since || null,
     })
-    await loadProfile()
+    await loadProfile({ quiet: true })
     await fetchProfile()
     toast.success('Profile updated successfully.')
   } catch (e) {
@@ -245,14 +248,19 @@ async function save() {
   }
 }
 
-async function loadProfile() {
-  loadError.value = ''
+async function loadProfile({ quiet = false } = {}) {
+  if (!quiet) {
+    loading.value = true
+    loadError.value = ''
+  }
   try {
     profileData.value = await get()
     resetForm()
   } catch (e) {
     loadError.value = toastErrorMessage(e, 'Failed to load profile.')
     toast.error(loadError.value)
+  } finally {
+    if (!quiet) loading.value = false
   }
 }
 
