@@ -41,8 +41,6 @@
         >
           {{ statusLoading ? 'Updating…' : 'Update status' }}
         </button>
-        <p v-if="statusError" class="text-sm text-red-600">{{ statusError }}</p>
-        <p v-else-if="statusOk" class="text-sm text-emerald-700">Status updated.</p>
       </div>
     </div>
 
@@ -115,8 +113,7 @@ const statusSelectOptions = computed(() =>
 const newStatus = ref('')
 const comment = ref('')
 const statusLoading = ref(false)
-const statusError = ref('')
-const statusOk = ref(false)
+const toast = useToast()
 
 const { data: history, pending: historyLoading, refresh: refreshHistory } = await useAsyncData(
   `project-status-history-${props.projectId}`,
@@ -135,20 +132,18 @@ const canSubmit = computed(() => {
 async function submitStatusChange() {
   if (!canSubmit.value) return
   statusLoading.value = true
-  statusError.value = ''
-  statusOk.value = false
   try {
     await changeStatus(props.projectId, {
       status: newStatus.value,
       comment: comment.value.trim(),
     })
-    statusOk.value = true
     newStatus.value = ''
     comment.value = ''
     await refreshHistory()
     emit('updated')
+    toast.success('Status updated.')
   } catch (e) {
-    statusError.value = e?.data?.error || e?.message || 'Failed to update status.'
+    toast.error(toastErrorMessage(e, 'Failed to update status.'))
   } finally {
     statusLoading.value = false
   }

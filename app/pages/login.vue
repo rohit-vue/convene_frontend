@@ -67,6 +67,7 @@
 definePageMeta({ layout: 'auth' })
 
 const supabase = useSupabaseClient()
+const toast = useToast()
 const email = ref('')
 const password = ref('')
 const error = ref('')
@@ -83,8 +84,10 @@ async function login() {
   loading.value = false
   if (err) {
     error.value = err.message
+    toast.error(err.message)
     return
   }
+  toast.success('Signed in successfully.')
   await navigateTo('/')
 }
 </script>

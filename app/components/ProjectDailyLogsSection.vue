@@ -103,10 +103,6 @@
         >
           Cancel
         </button>
-        <p v-if="saveError" class="text-sm text-red-600">{{ saveError }}</p>
-        <p v-else-if="saveOk" class="text-sm text-emerald-700">
-          {{ editingId ? 'Log updated.' : 'Log added.' }}
-        </p>
       </div>
     </div>
 
@@ -236,8 +232,7 @@ const editingId = ref<string | null>(null)
 const editingLogDate = ref('')
 const editingTrackerMinutes = ref(0)
 const saving = ref(false)
-const saveError = ref('')
-const saveOk = ref(false)
+const toast = useToast()
 const showDeleteModal = ref(false)
 const logToDelete = ref<ProjectDailyLog | null>(null)
 const deleting = ref(false)
@@ -302,8 +297,6 @@ function startEdit(entry: ProjectDailyLog) {
   trackerHours.value = isHourly.value
     ? Math.round(((entry.tracker_minutes || 0) / 60) * 100) / 100
     : 0
-  saveError.value = ''
-  saveOk.value = false
   nextTick(() => {
     formSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   })
@@ -311,19 +304,15 @@ function startEdit(entry: ProjectDailyLog) {
 
 function cancelEdit() {
   resetForm()
-  saveError.value = ''
-  saveOk.value = false
 }
 
 async function submitLog() {
   if (!canSubmit.value) return
   if (!editingId.value && isFutureDateKey(logDate.value)) {
-    saveError.value = 'You cannot add a log for a future date.'
+    toast.error('You cannot add a log for a future date.')
     return
   }
   saving.value = true
-  saveError.value = ''
-  saveOk.value = false
 
   const body = editingId.value
     ? { tasks_done: tasksDone.value.trim() }
@@ -336,14 +325,15 @@ async function submitLog() {
   try {
     if (editingId.value) {
       await updateDailyLog(props.projectId, editingId.value, body)
+      toast.success('Log updated.')
     } else {
       await createDailyLog(props.projectId, body)
+      toast.success('Log added.')
     }
-    saveOk.value = true
     resetForm()
     await refreshLogs()
   } catch (e) {
-    saveError.value = e?.data?.error || e?.message || 'Failed to save daily log.'
+    toast.error(toastErrorMessage(e, 'Failed to save daily log.'))
   } finally {
     saving.value = false
   }
@@ -373,7 +363,8 @@ async function confirmDeleteLog() {
     logToDelete.value = null
     await refreshLogs()
   } catch (e) {
-    deleteError.value = e?.data?.error || e?.message || 'Failed to delete daily log.'
+    deleteError.value = toastErrorMessage(e, 'Failed to delete daily log.')
+    toast.error(deleteError.value)
   } finally {
     deleting.value = false
   }

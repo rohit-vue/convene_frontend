@@ -17,7 +17,18 @@
           <span class="grid h-9 w-9 place-items-center rounded-xl" :class="card.iconBg" v-html="card.icon" />
         </div>
         <p class="mt-4 text-3xl font-bold tracking-tight">{{ card.value }}</p>
-        <p class="mt-1 text-xs font-medium text-slate-400">{{ card.trend }}</p>
+        <div v-if="card.badges?.length" class="mt-2 flex flex-wrap gap-1">
+          <span
+            v-for="badge in card.badges"
+            :key="badge.label"
+            class="inline-flex items-center gap-0.5 rounded-full px-1.5 py-px text-[10px] font-medium leading-4"
+            :class="badge.class"
+          >
+            <span class="font-semibold tabular-nums">{{ badge.count }}</span>
+            {{ badge.label }}
+          </span>
+        </div>
+        <p v-else class="mt-1 text-xs font-medium text-slate-400">{{ card.trend }}</p>
       </div>
     </div>
 
@@ -156,6 +167,7 @@ const { isAdmin, isEmployee } = useProfile()
 const { getOverview } = useDashboard()
 const { accept: acceptMeetingRequest } = useMeetings()
 const { accept: acceptProjectRequest } = useProjects()
+const toast = useToast()
 
 const { data: overview, refresh: refreshOverview } = await useAsyncData(
   'dashboard-overview',
@@ -173,8 +185,9 @@ async function acceptMeeting(id) {
   try {
     await acceptMeetingRequest(id)
     await refreshOverview()
+    toast.success('Meeting accepted.')
   } catch (e) {
-    console.error(e)
+    toast.error(toastErrorMessage(e, 'Failed to accept meeting.'))
   } finally {
     acceptingMeetingId.value = null
   }
@@ -185,8 +198,9 @@ async function acceptProject(id) {
   try {
     await acceptProjectRequest(id)
     await refreshOverview()
+    toast.success('Project accepted.')
   } catch (e) {
-    console.error(e)
+    toast.error(toastErrorMessage(e, 'Failed to accept project.'))
   } finally {
     acceptingProjectId.value = null
   }
@@ -241,10 +255,31 @@ const primaryCards = computed(() => {
     })
   }
 
+  const meetingOutcomes = overview.value?.meetingOutcomeBreakdown ?? {}
+  const projectStatuses = overview.value?.projectStatusBreakdown ?? {}
+  const attentionBadges = [
+    {
+      label: 'Follow-up',
+      count: meetingOutcomes.follow_up_required ?? 0,
+      class: 'bg-amber-50 text-amber-700',
+    },
+    {
+      label: 'Pending reply',
+      count: meetingOutcomes.pending_reply ?? 0,
+      class: 'bg-orange-50 text-orange-700',
+    },
+    {
+      label: 'On hold',
+      count: projectStatuses.on_hold ?? 0,
+      class: 'bg-slate-100 text-slate-700',
+    },
+  ].filter((badge) => badge.count > 0)
+
   cards.push({
     label: 'Needs attention',
     value: stats.value.needsAttention ?? 0,
     trend: 'Follow-ups & on hold',
+    badges: attentionBadges,
     iconBg: 'bg-amber-50 text-amber-600',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
   })

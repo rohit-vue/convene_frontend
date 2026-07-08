@@ -138,6 +138,7 @@ import { downloadMeetingsExcel } from '~/utils/exportMeetingsExcel'
 
 const { isAdmin, isEmployee, fetchProfile } = useProfile()
 const { list, exportAll } = useMeetings()
+const toast = useToast()
 
 await fetchProfile()
 
@@ -257,8 +258,9 @@ async function downloadAllMeetings() {
   try {
     const rows = await exportAll()
     downloadMeetingsExcel(rows)
+    toast.success('Meetings exported.')
   } catch (err) {
-    console.error('Failed to download meetings:', err)
+    toast.error(toastErrorMessage(err, 'Failed to download meetings.'))
   } finally {
     downloading.value = false
   }

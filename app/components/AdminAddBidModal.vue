@@ -139,6 +139,7 @@ const inputClass =
 
 const loading = ref(false)
 const error = ref('')
+const toast = useToast()
 
 const isEdit = computed(() => Boolean(props.bid?.id))
 const maxBidDate = todayDateKey()
@@ -198,22 +199,27 @@ function close() {
 async function save() {
   if (!form.upwork_account) {
     error.value = 'Upwork account is required.'
+    toast.error(error.value)
     return
   }
   if (!form.job_link.trim()) {
     error.value = 'Job link is required.'
+    toast.error(error.value)
     return
   }
   if (!form.job_type) {
     error.value = 'Project type is required.'
+    toast.error(error.value)
     return
   }
   if (form.job_type === 'hourly' && !form.hourly_rate) {
     error.value = 'Hourly rate is required for hourly bids.'
+    toast.error(error.value)
     return
   }
   if (form.job_type === 'fixed' && !form.fixed_amount) {
     error.value = 'Fixed amount is required for fixed bids.'
+    toast.error(error.value)
     return
   }
 
@@ -235,13 +241,16 @@ async function save() {
   try {
     if (isEdit.value && props.bid) {
       await update(props.bid.id, payload)
+      toast.success('Bid updated.')
     } else {
       await create(payload)
+      toast.success('Bid added.')
     }
     emit('saved')
     close()
   } catch (e: any) {
-    error.value = e?.data?.error || e?.message || `Failed to ${isEdit.value ? 'update' : 'add'} bid.`
+    error.value = toastErrorMessage(e, `Failed to ${isEdit.value ? 'update' : 'add'} bid.`)
+    toast.error(error.value)
   } finally {
     loading.value = false
   }

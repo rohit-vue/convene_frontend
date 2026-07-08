@@ -25,9 +25,6 @@
       </button>
     </div>
 
-    <p v-if="shareError" class="mt-3 text-sm text-red-600">{{ shareError }}</p>
-    <p v-else-if="shareOk" class="mt-3 text-sm text-emerald-700">Access granted.</p>
-
     <div class="mt-6">
       <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-400">People with access</h3>
       <div v-if="sharesLoading" class="mt-3 text-sm text-slate-400">Loading…</div>
@@ -81,8 +78,7 @@ const inputClass =
 
 const selectedEmployeeId = ref('')
 const sharing = ref(false)
-const shareError = ref('')
-const shareOk = ref(false)
+const toast = useToast()
 const revokingId = ref<string | null>(null)
 
 const { data: employeeOptions } = await useAsyncData(
@@ -108,15 +104,13 @@ const employeeSelectOptions = computed(() =>
 async function grantShare() {
   if (!selectedEmployeeId.value) return
   sharing.value = true
-  shareError.value = ''
-  shareOk.value = false
   try {
     await shareProject(props.projectId, { employee_id: selectedEmployeeId.value })
-    shareOk.value = true
     selectedEmployeeId.value = ''
     await refreshShares()
+    toast.success('Project shared.')
   } catch (e) {
-    shareError.value = e?.data?.error || e?.message || 'Failed to share project.'
+    toast.error(toastErrorMessage(e, 'Failed to share project.'))
   } finally {
     sharing.value = false
   }
@@ -124,12 +118,12 @@ async function grantShare() {
 
 async function revoke(shareId: string) {
   revokingId.value = shareId
-  shareError.value = ''
   try {
     await revokeShare(props.projectId, shareId)
     await refreshShares()
+    toast.success('Access revoked.')
   } catch (e) {
-    shareError.value = e?.data?.error || e?.message || 'Failed to revoke access.'
+    toast.error(toastErrorMessage(e, 'Failed to revoke access.'))
   } finally {
     revokingId.value = null
   }

@@ -143,6 +143,7 @@ const inputClass =
 
 const { create, update } = useMeetings()
 const { getOptions } = useEmployees()
+const toast = useToast()
 
 const { data: employees } = await useAsyncData(
   'employees-for-meetings',
@@ -202,6 +203,7 @@ async function save() {
     !form.meeting_outcome
   ) {
     error.value = 'Please fill in all required (*) fields.'
+    toast.error(error.value)
     return
   }
   loading.value = true
@@ -214,13 +216,16 @@ async function save() {
     }
     if (isEdit.value) {
       await update(props.meeting.id, body)
+      toast.success('Meeting updated.')
     } else {
       await create(body)
+      toast.success('Meeting created.')
       reset()
     }
     emit('saved')
   } catch (e) {
-    error.value = e?.data?.error || e?.message || 'Failed to save meeting.'
+    error.value = toastErrorMessage(e, 'Failed to save meeting.')
+    toast.error(error.value)
   } finally {
     loading.value = false
   }
