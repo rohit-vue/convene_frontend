@@ -5,11 +5,12 @@
       <div class="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
       <div class="pointer-events-none absolute -bottom-24 -left-16 h-80 w-80 rounded-full bg-violet-400/20 blur-3xl" />
 
-      <div class="relative flex items-center gap-3">
-        <div class="grid h-11 w-11 place-items-center rounded-2xl bg-white/95 shadow-sm">
-          <img src="/convenelogo.png" alt="Convene" class="h-8 w-8 object-contain" />
-        </div>
-        <span class="text-xl font-semibold tracking-tight">Convene</span>
+      <div class="relative w-fit rounded-2xl bg-white/95 px-4 py-2.5 shadow-sm">
+        <img
+          src="/convenelogo.png"
+          alt="Convene"
+          class="h-12 w-auto max-w-full object-contain sm:h-14"
+        />
       </div>
 
       <div class="relative max-w-md">

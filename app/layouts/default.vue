@@ -10,8 +10,12 @@
       class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white px-4 py-6 transition-transform duration-200 ease-in-out lg:translate-x-0"
       :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
     >
-      <div class="mb-8 flex items-center justify-between px-2">
-        <img src="/convenelogo.png" alt="Convene" class="h-8 w-auto object-contain" />
+      <div class="mb-8 flex items-center justify-between gap-3 px-2">
+        <img
+          src="/convenelogo.png"
+          alt="Convene"
+          class="h-12 w-auto max-w-[calc(100%-2.5rem)] shrink object-contain sm:h-14 lg:h-16"
+        />
         <button
           class="grid h-8 w-8 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 lg:hidden"
           aria-label="Close menu"
@@ -42,9 +46,13 @@
           active-class="!bg-indigo-50"
           @click="sidebarOpen = false"
         >
-          <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-xs font-semibold text-white ring-2 ring-white">
-            {{ initials }}
-          </div>
+          <ProfileAvatar
+            :src="avatarUrl"
+            :initials="initials"
+            size="sm"
+            shape="circle"
+            ring
+          />
           <div class="min-w-0 text-sm leading-tight">
             <p class="truncate font-medium text-slate-800">{{ displayName }}</p>
             <p class="text-xs capitalize text-slate-400">{{ role }}</p>
@@ -91,7 +99,7 @@
 <script setup>
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-const { displayName, role, initials, isAdmin, isEmployee, fetchProfile } = useProfile()
+const { displayName, role, initials, avatarUrl, isAdmin, isEmployee, fetchProfile } = useProfile()
 const route = useRoute()
 
 const sidebarOpen = ref(false)

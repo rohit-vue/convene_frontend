@@ -4,6 +4,7 @@ export interface ApiProfile {
   employee_code: string | null
   job_title: string | null
   member_since?: string | null
+  avatar_url?: string | null
   email?: string | null
   created_at?: string | null
 }
@@ -13,6 +14,7 @@ export interface ProfileUpdateInput {
   employee_code?: string
   job_title?: string
   member_since?: string | null
+  avatar_url?: string | null
 }
 
 export const useProfileApi = () => {

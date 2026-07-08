@@ -3,6 +3,7 @@ interface Profile {
   role: 'employee' | 'admin'
   employee_code: string | null
   job_title: string | null
+  avatar_url: string | null
 }
 
 interface AuthUserSnapshot {
@@ -39,7 +40,7 @@ export const useProfile = () => {
 
     const { data } = await supabase
       .from('profiles')
-      .select('full_name, role, employee_code, job_title')
+      .select('full_name, role, employee_code, job_title, avatar_url')
       .eq('id', resolvedUser.id)
       .single()
 
@@ -63,6 +64,8 @@ export const useProfile = () => {
 
   const employeeCode = computed(() => profile.value?.employee_code ?? null)
 
+  const avatarUrl = computed(() => profile.value?.avatar_url ?? null)
+
   const isAdmin = computed(() => role.value === 'admin')
 
   const isEmployee = computed(() => role.value === 'employee')
@@ -85,6 +88,7 @@ export const useProfile = () => {
     role,
     jobTitle,
     employeeCode,
+    avatarUrl,
     isAdmin,
     isEmployee,
     initials,
