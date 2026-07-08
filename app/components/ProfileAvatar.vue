@@ -21,7 +21,7 @@ const props = defineProps({
   size: {
     type: String,
     default: 'md',
-    validator: (value) => ['sm', 'md', 'lg'].includes(value),
+    validator: (value) => ['sm', 'md', 'lg', 'xl'].includes(value),
   },
   shape: {
     type: String,
@@ -34,6 +34,7 @@ const props = defineProps({
 const sizeClass = computed(() => {
   if (props.size === 'sm') return 'h-9 w-9 text-xs'
   if (props.size === 'lg') return 'h-24 w-24 text-3xl'
+  if (props.size === 'xl') return 'h-32 w-32 text-4xl'
   return 'h-12 w-12 text-sm'
 })
 

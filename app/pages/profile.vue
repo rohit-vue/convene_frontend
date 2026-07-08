@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto max-w-5xl">
+  <div class="mx-auto max-w-6xl">
     <div class="mb-6 sm:mb-8">
       <h1 class="text-xl font-bold tracking-tight sm:text-2xl">Profile</h1>
       <p class="mt-1 text-sm text-slate-500">Manage your personal details and how you appear in Convene.</p>
@@ -11,93 +11,120 @@
 
     <ContentLoader v-else-if="loading" variant="profile" />
 
-    <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
-      <!-- Sidebar card -->
-      <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm lg:sticky lg:top-24 lg:self-start">
-        <div class="bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 px-6 pb-10 pt-8 text-center">
-          <div class="relative mx-auto w-fit">
-            <ProfileAvatar
-              :src="profileData?.avatar_url"
-              :initials="initials"
-              size="lg"
-              ring
-            />
-            <label
-              class="absolute -bottom-1 -right-1 grid h-6 w-6 cursor-pointer place-items-center rounded-full bg-white text-slate-500 shadow ring-1 ring-white transition hover:bg-slate-50 hover:text-indigo-600"
-              :class="{ 'pointer-events-none opacity-60': avatarBusy }"
-              title="Change photo"
-            >
-              <input
-                ref="avatarInput"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                class="sr-only"
-                :disabled="avatarBusy"
-                @change="onAvatarSelected"
+    <div v-else class="space-y-6">
+      <!-- Profile card -->
+      <div class="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm">
+        <div class="grid min-h-[22rem] grid-cols-1 md:grid-cols-[minmax(280px,380px)_1fr]">
+          <!-- Left: identity -->
+          <div class="flex flex-col items-center justify-center bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 px-8 py-10 text-center">
+            <div class="relative w-fit">
+              <ProfileAvatar
+                :src="profileData?.avatar_url"
+                :initials="initials"
+                size="xl"
+                ring
               />
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-            </label>
-            <button
-              v-if="profileData?.avatar_url && !avatarBusy"
-              type="button"
-              class="absolute -right-1 -top-1 grid h-6 w-6 place-items-center rounded-full bg-white text-slate-500 shadow ring-1 ring-white transition hover:bg-red-50 hover:text-red-600"
-              title="Remove photo"
-              @click="removePhoto"
+              <label
+                class="absolute -bottom-1 -right-1 grid h-7 w-7 cursor-pointer place-items-center rounded-full bg-white text-slate-500 shadow ring-1 ring-white transition hover:bg-slate-50 hover:text-indigo-600"
+                :class="{ 'pointer-events-none opacity-60': avatarBusy }"
+                title="Change photo"
+              >
+                <input
+                  ref="avatarInput"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  class="sr-only"
+                  :disabled="avatarBusy"
+                  @change="onAvatarSelected"
+                />
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              </label>
+              <button
+                v-if="profileData?.avatar_url && !avatarBusy"
+                type="button"
+                class="absolute -right-1 -top-1 grid h-7 w-7 place-items-center rounded-full bg-white text-slate-500 shadow ring-1 ring-white transition hover:bg-red-50 hover:text-red-600"
+                title="Remove photo"
+                @click="removePhoto"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+            <p v-if="avatarBusy" class="mt-4 text-sm text-white/80">Uploading photo…</p>
+            <h2 class="mt-6 text-2xl font-semibold text-white">{{ form.full_name || displayName }}</h2>
+            <p v-if="form.job_title" class="mt-1.5 text-base text-white/85">{{ form.job_title }}</p>
+            <span
+              class="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-sm font-medium capitalize text-white ring-1 ring-white/25"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-            </button>
+              <span class="h-1.5 w-1.5 rounded-full bg-white" />
+              {{ role }} account
+            </span>
           </div>
-          <p v-if="avatarBusy" class="mt-4 text-xs text-white/80">Uploading photo…</p>
-        </div>
 
-        <div class="px-6 pb-6 pt-4 text-center">
-          <h2 class="text-lg font-semibold text-slate-800">{{ form.full_name || displayName }}</h2>
-          <p v-if="form.job_title" class="mt-0.5 text-sm text-slate-500">{{ form.job_title }}</p>
-          <span
-            class="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium capitalize"
-            :class="isAdmin ? 'bg-violet-50 text-violet-700' : 'bg-emerald-50 text-emerald-700'"
-          >
-            <span class="h-1.5 w-1.5 rounded-full" :class="isAdmin ? 'bg-violet-500' : 'bg-emerald-500'" />
-            {{ role }} account
-          </span>
-
-          <div class="mt-6 space-y-3 border-t border-slate-100 pt-6 text-left">
-            <div class="flex items-center gap-3 text-sm">
-              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-500">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-              </span>
-              <div class="min-w-0 flex-1">
-                <p class="text-xs text-slate-400">Email</p>
-                <p class="break-all text-sm font-medium text-slate-700">{{ profileData?.email || '—' }}</p>
+          <!-- Right: details + edit -->
+          <div class="flex flex-col justify-between gap-8 px-8 py-8 sm:px-10 sm:py-10">
+            <div class="space-y-6">
+              <div class="flex items-center gap-4">
+                <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-slate-400">Email</p>
+                  <p class="mt-0.5 break-all text-base font-medium text-slate-800 sm:text-lg">{{ profileData?.email || '—' }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                </span>
+                <div>
+                  <p class="text-sm text-slate-400">Member since</p>
+                  <p class="mt-0.5 text-base font-medium text-slate-800 sm:text-lg">{{ formatDate(displayMemberSince) }}</p>
+                </div>
+              </div>
+              <div v-if="form.employee_code" class="flex items-center gap-4">
+                <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </span>
+                <div>
+                  <p class="text-sm text-slate-400">Employee ID</p>
+                  <p class="mt-0.5 text-base font-medium text-slate-800 sm:text-lg">{{ form.employee_code }}</p>
+                </div>
               </div>
             </div>
-            <div class="flex items-center gap-3 text-sm">
-              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-500">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-              </span>
-              <div>
-                <p class="text-xs text-slate-400">Member since</p>
-                <p class="font-medium text-slate-700">{{ formatDate(displayMemberSince) }}</p>
-              </div>
-            </div>
-            <div v-if="form.employee_code" class="flex items-center gap-3 text-sm">
-              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-500">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-              </span>
-              <div>
-                <p class="text-xs text-slate-400">Employee ID</p>
-                <p class="font-medium text-slate-700">{{ form.employee_code }}</p>
-              </div>
+
+            <div class="flex justify-end border-t border-slate-100 pt-6">
+              <button
+                type="button"
+                :disabled="editing"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-default disabled:opacity-70"
+                @click="openEdit"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                {{ editing ? 'Editing…' : 'Edit profile' }}
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Edit form -->
-      <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-        <div class="border-b border-slate-100 px-6 py-5">
-          <h2 class="text-lg font-semibold text-slate-800">Personal information</h2>
-          <p class="mt-0.5 text-sm text-slate-500">Update your name, employee ID, and role title.</p>
+      <!-- Edit form (only when editing) -->
+      <div
+        v-if="editing"
+        class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm"
+      >
+        <div class="flex items-start justify-between gap-3 border-b border-slate-100 px-6 py-5">
+          <div>
+            <h2 class="text-lg font-semibold text-slate-800">Personal information</h2>
+            <p class="mt-0.5 text-sm text-slate-500">Update your name, employee ID, and role title.</p>
+          </div>
+          <button
+            type="button"
+            class="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            title="Close"
+            @click="cancelEdit"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
         </div>
 
         <form class="space-y-5 p-6" @submit.prevent="save">
@@ -164,12 +191,11 @@
               {{ saving ? 'Saving…' : 'Save changes' }}
             </button>
             <button
-              v-if="dirty"
               type="button"
               class="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
-              @click="resetForm"
+              @click="cancelEdit"
             >
-              Discard
+              Cancel
             </button>
           </div>
         </form>
@@ -194,6 +220,7 @@ const profileData = ref(null)
 const loadError = ref('')
 const loading = ref(true)
 const saving = ref(false)
+const editing = ref(false)
 
 const form = reactive({
   full_name: '',
@@ -228,6 +255,16 @@ function resetForm() {
   snapshot.value = serializeForm()
 }
 
+function openEdit() {
+  resetForm()
+  editing.value = true
+}
+
+function cancelEdit() {
+  resetForm()
+  editing.value = false
+}
+
 async function save() {
   saving.value = true
 
@@ -240,6 +277,7 @@ async function save() {
     })
     await loadProfile({ quiet: true })
     await fetchProfile()
+    editing.value = false
     toast.success('Profile updated successfully.')
   } catch (e) {
     toast.error(toastErrorMessage(e, 'Failed to save profile.'))

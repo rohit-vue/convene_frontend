@@ -141,3 +141,22 @@ export function getPanelWidth(): number {
   if (typeof window === 'undefined') return 288
   return Math.min(288, window.innerWidth - 16)
 }
+
+export const CALENDAR_MONTH_OPTIONS = Array.from({ length: 12 }, (_, month) => ({
+  value: month,
+  label: new Date(2000, month, 1).toLocaleDateString(undefined, { month: 'long' }),
+}))
+
+export function buildCalendarYearOptions(centerYear = new Date().getFullYear(), range = 100) {
+  const start = centerYear - range
+  const end = centerYear + range
+  const years: number[] = []
+  for (let year = end; year >= start; year -= 1) {
+    years.push(year)
+  }
+  return years
+}
+
+export function calendarMonthLabel(month: number): string {
+  return CALENDAR_MONTH_OPTIONS[month]?.label || ''
+}
