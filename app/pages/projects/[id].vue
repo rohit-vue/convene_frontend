@@ -31,10 +31,18 @@
             </span>
           </div>
 
-          <div v-if="canEditProject" class="mt-4 flex justify-end">
+          <div v-if="canEditProject" class="mt-4 flex flex-wrap items-center justify-end gap-2">
+            <button
+              type="button"
+              :disabled="deleting || loading"
+              class="rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-60"
+              @click="openDeleteModal"
+            >
+              {{ deleting ? 'Deleting…' : 'Delete project' }}
+            </button>
             <button
               type="submit"
-              :disabled="loading"
+              :disabled="loading || deleting"
               class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60"
             >
               {{ loading ? 'Saving…' : 'Save changes' }}
@@ -146,6 +154,7 @@
         <ProjectStatusSection
           :project-id="route.params.id"
           :current-status="project.status"
+          :start-date="form.start_date || project.start_date || ''"
           :read-only="!canEditProject"
           @updated="onStatusUpdated"
         />
@@ -154,11 +163,30 @@
           :project-id="route.params.id"
           :job-type="form.job_type"
           :can-edit-logs="canEditLogs"
+          :can-manage-all-logs="canEditProject"
         />
       </form>
     </div>
 
     <div v-else class="text-sm text-slate-400">Loading…</div>
+
+    <ConfirmDeleteModal
+      :open="showDeleteModal"
+      title="Delete this project?"
+      message="This action cannot be undone. All project data will be permanently removed."
+      confirm-label="Delete project"
+      :loading="deleting"
+      :error="deleteError"
+      @close="closeDeleteModal"
+      @confirm="confirmDeleteProject"
+    >
+      <div v-if="project" class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
+        <p class="font-medium text-slate-800">{{ form.name || project.name }}</p>
+        <p v-if="form.client_name || project.client_name" class="mt-1 text-slate-500">
+          {{ form.client_name || project.client_name }}
+        </p>
+      </div>
+    </ConfirmDeleteModal>
   </div>
 </template>
 
@@ -166,7 +194,8 @@
 definePageMeta({ middleware: 'employee' })
 
 const route = useRoute()
-const { getById, update } = useProjects()
+const router = useRouter()
+const { getById, update, remove } = useProjects()
 
 const { data: project, error, refresh } = await useAsyncData(
   `project-${route.params.id}`,
@@ -187,7 +216,10 @@ const statusMeta = {
 }
 
 const loading = ref(false)
+const deleting = ref(false)
+const showDeleteModal = ref(false)
 const saveError = ref('')
+const deleteError = ref('')
 const saveOk = ref(false)
 
 function blankForm() {
@@ -214,6 +246,8 @@ function fill(p) {
     for (const key of Object.keys(next)) {
       if (key === 'hourly_rate') {
         next.hourly_rate = p.hourly_rate != null ? String(p.hourly_rate) : ''
+      } else if (key === 'start_date' && p[key]) {
+        next.start_date = String(p[key]).slice(0, 10)
       } else if (p[key] !== null && p[key] !== undefined) {
         next[key] = p[key]
       }
@@ -267,6 +301,33 @@ async function save() {
     saveError.value = e?.data?.error || e?.message || 'Failed to save changes.'
   } finally {
     loading.value = false
+  }
+}
+
+function openDeleteModal() {
+  if (!canEditProject.value) return
+  deleteError.value = ''
+  showDeleteModal.value = true
+}
+
+function closeDeleteModal() {
+  if (deleting.value) return
+  showDeleteModal.value = false
+  deleteError.value = ''
+}
+
+async function confirmDeleteProject() {
+  if (!canEditProject.value || deleting.value) return
+  deleting.value = true
+  deleteError.value = ''
+  try {
+    await remove(route.params.id as string)
+    showDeleteModal.value = false
+    await router.push('/projects')
+  } catch (e) {
+    deleteError.value = e?.data?.error || e?.message || 'Failed to delete project.'
+  } finally {
+    deleting.value = false
   }
 }
 </script>

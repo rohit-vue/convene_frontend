@@ -105,6 +105,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
+const { openExclusive, closeExclusive } = useExclusiveDropdown()
+
 const root = ref(null)
 const trigger = ref(null)
 const panel = ref(null)
@@ -143,22 +145,27 @@ function updatePosition() {
   }
 }
 
+function close() {
+  if (!open.value) return
+  open.value = false
+  closeExclusive(close)
+}
+
 function toggle() {
   if (props.disabled) return
-  open.value = !open.value
   if (open.value) {
-    nextTick(() => updatePosition())
+    close()
+    return
   }
+  openExclusive(close)
+  open.value = true
+  nextTick(() => updatePosition())
 }
 
 function select(opt) {
   if (opt.disabled) return
   emit('update:modelValue', opt.value)
-  open.value = false
-}
-
-function close() {
-  open.value = false
+  close()
 }
 
 function onDocumentClick(e) {
@@ -177,6 +184,7 @@ onMounted(() => {
   window.addEventListener('resize', onViewportChange)
   window.addEventListener('scroll', onViewportChange, true)
   onUnmounted(() => {
+    closeExclusive(close)
     document.removeEventListener('click', onDocumentClick)
     window.removeEventListener('resize', onViewportChange)
     window.removeEventListener('scroll', onViewportChange, true)

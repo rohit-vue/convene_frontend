@@ -26,8 +26,19 @@
       </div>
     </div>
 
-    <div v-if="canEditLogs && !readOnly" class="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
-      <div class="grid grid-cols-1 gap-4" :class="isHourly ? 'sm:grid-cols-2' : ''">
+    <div
+      v-if="canEditLogs && !readOnly"
+      ref="formSection"
+      class="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4"
+      :class="editingId ? 'border-indigo-200 ring-1 ring-indigo-100' : ''"
+    >
+      <p
+        v-if="editingId"
+        class="rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-800"
+      >
+        Editing log for <strong>{{ formatLogDate(editingLogDate) }}</strong>. You can only update the task description below.
+      </p>
+      <div v-if="!editingId" class="grid grid-cols-1 gap-4" :class="isHourly ? 'sm:grid-cols-2' : ''">
         <div>
           <label class="mb-1 block text-sm font-medium text-slate-700">
             Date <span class="text-red-500">*</span>
@@ -59,6 +70,10 @@
             {{ formatTrackerMinutes(Math.round(trackerHours * 60)) }}
           </p>
         </div>
+      </div>
+      <div v-else-if="isHourly" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
+        <span class="text-slate-500">Tracked time:</span>
+        {{ formatTrackerMinutes(editingTrackerMinutes) }}
       </div>
       <div>
         <label class="mb-1 block text-sm font-medium text-slate-700">
@@ -127,34 +142,72 @@
             <p v-if="entry.logged_by_name" class="mt-2 text-xs text-slate-400">
               by {{ entry.logged_by_name }}
             </p>
-            <button
-              v-if="canEditLogs && !readOnly && entry.created_by === currentUserId"
-              type="button"
-              class="mt-2 text-xs font-medium text-indigo-600 transition hover:text-indigo-700"
-              @click="startEdit(entry)"
-            >
-              Edit
-            </button>
+            <div v-if="canManageLog(entry)" class="mt-2 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                class="text-xs font-medium text-indigo-600 transition hover:text-indigo-700"
+                @click="startEdit(entry)"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                class="text-xs font-medium text-red-600 transition hover:text-red-700"
+                @click="openDeleteModal(entry)"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </li>
       </ol>
     </div>
+
+    <ConfirmDeleteModal
+      :open="showDeleteModal"
+      title="Delete this daily log?"
+      message="This action cannot be undone. The log entry will be permanently removed."
+      confirm-label="Delete log"
+      :loading="deleting"
+      :error="deleteError"
+      @close="closeDeleteModal"
+      @confirm="confirmDeleteLog"
+    >
+      <div v-if="logToDelete" class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
+        <p class="font-medium text-slate-800">{{ formatLogDate(logToDelete.log_date) }}</p>
+        <p class="mt-2 line-clamp-3 whitespace-pre-wrap text-slate-600">{{ logToDelete.tasks_done }}</p>
+      </div>
+    </ConfirmDeleteModal>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { ProjectDailyLog } from '~/types/projects'
+
 const props = defineProps({
   projectId: { type: String, required: true },
   jobType: { type: String, default: '' },
   readOnly: { type: Boolean, default: false },
   canEditLogs: { type: Boolean, default: true },
+  canManageAllLogs: { type: Boolean, default: false },
   adminEmployeeId: { type: String, default: '' },
 })
 
+const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-const currentUserId = computed(() => user.value?.id ?? '')
+const sessionUserId = ref('')
+const formSection = ref<HTMLElement | null>(null)
 
-const { getDailyLogs, createDailyLog, updateDailyLog, getAdminDailyLogs } = useProjects()
+onMounted(async () => {
+  if (!user.value?.id) {
+    const { data } = await supabase.auth.getSession()
+    sessionUserId.value = data.session?.user?.id ?? ''
+  }
+})
+
+const currentUserId = computed(() => user.value?.id ?? sessionUserId.value)
+
+const { getDailyLogs, createDailyLog, updateDailyLog, deleteDailyLog, getAdminDailyLogs } = useProjects()
 
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
@@ -179,10 +232,16 @@ const logDate = ref(todayDateKey())
 const filterDate = ref('')
 const tasksDone = ref('')
 const trackerHours = ref(0)
-const editingId = ref(null)
+const editingId = ref<string | null>(null)
+const editingLogDate = ref('')
+const editingTrackerMinutes = ref(0)
 const saving = ref(false)
 const saveError = ref('')
 const saveOk = ref(false)
+const showDeleteModal = ref(false)
+const logToDelete = ref<ProjectDailyLog | null>(null)
+const deleting = ref(false)
+const deleteError = ref('')
 
 const { data: logs, pending: logsLoading, refresh: refreshLogs } = await useAsyncData(
   () => `project-daily-logs-${logsPathKey.value}`,
@@ -207,28 +266,47 @@ const maxLogDate = computed(() => todayDateKey())
 const isFutureLogDate = computed(() => isFutureDateKey(logDate.value))
 
 const canSubmit = computed(() => {
+  if (editingId.value) return Boolean(tasksDone.value.trim())
   const hasTasks = Boolean(logDate.value && tasksDone.value.trim())
   if (!hasTasks || isFutureLogDate.value) return false
   if (!isHourly.value) return true
   return Number.isFinite(trackerHours.value) && trackerHours.value >= 0
 })
 
+function canManageLog(entry: ProjectDailyLog) {
+  if (!props.canEditLogs || props.readOnly) return false
+  if (props.canManageAllLogs) return true
+  return Boolean(currentUserId.value && entry.created_by === currentUserId.value)
+}
+
+function normalizeLogDate(value: string) {
+  if (!value) return ''
+  return String(value).slice(0, 10)
+}
+
 function resetForm() {
   logDate.value = todayDateKey()
   tasksDone.value = ''
   trackerHours.value = 0
   editingId.value = null
+  editingLogDate.value = ''
+  editingTrackerMinutes.value = 0
 }
 
-function startEdit(entry) {
+function startEdit(entry: ProjectDailyLog) {
   editingId.value = entry.id
-  logDate.value = entry.log_date
+  editingLogDate.value = normalizeLogDate(entry.log_date)
+  editingTrackerMinutes.value = entry.tracker_minutes || 0
+  logDate.value = editingLogDate.value
   tasksDone.value = entry.tasks_done
   trackerHours.value = isHourly.value
-    ? Math.round((entry.tracker_minutes / 60) * 100) / 100
+    ? Math.round(((entry.tracker_minutes || 0) / 60) * 100) / 100
     : 0
   saveError.value = ''
   saveOk.value = false
+  nextTick(() => {
+    formSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
 }
 
 function cancelEdit() {
@@ -239,7 +317,7 @@ function cancelEdit() {
 
 async function submitLog() {
   if (!canSubmit.value) return
-  if (isFutureDateKey(logDate.value)) {
+  if (!editingId.value && isFutureDateKey(logDate.value)) {
     saveError.value = 'You cannot add a log for a future date.'
     return
   }
@@ -247,11 +325,13 @@ async function submitLog() {
   saveError.value = ''
   saveOk.value = false
 
-  const body = {
-    log_date: logDate.value,
-    tasks_done: tasksDone.value.trim(),
-    tracker_minutes: isHourly.value ? Math.round(trackerHours.value * 60) : 0,
-  }
+  const body = editingId.value
+    ? { tasks_done: tasksDone.value.trim() }
+    : {
+        log_date: logDate.value,
+        tasks_done: tasksDone.value.trim(),
+        tracker_minutes: isHourly.value ? Math.round(trackerHours.value * 60) : 0,
+      }
 
   try {
     if (editingId.value) {
@@ -269,9 +349,41 @@ async function submitLog() {
   }
 }
 
+function openDeleteModal(entry: ProjectDailyLog) {
+  if (editingId.value === entry.id) cancelEdit()
+  logToDelete.value = entry
+  deleteError.value = ''
+  showDeleteModal.value = true
+}
+
+function closeDeleteModal() {
+  if (deleting.value) return
+  showDeleteModal.value = false
+  logToDelete.value = null
+  deleteError.value = ''
+}
+
+async function confirmDeleteLog() {
+  if (!logToDelete.value || deleting.value) return
+  deleting.value = true
+  deleteError.value = ''
+  try {
+    await deleteDailyLog(props.projectId, logToDelete.value.id)
+    showDeleteModal.value = false
+    logToDelete.value = null
+    await refreshLogs()
+  } catch (e) {
+    deleteError.value = e?.data?.error || e?.message || 'Failed to delete daily log.'
+  } finally {
+    deleting.value = false
+  }
+}
+
 function formatLogDate(value) {
   if (!value) return '—'
-  const [year, month, day] = String(value).split('-').map(Number)
+  const dateKey = normalizeLogDate(value)
+  const [year, month, day] = dateKey.split('-').map(Number)
+  if (!year || !month || !day) return '—'
   return new Date(year, month - 1, day).toLocaleDateString(undefined, {
     weekday: 'short',
     year: 'numeric',

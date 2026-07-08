@@ -99,9 +99,9 @@
         <button
           v-if="isEdit"
           type="button"
-          :disabled="loading"
+          :disabled="loading || deleting"
           class="rounded-xl px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-60"
-          @click="remove"
+          @click="openDeleteModal"
         >
           Delete
         </button>
@@ -121,6 +121,24 @@
       </div>
     </div>
   </div>
+
+  <ConfirmDeleteModal
+    :open="showDeleteModal"
+    title="Delete this project?"
+    message="This action cannot be undone. All project data will be permanently removed."
+    confirm-label="Delete project"
+    :loading="deleting"
+    :error="deleteError"
+    @close="closeDeleteModal"
+    @confirm="confirmDelete"
+  >
+    <div v-if="project" class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
+      <p class="font-medium text-slate-800">{{ form.name || project.name }}</p>
+      <p v-if="form.client_name || project.client_name" class="mt-1 text-slate-500">
+        {{ form.client_name || project.client_name }}
+      </p>
+    </div>
+  </ConfirmDeleteModal>
 </template>
 
 <script setup>
@@ -136,7 +154,10 @@ const inputClass =
 const { create, update, remove: deleteProject } = useProjects()
 
 const loading = ref(false)
+const deleting = ref(false)
+const showDeleteModal = ref(false)
 const error = ref('')
+const deleteError = ref('')
 
 const isEdit = computed(() => Boolean(props.project?.id))
 
@@ -205,18 +226,30 @@ async function save() {
   }
 }
 
-async function remove() {
+function openDeleteModal() {
   if (!isEdit.value) return
-  if (!window.confirm('Delete this project? This cannot be undone.')) return
-  loading.value = true
-  error.value = ''
+  deleteError.value = ''
+  showDeleteModal.value = true
+}
+
+function closeDeleteModal() {
+  if (deleting.value) return
+  showDeleteModal.value = false
+  deleteError.value = ''
+}
+
+async function confirmDelete() {
+  if (!isEdit.value || deleting.value) return
+  deleting.value = true
+  deleteError.value = ''
   try {
     await deleteProject(props.project.id)
+    showDeleteModal.value = false
     emit('saved')
   } catch (e) {
-    error.value = e?.data?.error || e?.message || 'Failed to delete project.'
+    deleteError.value = e?.data?.error || e?.message || 'Failed to delete project.'
   } finally {
-    loading.value = false
+    deleting.value = false
   }
 }
 

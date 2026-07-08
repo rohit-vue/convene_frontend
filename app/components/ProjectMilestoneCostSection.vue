@@ -15,7 +15,10 @@
     </p>
     <p v-else-if="!readOnly" class="mt-4 text-sm text-slate-500">No active milestone.</p>
 
-    <div v-if="canAddMilestone" class="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+    <div
+      v-if="canAddMilestone && !editingId"
+      class="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4"
+    >
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label class="mb-1 block text-sm font-medium text-slate-700">
@@ -49,8 +52,57 @@
       </div>
     </div>
 
+    <div
+      v-else-if="editingId && !readOnly"
+      ref="formSection"
+      class="mt-5 space-y-4 rounded-xl border border-indigo-200 bg-slate-50/60 p-4 ring-1 ring-indigo-100"
+    >
+      <p class="rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-800">
+        Editing milestone <strong>{{ editingMilestoneNumber }}</strong>.
+        Update the amount and comment below.
+      </p>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">
+            Amount <span class="text-red-500">*</span>
+          </label>
+          <BudgetInput v-model="editAmount" :input-class="inputClass" placeholder="5000" />
+        </div>
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium text-slate-700">
+          Comment <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          v-model="comment"
+          rows="3"
+          placeholder="Milestone notes…"
+          :class="inputClass"
+        />
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          :disabled="!canEditSubmit || saving"
+          class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+          @click="submitEdit"
+        >
+          {{ saving ? 'Saving…' : 'Update milestone' }}
+        </button>
+        <button
+          type="button"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+          @click="cancelEdit"
+        >
+          Cancel
+        </button>
+        <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+        <p v-else-if="ok" class="text-sm text-emerald-700">Milestone updated.</p>
+      </div>
+    </div>
+
     <p
-      v-else-if="!readOnly"
+      v-else-if="!readOnly && !editingId"
       class="mt-5 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800"
     >
       Set the project status to <strong>Active</strong> to add a new milestone.
@@ -92,10 +144,45 @@
             <p v-if="entry.completed_at" class="mt-1 text-xs text-slate-400">
               Completed {{ formatDateTime(entry.completed_at) }}
             </p>
+            <div v-if="!readOnly" class="mt-2 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                class="text-xs font-medium text-indigo-600 transition hover:text-indigo-700"
+                @click="startEdit(entry)"
+              >
+                Edit
+              </button>
+              <button
+                v-if="isLatestMilestone(entry)"
+                type="button"
+                class="text-xs font-medium text-red-600 transition hover:text-red-700"
+                @click="openDeleteModal(entry)"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </li>
       </ol>
     </div>
+
+    <ConfirmDeleteModal
+      :open="showDeleteModal"
+      title="Delete this milestone?"
+      message="This action cannot be undone. Only the most recent milestone can be deleted."
+      confirm-label="Delete milestone"
+      :loading="deleting"
+      :error="deleteError"
+      @close="closeDeleteModal"
+      @confirm="confirmDeleteMilestone"
+    >
+      <div v-if="milestoneToDelete" class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
+        <p class="font-medium text-slate-800">
+          Milestone {{ milestoneToDelete.milestone_number }} · {{ formatMilestoneCostLabel(milestoneToDelete.amount) }}
+        </p>
+        <p class="mt-2 line-clamp-3 text-slate-600">{{ milestoneToDelete.comment }}</p>
+      </div>
+    </ConfirmDeleteModal>
   </div>
 </template>
 
@@ -111,16 +198,24 @@ const props = defineProps({
 
 const emit = defineEmits(['updated'])
 
-const { getMilestones, addMilestone, getAdminMilestones } = useProjects()
+const { getMilestones, addMilestone, updateMilestone, deleteMilestone, getAdminMilestones } = useProjects()
 
 const inputClass =
   'w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
 
+const formSection = ref<HTMLElement | null>(null)
 const newAmount = ref('')
 const comment = ref('')
+const editingId = ref<string | null>(null)
+const editingMilestoneNumber = ref(0)
+const editAmount = ref('')
 const saving = ref(false)
 const error = ref('')
 const ok = ref('')
+const showDeleteModal = ref(false)
+const milestoneToDelete = ref<ProjectMilestone | null>(null)
+const deleting = ref(false)
+const deleteError = ref('')
 
 const milestonesKey = computed(() =>
   props.adminEmployeeId
@@ -143,11 +238,17 @@ const sortedMilestones = computed(() =>
   [...(milestones.value || [])].sort((a, b) => b.milestone_number - a.milestone_number),
 )
 
+const latestMilestoneNumber = computed(() => {
+  const items = milestones.value || []
+  if (!items.length) return 0
+  return Math.max(...items.map((entry) => entry.milestone_number))
+})
+
 const activeMilestone = computed(() =>
   (milestones.value || []).find((entry) => entry.status === 'active') || null,
 )
 
-const canAddMilestone = computed(() => !props.readOnly && props.projectStatus === 'active')
+const canAddMilestone = computed(() => !props.readOnly && props.projectStatus === 'active' && !editingId.value)
 
 watch(
   () => props.projectStatus,
@@ -178,6 +279,41 @@ const canSubmit = computed(() =>
   Boolean(sanitizeBudgetInput(newAmount.value) && comment.value.trim()),
 )
 
+const canEditSubmit = computed(() =>
+  Boolean(sanitizeBudgetInput(editAmount.value) && comment.value.trim()),
+)
+
+function isLatestMilestone(entry: ProjectMilestone) {
+  return entry.milestone_number === latestMilestoneNumber.value
+}
+
+function resetAddForm() {
+  newAmount.value = ''
+  comment.value = ''
+}
+
+function cancelEdit() {
+  editingId.value = null
+  editingMilestoneNumber.value = 0
+  editAmount.value = ''
+  comment.value = ''
+  error.value = ''
+  ok.value = ''
+}
+
+function startEdit(entry: ProjectMilestone) {
+  if (props.readOnly) return
+  editingId.value = entry.id
+  editingMilestoneNumber.value = entry.milestone_number
+  editAmount.value = entry.amount != null ? String(entry.amount) : ''
+  comment.value = entry.comment
+  error.value = ''
+  ok.value = ''
+  nextTick(() => {
+    formSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
+}
+
 async function submitMilestone() {
   if (!canSubmit.value) return
   saving.value = true
@@ -193,14 +329,65 @@ async function submitMilestone() {
     ok.value = completedNumber
       ? `Milestone ${completedNumber} completed. Milestone ${addedNumber} is now active.`
       : 'Milestone 1 added.'
-    newAmount.value = ''
-    comment.value = ''
+    resetAddForm()
     await refreshMilestones()
     emit('updated')
   } catch (e) {
     error.value = e?.data?.error || e?.message || 'Failed to add milestone.'
   } finally {
     saving.value = false
+  }
+}
+
+async function submitEdit() {
+  if (!editingId.value || !canEditSubmit.value) return
+  saving.value = true
+  error.value = ''
+  ok.value = ''
+  try {
+    await updateMilestone(props.projectId, editingId.value, {
+      amount: sanitizeBudgetInput(editAmount.value),
+      comment: comment.value.trim(),
+    })
+    ok.value = 'Milestone updated.'
+    cancelEdit()
+    await refreshMilestones()
+    emit('updated')
+  } catch (e) {
+    error.value = e?.data?.error || e?.message || 'Failed to update milestone.'
+  } finally {
+    saving.value = false
+  }
+}
+
+function openDeleteModal(entry: ProjectMilestone) {
+  if (editingId.value === entry.id) cancelEdit()
+  milestoneToDelete.value = entry
+  deleteError.value = ''
+  showDeleteModal.value = true
+}
+
+function closeDeleteModal() {
+  if (deleting.value) return
+  showDeleteModal.value = false
+  milestoneToDelete.value = null
+  deleteError.value = ''
+}
+
+async function confirmDeleteMilestone() {
+  if (!milestoneToDelete.value || deleting.value) return
+  deleting.value = true
+  deleteError.value = ''
+  try {
+    await deleteMilestone(props.projectId, milestoneToDelete.value.id)
+    showDeleteModal.value = false
+    milestoneToDelete.value = null
+    await refreshMilestones()
+    emit('updated')
+  } catch (e) {
+    deleteError.value = e?.data?.error || e?.message || 'Failed to delete milestone.'
+  } finally {
+    deleting.value = false
   }
 }
 

@@ -171,14 +171,22 @@
       @edit="openEditFromView"
     />
 
-    <AdminDeleteBidModal
+    <ConfirmDeleteModal
       :open="showDeleteModal"
-      :bid="bidToDelete"
+      title="Delete this bid?"
+      message="This action cannot be undone. The bid will be permanently removed."
+      confirm-label="Delete bid"
       :loading="Boolean(deletingId)"
       :error="deleteError"
       @close="closeDeleteModal"
       @confirm="confirmDeleteBid"
-    />
+    >
+      <div v-if="bidToDelete" class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
+        <p class="font-medium text-slate-800">{{ upworkAccountLabel(bidToDelete.upwork_account) }}</p>
+        <p class="mt-1 truncate text-slate-500" :title="bidToDelete.job_link">{{ bidToDelete.job_link }}</p>
+        <p class="mt-1 text-slate-600">{{ formatBidAmount(bidToDelete) }} · {{ bidJobTypeLabel(bidToDelete.job_type) }}</p>
+      </div>
+    </ConfirmDeleteModal>
   </div>
 </template>
 

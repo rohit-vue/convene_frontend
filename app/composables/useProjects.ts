@@ -35,6 +35,13 @@ export const useProjects = () => {
     apiFetch<ProjectMilestone[]>(`/api/projects/${id}/milestones`)
   const addMilestone = (id: string, body: { amount: string; comment: string }) =>
     apiFetch<ProjectMilestone>(`/api/projects/${id}/milestones`, { method: 'POST', body })
+  const updateMilestone = (id: string, milestoneId: string, body: { amount: string; comment: string }) =>
+    apiFetch<ProjectMilestone>(`/api/projects/${id}/milestones/${milestoneId}`, {
+      method: 'PUT',
+      body,
+    })
+  const deleteMilestone = (id: string, milestoneId: string) =>
+    apiFetch<void>(`/api/projects/${id}/milestones/${milestoneId}`, { method: 'DELETE' })
   const getMilestoneCostHistory = (id: string) => getMilestones(id)
   const changeMilestoneCost = (id: string, body: { milestone_cost: string; comment: string }) =>
     addMilestone(id, { amount: body.milestone_cost, comment: body.comment })
@@ -47,6 +54,8 @@ export const useProjects = () => {
       method: 'PUT',
       body,
     })
+  const deleteDailyLog = (id: string, logId: string) =>
+    apiFetch<void>(`/api/projects/${id}/daily-logs/${logId}`, { method: 'DELETE' })
   const listShares = (id: string) =>
     apiFetch<ProjectShare[]>(`/api/projects/${id}/shares`)
   const shareProject = (id: string, body: { employee_id: string }) =>
@@ -89,9 +98,12 @@ export const useProjects = () => {
     getMilestones,
     changeMilestoneCost,
     addMilestone,
+    updateMilestone,
+    deleteMilestone,
     getDailyLogs,
     createDailyLog,
     updateDailyLog,
+    deleteDailyLog,
     listShares,
     shareProject,
     revokeShare,

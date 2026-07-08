@@ -149,6 +149,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
+const { openExclusive, closeExclusive } = useExclusiveDropdown()
+
 const timeInputClass =
   'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
 
@@ -247,13 +249,22 @@ function updatePosition() {
   }
 }
 
+function close() {
+  if (!open.value) return
+  open.value = false
+  closeExclusive(close)
+}
+
 function toggle() {
   if (props.disabled) return
-  open.value = !open.value
   if (open.value) {
-    syncFromModel()
-    nextTick(() => updatePosition())
+    close()
+    return
   }
+  openExclusive(close)
+  open.value = true
+  syncFromModel()
+  nextTick(() => updatePosition())
 }
 
 function prevMonth() {
@@ -287,13 +298,13 @@ function emitValue() {
 
 function confirm() {
   emitValue()
-  open.value = false
+  close()
 }
 
 function onDocumentClick(e) {
   if (!open.value) return
   if (root.value?.contains(e.target) || panel.value?.contains(e.target)) return
-  open.value = false
+  close()
 }
 
 function onViewportChange() {
@@ -311,6 +322,7 @@ onMounted(() => {
   window.addEventListener('resize', onViewportChange)
   window.addEventListener('scroll', onViewportChange, true)
   onUnmounted(() => {
+    closeExclusive(close)
     document.removeEventListener('click', onDocumentClick)
     window.removeEventListener('resize', onViewportChange)
     window.removeEventListener('scroll', onViewportChange, true)

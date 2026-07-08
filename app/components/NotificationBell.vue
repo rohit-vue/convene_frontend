@@ -49,6 +49,7 @@ const { list, unreadCount } = useNotifications()
 
 const root = ref(null)
 const open = ref(false)
+const { openExclusive, closeExclusive } = useExclusiveDropdown()
 
 const { data: notifications, refresh: refreshList } = await useAsyncData(
   'notifications',
@@ -64,16 +65,25 @@ const { data: unreadData, refresh: refreshUnread } = await useAsyncData(
 
 const unread = computed(() => unreadData.value?.count ?? 0)
 
+function close() {
+  if (!open.value) return
+  open.value = false
+  closeExclusive(close)
+}
+
 function togglePanel() {
-  open.value = !open.value
   if (open.value) {
-    refreshList()
-    refreshUnread()
+    close()
+    return
   }
+  openExclusive(close)
+  open.value = true
+  refreshList()
+  refreshUnread()
 }
 
 function goToDashboard() {
-  open.value = false
+  close()
   navigateTo('/')
 }
 
@@ -88,9 +98,12 @@ function formatTime(value) {
 onMounted(() => {
   const onClickOutside = (e) => {
     if (!open.value || !root.value) return
-    if (!root.value.contains(e.target)) open.value = false
+    if (!root.value.contains(e.target)) close()
   }
   document.addEventListener('click', onClickOutside)
-  onUnmounted(() => document.removeEventListener('click', onClickOutside))
+  onUnmounted(() => {
+    closeExclusive(close)
+    document.removeEventListener('click', onClickOutside)
+  })
 })
 </script>

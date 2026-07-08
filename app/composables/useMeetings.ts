@@ -25,6 +25,8 @@ export const useMeetings = () => {
       method: 'PUT',
       body,
     })
+  const remove = (id: string) =>
+    apiFetch<void>(`/api/meetings/${id}`, { method: 'DELETE' })
 
   return {
     list,
@@ -38,5 +40,6 @@ export const useMeetings = () => {
     listUpdates,
     createUpdate,
     updateUpdate,
+    remove,
   }
 }
