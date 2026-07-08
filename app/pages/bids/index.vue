@@ -124,7 +124,14 @@
                 {{ formatBidAmount(bid) }}
               </td>
               <td class="overflow-hidden px-4 py-4 text-slate-600">
-                <span class="line-clamp-2 break-words" :title="bid.notes || undefined">{{ bid.notes || '—' }}</span>
+                <AppTooltip
+                  v-if="bid.notes"
+                  :content="bid.notes"
+                  class="w-full"
+                >
+                  <span class="line-clamp-2 w-full break-words">{{ bid.notes }}</span>
+                </AppTooltip>
+                <span v-else>—</span>
               </td>
               <td class="overflow-hidden px-4 py-4 text-slate-500">
                 <span class="block truncate" :title="formatDateTime(bid.created_at)">
