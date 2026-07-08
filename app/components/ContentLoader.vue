@@ -137,43 +137,35 @@
       </div>
     </div>
 
-    <!-- Profile sidebar + form -->
-    <div
-      v-else-if="variant === 'profile'"
-      class="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]"
-    >
-      <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-        <div class="bg-slate-100 px-6 pb-10 pt-8 text-center">
-          <div class="mx-auto h-24 w-24 animate-pulse rounded-full bg-slate-200" />
-        </div>
-        <div class="space-y-3 px-6 pb-6 pt-4">
-          <div class="mx-auto h-5 w-36 animate-pulse rounded bg-slate-200" />
-          <div class="mx-auto h-3 w-24 animate-pulse rounded bg-slate-200" />
-          <div class="mx-auto h-6 w-28 animate-pulse rounded-full bg-slate-200" />
-          <div class="mt-6 space-y-3 border-t border-slate-100 pt-6">
-            <div v-for="j in 3" :key="j" class="flex items-center gap-3">
-              <div class="h-8 w-8 shrink-0 animate-pulse rounded-lg bg-slate-200" />
-              <div class="flex-1 space-y-1.5">
-                <div class="h-2.5 w-14 animate-pulse rounded bg-slate-200" />
-                <div class="h-3.5 w-40 max-w-full animate-pulse rounded bg-slate-200" />
+    <!-- Profile wide card -->
+    <div v-else-if="variant === 'profile'" class="space-y-6">
+      <div class="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm">
+        <div class="grid min-h-[22rem] grid-cols-1 md:grid-cols-[minmax(280px,380px)_1fr]">
+          <!-- Left: identity -->
+          <div class="flex flex-col items-center justify-center bg-slate-100 px-8 py-10 text-center">
+            <div class="h-32 w-32 animate-pulse rounded-2xl bg-slate-200" />
+            <div class="mt-6 h-7 w-44 animate-pulse rounded bg-slate-200" />
+            <div class="mt-2 h-4 w-36 animate-pulse rounded bg-slate-200" />
+            <div class="mt-4 h-7 w-32 animate-pulse rounded-full bg-slate-200" />
+          </div>
+
+          <!-- Right: details + edit -->
+          <div class="flex flex-col justify-between gap-8 px-8 py-8 sm:px-10 sm:py-10">
+            <div class="space-y-6">
+              <div v-for="j in 3" :key="j" class="flex items-center gap-4">
+                <div class="h-12 w-12 shrink-0 animate-pulse rounded-xl bg-slate-200" />
+                <div class="min-w-0 flex-1 space-y-2">
+                  <div class="h-3.5 w-20 animate-pulse rounded bg-slate-200" />
+                  <div
+                    class="h-5 animate-pulse rounded bg-slate-200"
+                    :class="j === 1 ? 'w-56 max-w-full' : 'w-40'"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-        <div class="border-b border-slate-100 px-6 py-5">
-          <div class="h-5 w-44 animate-pulse rounded bg-slate-200" />
-          <div class="mt-2 h-3 w-64 max-w-full animate-pulse rounded bg-slate-200" />
-        </div>
-        <div class="space-y-5 p-6">
-          <div v-for="j in 5" :key="j" class="space-y-1.5">
-            <div class="h-3.5 w-24 animate-pulse rounded bg-slate-200" />
-            <div class="h-10 w-full animate-pulse rounded-xl bg-slate-100" />
-          </div>
-          <div class="border-t border-slate-100 pt-5">
-            <div class="h-10 w-32 animate-pulse rounded-xl bg-slate-200" />
+            <div class="flex justify-end border-t border-slate-100 pt-6">
+              <div class="h-12 w-36 animate-pulse rounded-xl bg-slate-200" />
+            </div>
           </div>
         </div>
       </div>
