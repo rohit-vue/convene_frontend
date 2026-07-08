@@ -5,160 +5,168 @@
       <p class="mt-1 text-sm text-slate-500">Welcome back, here's what's happening today.</p>
     </div>
 
-    <!-- Primary stats -->
-    <div :class="statsGridClass">
-      <div
-        v-for="card in primaryCards"
-        :key="card.label"
-        class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition hover:shadow-md sm:p-6"
-      >
-        <div class="flex items-center justify-between">
-          <p class="text-sm font-medium text-slate-500">{{ card.label }}</p>
-          <span class="grid h-9 w-9 place-items-center rounded-xl" :class="card.iconBg" v-html="card.icon" />
-        </div>
-        <p class="mt-4 text-3xl font-bold tracking-tight">{{ card.value }}</p>
-        <div v-if="card.badges?.length" class="mt-2 flex flex-wrap gap-1">
-          <span
-            v-for="badge in card.badges"
-            :key="badge.label"
-            class="inline-flex items-center gap-0.5 rounded-full px-1.5 py-px text-[10px] font-medium leading-4"
-            :class="badge.class"
-          >
-            <span class="font-semibold tabular-nums">{{ badge.count }}</span>
-            {{ badge.label }}
-          </span>
-        </div>
-        <p v-else class="mt-1 text-xs font-medium text-slate-400">{{ card.trend }}</p>
-      </div>
-    </div>
+    <ContentLoader
+      v-if="isLoading"
+      variant="dashboard"
+      :stats-count="isAdmin ? 4 : 3"
+    />
 
-    <!-- Breakdowns -->
-    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
-        <h2 class="text-lg font-semibold text-slate-800">Project status</h2>
-        <p class="mt-0.5 text-sm text-slate-500">{{ scopeLabel }} projects by status</p>
-        <div class="mt-4 space-y-3">
-          <div v-for="item in projectBreakdown" :key="item.key" class="flex items-center gap-2 sm:gap-3">
-            <span class="w-16 shrink-0 text-xs text-slate-600 sm:w-24 sm:text-sm">{{ item.label }}</span>
-            <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
-              <div
-                class="h-full rounded-full transition-all"
-                :class="item.barClass"
-                :style="{ width: `${item.pct}%` }"
-              />
-            </div>
-            <span class="w-8 shrink-0 text-right text-sm font-semibold text-slate-800">{{ item.count }}</span>
+    <template v-else>
+      <!-- Primary stats -->
+      <div :class="statsGridClass">
+        <div
+          v-for="card in primaryCards"
+          :key="card.label"
+          class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition hover:shadow-md sm:p-6"
+        >
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-medium text-slate-500">{{ card.label }}</p>
+            <span class="grid h-9 w-9 place-items-center rounded-xl" :class="card.iconBg" v-html="card.icon" />
           </div>
-        </div>
-      </div>
-
-      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
-        <h2 class="text-lg font-semibold text-slate-800">Meeting outcomes</h2>
-        <p class="mt-0.5 text-sm text-slate-500">{{ scopeLabel }} meetings by outcome</p>
-        <div class="mt-4 space-y-3">
-          <div v-for="item in meetingBreakdown" :key="item.key" class="flex items-center gap-2 sm:gap-3">
-            <span class="min-w-0 w-20 shrink-0 text-xs leading-tight text-slate-600 sm:w-32 sm:text-sm">{{ item.label }}</span>
-            <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
-              <div
-                class="h-full rounded-full transition-all"
-                :class="item.barClass"
-                :style="{ width: `${item.pct}%` }"
-              />
-            </div>
-            <span class="w-8 shrink-0 text-right text-sm font-semibold text-slate-800">{{ item.count }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Activity & quick links -->
-    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6 lg:col-span-2">
-        <h2 class="text-lg font-semibold">Recent Activity</h2>
-        <ul v-if="overview?.activity?.length" class="mt-4 space-y-4">
-          <li v-for="(a, i) in overview.activity" :key="`${a.at}-${i}`" class="flex items-start gap-3">
-            <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-indigo-500" />
-            <div>
-              <p class="text-sm text-slate-700">{{ a.text }}</p>
-              <p class="text-xs text-slate-400">{{ formatActivityTime(a.at) }}</p>
-            </div>
-          </li>
-        </ul>
-        <p v-else class="mt-4 text-sm text-slate-400">No recent activity yet.</p>
-      </div>
-
-      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
-        <h2 class="text-lg font-semibold">
-          {{ isEmployee ? 'Assignments to Accept' : 'Quick Links' }}
-        </h2>
-
-        <!-- Employee: pending assignments -->
-        <div v-if="isEmployee" class="mt-4 space-y-3">
-          <div
-            v-for="m in pendingMeetings"
-            :key="`meeting-${m.id}`"
-            class="rounded-xl border border-amber-100 bg-amber-50/50 px-4 py-3"
-          >
-            <p class="text-xs font-medium uppercase tracking-wide text-amber-700">Meeting</p>
-            <p class="mt-1 text-sm font-medium text-slate-800">{{ m.project_name }}</p>
-            <p class="mt-0.5 text-xs text-slate-500">{{ m.client_name }} · {{ formatMeetingTime(m.meeting_at) }}</p>
-            <button
-              class="mt-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
-              :disabled="acceptingMeetingId === m.id"
-              @click="acceptMeeting(m.id)"
+          <p class="mt-4 text-3xl font-bold tracking-tight">{{ card.value }}</p>
+          <div v-if="card.badges?.length" class="mt-2 flex flex-wrap gap-1">
+            <span
+              v-for="badge in card.badges"
+              :key="badge.label"
+              class="inline-flex items-center gap-0.5 rounded-full px-1.5 py-px text-[10px] font-medium leading-4"
+              :class="badge.class"
             >
-              {{ acceptingMeetingId === m.id ? 'Accepting…' : 'Accept' }}
-            </button>
+              <span class="font-semibold tabular-nums">{{ badge.count }}</span>
+              {{ badge.label }}
+            </span>
           </div>
+          <p v-else class="mt-1 text-xs font-medium text-slate-400">{{ card.trend }}</p>
+        </div>
+      </div>
 
-          <div
-            v-for="p in pendingProjects"
-            :key="`project-${p.id}`"
-            class="rounded-xl border border-sky-100 bg-sky-50/50 px-4 py-3"
-          >
-            <p class="text-xs font-medium uppercase tracking-wide text-sky-700">Project</p>
-            <p class="mt-1 text-sm font-medium text-slate-800">{{ p.name }}</p>
-            <p class="mt-0.5 text-xs text-slate-500">
-              {{ p.client_name || 'No client' }}
-              <template v-if="p.start_date"> · Starts {{ formatProjectDate(p.start_date) }}</template>
+      <!-- Breakdowns -->
+      <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+          <h2 class="text-lg font-semibold text-slate-800">Project status</h2>
+          <p class="mt-0.5 text-sm text-slate-500">{{ scopeLabel }} projects by status</p>
+          <div class="mt-4 space-y-3">
+            <div v-for="item in projectBreakdown" :key="item.key" class="flex items-center gap-2 sm:gap-3">
+              <span class="w-16 shrink-0 text-xs text-slate-600 sm:w-24 sm:text-sm">{{ item.label }}</span>
+              <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  class="h-full rounded-full transition-all"
+                  :class="item.barClass"
+                  :style="{ width: `${item.pct}%` }"
+                />
+              </div>
+              <span class="w-8 shrink-0 text-right text-sm font-semibold text-slate-800">{{ item.count }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+          <h2 class="text-lg font-semibold text-slate-800">Meeting outcomes</h2>
+          <p class="mt-0.5 text-sm text-slate-500">{{ scopeLabel }} meetings by outcome</p>
+          <div class="mt-4 space-y-3">
+            <div v-for="item in meetingBreakdown" :key="item.key" class="flex items-center gap-2 sm:gap-3">
+              <span class="min-w-0 w-20 shrink-0 text-xs leading-tight text-slate-600 sm:w-32 sm:text-sm">{{ item.label }}</span>
+              <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  class="h-full rounded-full transition-all"
+                  :class="item.barClass"
+                  :style="{ width: `${item.pct}%` }"
+                />
+              </div>
+              <span class="w-8 shrink-0 text-right text-sm font-semibold text-slate-800">{{ item.count }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity & quick links -->
+      <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6 lg:col-span-2">
+          <h2 class="text-lg font-semibold">Recent Activity</h2>
+          <ul v-if="overview?.activity?.length" class="mt-4 space-y-4">
+            <li v-for="(a, i) in overview.activity" :key="`${a.at}-${i}`" class="flex items-start gap-3">
+              <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-indigo-500" />
+              <div>
+                <p class="text-sm text-slate-700">{{ a.text }}</p>
+                <p class="text-xs text-slate-400">{{ formatActivityTime(a.at) }}</p>
+              </div>
+            </li>
+          </ul>
+          <p v-else class="mt-4 text-sm text-slate-400">No recent activity yet.</p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+          <h2 class="text-lg font-semibold">
+            {{ isEmployee ? 'Assignments to Accept' : 'Quick Links' }}
+          </h2>
+
+          <!-- Employee: pending assignments -->
+          <div v-if="isEmployee" class="mt-4 space-y-3">
+            <div
+              v-for="m in pendingMeetings"
+              :key="`meeting-${m.id}`"
+              class="rounded-xl border border-amber-100 bg-amber-50/50 px-4 py-3"
+            >
+              <p class="text-xs font-medium uppercase tracking-wide text-amber-700">Meeting</p>
+              <p class="mt-1 text-sm font-medium text-slate-800">{{ m.project_name }}</p>
+              <p class="mt-0.5 text-xs text-slate-500">{{ m.client_name }} · {{ formatMeetingTime(m.meeting_at) }}</p>
+              <button
+                class="mt-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+                :disabled="acceptingMeetingId === m.id"
+                @click="acceptMeeting(m.id)"
+              >
+                {{ acceptingMeetingId === m.id ? 'Accepting…' : 'Accept' }}
+              </button>
+            </div>
+
+            <div
+              v-for="p in pendingProjects"
+              :key="`project-${p.id}`"
+              class="rounded-xl border border-sky-100 bg-sky-50/50 px-4 py-3"
+            >
+              <p class="text-xs font-medium uppercase tracking-wide text-sky-700">Project</p>
+              <p class="mt-1 text-sm font-medium text-slate-800">{{ p.name }}</p>
+              <p class="mt-0.5 text-xs text-slate-500">
+                {{ p.client_name || 'No client' }}
+                <template v-if="p.start_date"> · Starts {{ formatProjectDate(p.start_date) }}</template>
+              </p>
+              <button
+                class="mt-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+                :disabled="acceptingProjectId === p.id"
+                @click="acceptProject(p.id)"
+              >
+                {{ acceptingProjectId === p.id ? 'Accepting…' : 'Accept' }}
+              </button>
+            </div>
+
+            <p v-if="!pendingMeetings.length && !pendingProjects.length" class="text-sm text-slate-400">
+              No assignments awaiting acceptance.
             </p>
-            <button
-              class="mt-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
-              :disabled="acceptingProjectId === p.id"
-              @click="acceptProject(p.id)"
-            >
-              {{ acceptingProjectId === p.id ? 'Accepting…' : 'Accept' }}
-            </button>
           </div>
 
-          <p v-if="!pendingMeetings.length && !pendingProjects.length" class="text-sm text-slate-400">
-            No assignments awaiting acceptance.
-          </p>
-        </div>
-
-        <!-- Admin: quick links -->
-        <div v-else class="mt-4 space-y-3">
-          <NuxtLink
-            to="/meetings"
-            class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-          >
-            View all meetings <span>&rarr;</span>
-          </NuxtLink>
-          <NuxtLink
-            to="/projects"
-            class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-          >
-            View all projects <span>&rarr;</span>
-          </NuxtLink>
-          <NuxtLink
-            to="/employees"
-            class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-          >
-            Manage employees <span>&rarr;</span>
-          </NuxtLink>
+          <!-- Admin: quick links -->
+          <div v-else class="mt-4 space-y-3">
+            <NuxtLink
+              to="/meetings"
+              class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+            >
+              View all meetings <span>&rarr;</span>
+            </NuxtLink>
+            <NuxtLink
+              to="/projects"
+              class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+            >
+              View all projects <span>&rarr;</span>
+            </NuxtLink>
+            <NuxtLink
+              to="/employees"
+              class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+            >
+              Manage employees <span>&rarr;</span>
+            </NuxtLink>
+          </div>
         </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -169,11 +177,13 @@ const { accept: acceptMeetingRequest } = useMeetings()
 const { accept: acceptProjectRequest } = useProjects()
 const toast = useToast()
 
-const { data: overview, refresh: refreshOverview } = await useAsyncData(
+const { data: overview, status, refresh: refreshOverview } = await useAsyncData(
   'dashboard-overview',
   () => getOverview(),
   { server: false },
 )
+
+const isLoading = computed(() => status.value !== 'success' && status.value !== 'error')
 
 const pendingMeetings = computed(() => overview.value?.pendingMeetings ?? [])
 const pendingProjects = computed(() => overview.value?.pendingProjects ?? [])

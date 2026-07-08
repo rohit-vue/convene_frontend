@@ -119,7 +119,9 @@
 
       <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
         <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Status history</h2>
-        <div v-if="historyLoading" class="mt-4 text-sm text-slate-400">Loading history…</div>
+        <div v-if="historyLoading" class="mt-4">
+          <ContentLoader variant="table" :rows="3" :columns="3" />
+        </div>
         <div v-else-if="!history?.length" class="mt-4 text-sm text-slate-400">No status history yet.</div>
         <ol v-else class="mt-4 space-y-0">
           <li
@@ -160,7 +162,9 @@
       />
     </div>
 
-    <div v-else class="text-sm text-slate-400">Loading…</div>
+    <div v-else class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+      <ContentLoader variant="table" :rows="8" :columns="4" />
+    </div>
   </div>
 </template>
 

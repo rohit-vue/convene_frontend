@@ -84,7 +84,9 @@
           </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <ContentLoader v-if="isLoading" variant="table" :rows="6" :columns="6" />
+
+        <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[720px] text-sm">
           <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
             <tr>
@@ -126,7 +128,7 @@
               <td class="px-4 py-4 text-slate-600 sm:px-6">{{ formatDate(p.start_date) }}</td>
               <td class="px-4 py-4 text-slate-600 sm:px-6">{{ jobTypeLabel(p.job_type) }}</td>
             </tr>
-            <tr v-if="projects && adminFilteredProjects.length === 0">
+            <tr v-if="adminFilteredProjects.length === 0">
               <td colspan="7" class="px-4 py-12 text-center text-sm text-slate-400 sm:px-6">
                 {{ adminEmptyMessage }}
               </td>
@@ -139,6 +141,9 @@
 
     <!-- Employee card view -->
     <template v-else>
+      <ContentLoader v-if="isLoading" variant="cards" :rows="6" />
+
+      <template v-else>
       <div v-if="projects && projects.length" class="mb-6 flex flex-nowrap items-center gap-2 overflow-x-auto pb-1">
         <button
           v-for="f in filters"
@@ -196,7 +201,7 @@
         </div>
       </div>
 
-      <div v-else-if="projects" class="rounded-2xl border border-dashed border-slate-200 bg-white p-12 text-center">
+      <div v-else class="rounded-2xl border border-dashed border-slate-200 bg-white p-12 text-center">
         <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-indigo-50 text-indigo-600">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
         </div>
@@ -211,6 +216,7 @@
           + New Project
         </button>
       </div>
+      </template>
 
       <ProjectFormModal :open="showModal" @close="closeModal" @saved="onSaved" />
     </template>
@@ -267,11 +273,13 @@ const projectTypeFilterOptions = computed(() => [
   ...jobTypeOptions,
 ])
 
-const { data: projects, refresh } = await useAsyncData(
+const { data: projects, status, refresh } = await useAsyncData(
   'projects',
   () => list(),
   { server: false, default: () => [] },
 )
+
+const isLoading = computed(() => status.value !== 'success' && status.value !== 'error')
 
 const statuses = [
   { value: 'planning', label: 'Planning' },

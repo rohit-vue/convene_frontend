@@ -41,7 +41,7 @@
       </div>
     </div>
 
-    <div v-if="pending" class="text-sm text-slate-400">Loading bids…</div>
+    <ContentLoader v-if="isLoading" variant="groups" :rows="2" :columns="5" />
 
     <div v-else-if="!bidGroups.length" class="rounded-2xl border border-dashed border-slate-200 bg-white p-12 text-center">
       <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-indigo-50 text-indigo-600">
@@ -188,7 +188,7 @@ const upworkFilterOptions = computed(() => [
   ...upworkAccountOptions,
 ])
 
-const { data: bids, pending, refresh } = await useAsyncData(
+const { data: bids, status, refresh } = await useAsyncData(
   'upwork-bids',
   () =>
     list(
@@ -198,6 +198,8 @@ const { data: bids, pending, refresh } = await useAsyncData(
     ),
   { server: false, default: () => [], watch: [filterUpworkAccount] },
 )
+
+const isLoading = computed(() => status.value !== 'success' && status.value !== 'error')
 
 const markedDates = computed(() =>
   collectDateKeys((bids.value || []).map((bid) => bid.bid_date)),

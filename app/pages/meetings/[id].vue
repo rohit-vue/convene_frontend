@@ -53,7 +53,9 @@
       />
     </form>
 
-    <div v-else class="text-sm text-slate-400">Loading…</div>
+    <div v-else class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+      <ContentLoader variant="table" :rows="8" :columns="4" />
+    </div>
 
     <div v-if="showCreateModal" class="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-slate-900/45 p-4 backdrop-blur-sm" @click.self="showCreateModal = false">
       <div class="my-8 w-full max-w-2xl rounded-2xl border border-slate-100 bg-white shadow-2xl">

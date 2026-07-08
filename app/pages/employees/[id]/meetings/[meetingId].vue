@@ -40,7 +40,9 @@
       />
     </div>
 
-    <div v-else class="text-sm text-slate-400">Loading…</div>
+    <div v-else class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+      <ContentLoader variant="table" :rows="8" :columns="4" />
+    </div>
   </div>
 </template>
 
