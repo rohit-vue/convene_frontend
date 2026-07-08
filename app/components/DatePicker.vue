@@ -41,25 +41,17 @@
         ref="panel"
         class="fixed z-[200] max-w-[calc(100vw-1rem)] rounded-xl border border-slate-100 bg-white p-4 shadow-xl"
         :style="panelStyle"
-        @click.stop
+        @click.stop="onPanelClick"
       >
-        <div class="mb-3 flex items-center justify-between">
-          <button
-            type="button"
-            class="grid h-8 w-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-            @click="prevMonth"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6" /></svg>
-          </button>
-          <span class="text-sm font-semibold text-slate-800">{{ monthLabel }}</span>
-          <button
-            type="button"
-            class="grid h-8 w-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-            @click="nextMonth"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6" /></svg>
-          </button>
-        </div>
+        <CalendarMonthYearNav
+          ref="monthYearNav"
+          :year="viewYear"
+          :month="viewMonth"
+          @update:year="viewYear = $event"
+          @update:month="viewMonth = $event"
+          @prev="prevMonth"
+          @next="nextMonth"
+        />
 
         <div class="mb-1 grid grid-cols-7 gap-1">
           <span
@@ -149,6 +141,7 @@ const { openExclusive, closeExclusive } = useExclusiveDropdown()
 const root = ref(null)
 const trigger = ref(null)
 const panel = ref(null)
+const monthYearNav = ref(null)
 const open = ref(false)
 const panelStyle = ref({})
 const viewYear = ref(new Date().getFullYear())
@@ -158,13 +151,6 @@ const weekDays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
 
 const markedSet = computed(() => new Set(props.markedDates))
 const todayKey = computed(() => todayDateKey())
-
-const monthLabel = computed(() =>
-  new Date(viewYear.value, viewMonth.value, 1).toLocaleDateString(undefined, {
-    month: 'long',
-    year: 'numeric',
-  }),
-)
 
 const displayValue = computed(() => formatDateKeyDisplay(props.modelValue, props.placeholder))
 const calendarDays = computed(() => buildCalendarDays(viewYear.value, viewMonth.value))
@@ -226,6 +212,7 @@ function syncViewToSelection() {
 
 function close() {
   if (!open.value) return
+  monthYearNav.value?.closePickers?.()
   open.value = false
   closeExclusive(close)
 }
@@ -269,6 +256,10 @@ function selectDate(dateKey) {
 function clear() {
   emit('update:modelValue', '')
   close()
+}
+
+function onPanelClick() {
+  monthYearNav.value?.closePickers?.()
 }
 
 function onDocumentClick(e) {
