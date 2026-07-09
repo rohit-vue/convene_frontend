@@ -5,6 +5,9 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@nuxtjs/supabase'],
+  alias: {
+    cookie: 'cookie-es',
+  },
   app: {
     head: {
       title: 'Convene',
@@ -14,6 +17,14 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ['cookie-es'],
+    },
+  },
+  nitro: {
+    alias: {
+      cookie: 'cookie-es',
+    },
   },
   supabase: {
     redirectOptions: {

@@ -16,14 +16,6 @@
           + Assign Project
         </button>
         <button
-          v-if="isAdmin"
-          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-          :disabled="exporting"
-          @click="exportAllProjects"
-        >
-          {{ exporting ? 'Exporting…' : 'Export' }}
-        </button>
-        <button
           v-else-if="isEmployee"
           class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
           @click="openCreate"
@@ -231,11 +223,8 @@
 </template>
 
 <script setup>
-import { downloadProjectsExcel } from '~/utils/exportProjectsExcel'
-
 const { isAdmin, isEmployee, fetchProfile } = useProfile()
-const { list, exportAll } = useProjects()
-const toast = useToast()
+const { list } = useProjects()
 
 await fetchProfile()
 
@@ -246,7 +235,6 @@ if (!isAdmin.value && !isEmployee.value) {
 const showModal = ref(false)
 const showAssignModal = ref(false)
 const activeFilter = ref('all')
-const exporting = ref(false)
 
 const filterDate = ref('')
 const dateSortOrder = ref('desc')
@@ -398,20 +386,6 @@ function assignmentBadgeClass(status) {
   if (status === 'accepted') return 'bg-emerald-50 text-emerald-700'
   if (status === 'declined') return 'bg-red-50 text-red-600'
   return 'bg-slate-100 text-slate-600'
-}
-
-async function exportAllProjects() {
-  if (exporting.value) return
-  exporting.value = true
-  try {
-    const rows = await exportAll()
-    downloadProjectsExcel(rows)
-    toast.success('Projects exported.')
-  } catch (err) {
-    toast.error(toastErrorMessage(err, 'Failed to export projects.'))
-  } finally {
-    exporting.value = false
-  }
 }
 
 function formatDate(value) {

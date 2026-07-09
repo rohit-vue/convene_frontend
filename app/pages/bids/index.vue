@@ -9,14 +9,6 @@
       </div>
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
         <button
-          type="button"
-          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-          :disabled="exporting || !bids?.length"
-          @click="openExportModal"
-        >
-          Export
-        </button>
-        <button
           class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
           @click="openAdd"
         >
@@ -178,36 +170,23 @@
       @edit="openEditFromView"
     />
 
-    <AdminExportBidsModal
-      :open="showExportModal"
-      :loading="exporting"
-      :error="exportError"
-      @close="closeExportModal"
-      @export="exportBidsForRange"
-    />
-
   </div>
 </template>
 
 <script setup lang="ts">
 import type { UpworkBid } from '~/types/bids'
 import { bidJobTypeLabel, bidStatusBadgeClass, bidStatusLabel, formatBidAmount, groupBidsByDay } from '~/utils/bids'
-import { downloadBidsExcel } from '~/utils/exportBidsExcel'
 
 definePageMeta({ middleware: 'admin' })
 
 const { list } = useBids()
-const toast = useToast()
 
 const showModal = ref(false)
 const showViewModal = ref(false)
-const showExportModal = ref(false)
 const selectedBid = ref<UpworkBid | null>(null)
 const editingBid = ref<UpworkBid | null>(null)
 const filterDate = ref('')
 const filterUpworkAccount = ref('')
-const exporting = ref(false)
-const exportError = ref('')
 
 const filterLabelClass = 'mb-1 block text-xs font-medium text-slate-500'
 const filterInputClass =
@@ -239,13 +218,6 @@ function bidDateKey(bid: UpworkBid): string {
   return bid.bid_date?.slice(0, 10) || bid.created_at.slice(0, 10)
 }
 
-function bidsForRange(from: string, to: string): UpworkBid[] {
-  return (bids.value || []).filter((bid) => {
-    const key = bidDateKey(bid)
-    return key >= from && key <= to
-  })
-}
-
 const filteredBids = computed(() => {
   const items = bids.value || []
   if (!filterDate.value) return items
@@ -263,39 +235,6 @@ const emptyMessage = computed(() => {
   if (hasActiveFilters.value) return 'No bids match the selected filters.'
   return 'Add your first bid to start tracking.'
 })
-
-function openExportModal() {
-  exportError.value = ''
-  showExportModal.value = true
-}
-
-function closeExportModal() {
-  if (exporting.value) return
-  showExportModal.value = false
-  exportError.value = ''
-}
-
-async function exportBidsForRange(range: { from: string; to: string }) {
-  if (exporting.value) return
-  if (!range.from || !range.to) return
-
-  exporting.value = true
-  exportError.value = ''
-  try {
-    const rows = bidsForRange(range.from, range.to)
-    if (!rows.length) {
-      exportError.value = 'No bids found for the selected dates.'
-      return
-    }
-    downloadBidsExcel(rows)
-    toast.success('Bids exported.')
-    showExportModal.value = false
-  } catch (err) {
-    exportError.value = toastErrorMessage(err, 'Failed to export bids.')
-  } finally {
-    exporting.value = false
-  }
-}
 
 async function onSaved() {
   closeModal()
