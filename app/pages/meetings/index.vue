@@ -9,13 +9,6 @@
       </div>
       <div v-if="isAdmin" class="flex flex-wrap items-center gap-2 sm:gap-3">
         <button
-          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-          :disabled="downloading"
-          @click="downloadAllMeetings"
-        >
-          {{ downloading ? 'Exporting…' : 'Export' }}
-        </button>
-        <button
           class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
           @click="showAssignModal = true"
         >
@@ -136,11 +129,8 @@
 </template>
 
 <script setup>
-import { downloadMeetingsExcel } from '~/utils/exportMeetingsExcel'
-
 const { isAdmin, isEmployee, fetchProfile } = useProfile()
-const { list, exportAll } = useMeetings()
-const toast = useToast()
+const { list } = useMeetings()
 
 await fetchProfile()
 
@@ -150,7 +140,6 @@ if (!isAdmin.value && !isEmployee.value) {
 
 const showModal = ref(false)
 const showAssignModal = ref(false)
-const downloading = ref(false)
 
 const filterDate = ref('')
 const dateSortOrder = ref('desc')
@@ -254,20 +243,6 @@ async function onSaved() {
 async function onAssignSaved() {
   showAssignModal.value = false
   await refresh()
-}
-
-async function downloadAllMeetings() {
-  if (downloading.value) return
-  downloading.value = true
-  try {
-    const rows = await exportAll()
-    downloadMeetingsExcel(rows)
-    toast.success('Meetings exported.')
-  } catch (err) {
-    toast.error(toastErrorMessage(err, 'Failed to download meetings.'))
-  } finally {
-    downloading.value = false
-  }
 }
 
 function openMeeting(m) {

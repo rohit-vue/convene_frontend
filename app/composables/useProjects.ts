@@ -8,7 +8,6 @@ import type {
   ProjectShare,
   ProjectStatusHistoryEntry,
 } from '~/types/projects'
-import type { ProjectExportRow } from '~/utils/exportProjectsExcel'
 
 export const useProjects = () => {
   const { apiFetch } = useApi()
@@ -19,7 +18,6 @@ export const useProjects = () => {
     apiFetch<Project>('/api/projects/assign', { method: 'POST', body })
   const accept = (id: string) =>
     apiFetch<Project>(`/api/projects/${id}/accept`, { method: 'PATCH' })
-  const exportAll = () => apiFetch<ProjectExportRow[]>('/api/projects/export')
   const getById = (id: string) => apiFetch<Project>(`/api/projects/${id}`)
   const create = (body: ProjectInput) =>
     apiFetch<Project>('/api/projects', { method: 'POST', body })
@@ -87,7 +85,6 @@ export const useProjects = () => {
     listPending,
     assign,
     accept,
-    exportAll,
     getById,
     create,
     update,
