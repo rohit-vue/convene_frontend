@@ -40,6 +40,7 @@ export function projectTypeLabel(value?: string | null): string {
 }
 
 export function upworkAccountLabel(value?: string | null): string {
+  if (value === 'Inhouse') return 'Inhouse'
   return (value && upworkAccountLabelMap[value]) || '—'
 }
 

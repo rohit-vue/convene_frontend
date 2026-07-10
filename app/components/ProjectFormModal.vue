@@ -57,6 +57,7 @@
               :options="jobTypeOptions"
               placeholder="Select…"
               :input-class="inputClass"
+              :disabled="isInhouseProject"
             />
           </div>
         </div>
@@ -66,14 +67,20 @@
             <label class="mb-1 block text-sm font-medium text-fg">Upwork account</label>
             <AppSelect
               v-model="form.upwork_account"
-              :options="upworkAccountOptions"
+              :options="projectUpworkAccountOptions"
               placeholder="Select…"
               :input-class="inputClass"
             />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-fg">Upwork link</label>
-            <input v-model="form.link_url" type="url" placeholder="https://www.upwork.com/…" :class="inputClass" />
+            <input
+              v-model="form.link_url"
+              type="url"
+              placeholder="https://www.upwork.com/…"
+              :class="inputClass"
+              :disabled="isInhouseProject"
+            />
           </div>
         </div>
 
@@ -178,6 +185,8 @@ function blankForm() {
 
 const form = reactive(blankForm())
 
+const isInhouseProject = computed(() => isInhouseUpworkAccount(form.upwork_account))
+
 function hydrate() {
   if (props.project) {
     Object.assign(form, {
@@ -212,12 +221,17 @@ async function save() {
   loading.value = true
   error.value = ''
   try {
+    const payload = { ...form }
+    if (isInhouseUpworkAccount(payload.upwork_account)) {
+      payload.job_type = ''
+      payload.link_url = ''
+    }
     if (isEdit.value) {
-      const { status, ...body } = form
+      const { status, ...body } = payload
       await update(props.project.id, body)
       toast.success('Project updated.')
     } else {
-      await create({ ...form })
+      await create(payload)
       toast.success('Project created.')
     }
     emit('saved')
@@ -256,6 +270,16 @@ async function confirmDelete() {
     deleting.value = false
   }
 }
+
+watch(
+  () => form.upwork_account,
+  (value) => {
+    if (isInhouseUpworkAccount(value)) {
+      form.job_type = ''
+      form.link_url = ''
+    }
+  },
+)
 
 watch(
   () => props.open,

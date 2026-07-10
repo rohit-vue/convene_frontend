@@ -86,7 +86,7 @@
               <label :class="labelClass">Upwork account</label>
               <AppSelect
                 v-model="form.upwork_account"
-                :options="upworkAccountOptions"
+                :options="projectUpworkAccountOptions"
                 placeholder="Select…"
                 :input-class="inputClass"
                 :disabled="!canEditProject"
@@ -94,7 +94,13 @@
             </div>
             <div>
               <label :class="labelClass">Upwork link</label>
-              <input v-model="form.link_url" :disabled="!canEditProject" type="url" placeholder="https://www.upwork.com/…" :class="inputClass" />
+              <input
+                v-model="form.link_url"
+                :disabled="!canEditProject || isInhouseProject"
+                type="url"
+                placeholder="https://www.upwork.com/…"
+                :class="inputClass"
+              />
             </div>
             <div>
               <label :class="labelClass">Job type</label>
@@ -103,7 +109,7 @@
                 :options="jobTypeOptions"
                 placeholder="Select…"
                 :input-class="inputClass"
-                :disabled="!canEditProject"
+                :disabled="!canEditProject || isInhouseProject"
               />
             </div>
             <div>
@@ -238,6 +244,8 @@ function blankForm() {
 
 const form = reactive(blankForm())
 
+const isInhouseProject = computed(() => isInhouseUpworkAccount(form.upwork_account))
+
 function fill(p) {
   const next = blankForm()
   if (p) {
@@ -256,6 +264,17 @@ function fill(p) {
 }
 
 watch(project, (p) => { if (p) fill(p) }, { immediate: true })
+
+watch(
+  () => form.upwork_account,
+  (value) => {
+    if (isInhouseUpworkAccount(value)) {
+      form.job_type = ''
+      form.link_url = ''
+      form.hourly_rate = ''
+    }
+  },
+)
 
 const isOwner = computed(() => project.value?.access?.role === 'owner')
 const isShared = computed(() => Boolean(project.value?.access?.is_shared))
@@ -281,13 +300,15 @@ async function save() {
     const { hourly_rate: _hourlyRate, ...rest } = form
     const payload = {
       ...rest,
-      ...(form.job_type === 'hourly'
-        ? {
-            hourly_rate: form.hourly_rate
-              ? sanitizeBudgetInput(form.hourly_rate)
-              : '',
-          }
-        : {}),
+      ...(isInhouseProject.value
+        ? { job_type: '', link_url: '', hourly_rate: '' }
+        : form.job_type === 'hourly'
+          ? {
+              hourly_rate: form.hourly_rate
+                ? sanitizeBudgetInput(form.hourly_rate)
+                : '',
+            }
+          : {}),
     }
     await update(route.params.id as string, payload)
     toast.success('Changes saved.')

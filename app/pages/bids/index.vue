@@ -9,6 +9,15 @@
       </div>
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
         <button
+          type="button"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          :disabled="isExporting || isLoading || !filteredBids.length"
+          @click="exportPdf"
+        >
+          {{ isExporting ? 'Exporting…' : 'Export PDF' }}
+        </button>
+        <button
+          type="button"
           class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
           @click="openAdd"
         >
@@ -181,15 +190,18 @@
 import type { UpworkBid } from '~/types/bids'
 import { bidJobTypeLabel, bidStatusBadgeClass, bidStatusLabel, formatBidAmount, groupBidsByDay } from '~/utils/bids'
 import { filterInputClass, filterLabelClass } from '~/utils/ui'
+import { exportBidsPdf } from '~/utils/exportPdf'
 
 definePageMeta({ middleware: 'admin' })
 
 const { list } = useBids()
+const toast = useToast()
 
 const showModal = ref(false)
 const showViewModal = ref(false)
 const selectedBid = ref<UpworkBid | null>(null)
 const editingBid = ref<UpworkBid | null>(null)
+const isExporting = ref(false)
 const filterDate = ref('')
 const filterUpworkAccount = ref('')
 
@@ -240,6 +252,19 @@ const emptyMessage = computed(() => {
 async function onSaved() {
   closeModal()
   await refresh()
+}
+
+async function exportPdf() {
+  if (isExporting.value || !filteredBids.value.length) return
+  isExporting.value = true
+  try {
+    await exportBidsPdf(filteredBids.value)
+    toast.success('Bids PDF downloaded.')
+  } catch (e) {
+    toast.error(toastErrorMessage(e, 'Failed to export bids PDF.'))
+  } finally {
+    isExporting.value = false
+  }
 }
 
 function openAdd() {

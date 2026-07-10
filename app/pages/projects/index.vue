@@ -8,15 +8,26 @@
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-        <button
-          v-if="isAdmin"
-          class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
-          @click="showAssignModal = true"
-        >
-          + Assign Project
-        </button>
+        <template v-if="isAdmin">
+          <button
+            type="button"
+            class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+            :disabled="isExporting || isLoading || !adminFilteredProjects.length"
+            @click="exportPdf"
+          >
+            {{ isExporting ? 'Exporting…' : 'Export PDF' }}
+          </button>
+          <button
+            type="button"
+            class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+            @click="showAssignModal = true"
+          >
+            + Assign Project
+          </button>
+        </template>
         <button
           v-else-if="isEmployee"
+          type="button"
           class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
           @click="openCreate"
         >
@@ -225,8 +236,11 @@
 <script setup>
 import { filterInputClass, filterLabelClass } from '~/utils/ui'
 
+import { exportProjectsPdf } from '~/utils/exportPdf'
+
 const { isAdmin, isEmployee, fetchProfile } = useProfile()
 const { list } = useProjects()
+const toast = useToast()
 
 await fetchProfile()
 
@@ -236,6 +250,7 @@ if (!isAdmin.value && !isEmployee.value) {
 
 const showModal = ref(false)
 const showAssignModal = ref(false)
+const isExporting = ref(false)
 const activeFilter = ref('all')
 
 const filterDate = ref('')
@@ -377,6 +392,19 @@ async function onSaved() {
 async function onAssignSaved() {
   showAssignModal.value = false
   await refresh()
+}
+
+async function exportPdf() {
+  if (!isAdmin.value || isExporting.value || !adminFilteredProjects.value.length) return
+  isExporting.value = true
+  try {
+    await exportProjectsPdf(adminFilteredProjects.value)
+    toast.success('Projects PDF downloaded.')
+  } catch (e) {
+    toast.error(toastErrorMessage(e, 'Failed to export projects PDF.'))
+  } finally {
+    isExporting.value = false
+  }
 }
 
 function assignmentBadgeClass(status) {

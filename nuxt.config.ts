@@ -18,7 +18,7 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
     optimizeDeps: {
-      include: ['cookie-es'],
+      include: ['cookie-es', 'jspdf', 'jspdf-autotable'],
     },
   },
   nitro: {
