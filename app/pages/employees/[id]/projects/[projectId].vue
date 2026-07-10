@@ -181,6 +181,9 @@ const backTarget = computed(() => {
   if (route.query.from === 'projects') {
     return { to: '/projects', label: 'Back to projects' }
   }
+  if (route.query.from === 'daily-logs') {
+    return { to: '/daily-logs', label: 'Back to daily logs' }
+  }
   return {
     to: `/employees/${route.params.id}`,
     label: 'Back to employee',
