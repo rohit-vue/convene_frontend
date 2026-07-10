@@ -26,18 +26,39 @@
           />
         </div>
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-fg">Project name <span class="text-red-500">*</span></label>
-          <input v-model="form.name" required type="text" placeholder="e.g. Website Redesign" :class="inputClass" />
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-fg">Project name <span class="text-red-500">*</span></label>
+            <input v-model="form.name" required type="text" placeholder="e.g. Website Redesign" :class="inputClass" />
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-fg">Upwork account <span class="text-red-500">*</span></label>
+            <AppSelect
+              v-model="form.upwork_account"
+              :options="upworkSelectOptions"
+              placeholder="Select…"
+              :input-class="inputClass"
+            />
+          </div>
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-fg">Client name <span class="text-red-500">*</span></label>
-          <input v-model="form.client_name" required type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
+          <label class="mb-1 block text-sm font-medium text-fg">
+            Client name
+            <span v-if="!isInhouseProject" class="text-red-500">*</span>
+          </label>
+          <input
+            v-model="form.client_name"
+            :required="!isInhouseProject"
+            type="text"
+            placeholder="e.g. Acme Corp"
+            :class="inputClass"
+            :disabled="isInhouseProject"
+          />
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-fg">Start date</label>
+          <label class="mb-1 block text-sm font-medium text-fg">Start date <span class="text-red-500">*</span></label>
           <DatePicker
             v-model="form.start_date"
             placeholder="Select date"
@@ -57,7 +78,10 @@
             />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-fg">Job type</label>
+            <label class="mb-1 block text-sm font-medium text-fg">
+              Job type
+              <span v-if="!isInhouseProject" class="text-red-500">*</span>
+            </label>
             <AppSelect
               v-model="form.job_type"
               :options="jobTypeOptions"
@@ -66,16 +90,6 @@
               :disabled="isInhouseProject"
             />
           </div>
-        </div>
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-fg">Upwork account</label>
-          <AppSelect
-            v-model="form.upwork_account"
-            :options="upworkSelectOptions"
-            placeholder="Select…"
-            :input-class="inputClass"
-          />
         </div>
 
         <div>
@@ -157,8 +171,28 @@ function close() {
 }
 
 async function save() {
-  if (!form.employee_id || !form.name.trim() || !form.client_name.trim()) {
+  if (!form.employee_id || !form.name.trim()) {
     error.value = 'Please fill in all required (*) fields.'
+    toast.error(error.value)
+    return
+  }
+  if (!form.upwork_account) {
+    error.value = 'Upwork account is required.'
+    toast.error(error.value)
+    return
+  }
+  if (!isInhouseProject.value && !form.client_name.trim()) {
+    error.value = 'Client name is required.'
+    toast.error(error.value)
+    return
+  }
+  if (!form.start_date) {
+    error.value = 'Start date is required.'
+    toast.error(error.value)
+    return
+  }
+  if (!isInhouseProject.value && !form.job_type) {
+    error.value = 'Job type is required.'
     toast.error(error.value)
     return
   }
@@ -169,7 +203,7 @@ async function save() {
     await assign({
       employee_id: form.employee_id,
       name: form.name.trim(),
-      client_name: form.client_name.trim(),
+      client_name: isInhouseProject.value ? undefined : form.client_name.trim(),
       start_date: form.start_date || undefined,
       job_category: form.job_category || undefined,
       job_type: isInhouseProject.value ? undefined : form.job_type || undefined,
@@ -191,6 +225,7 @@ watch(
   () => form.upwork_account,
   (value) => {
     if (isInhouseUpworkAccount(value)) {
+      form.client_name = ''
       form.job_type = ''
       form.link_url = ''
     }

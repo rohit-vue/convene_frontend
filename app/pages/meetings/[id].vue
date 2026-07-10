@@ -290,7 +290,7 @@ function buildUpdateBody(includeOutcome = true) {
 }
 
 async function save() {
-  if (!form.project_name || !form.client_name) {
+  if (!form.project_name || !form.client_name || !form.upwork_account || !form.project_type) {
     toast.error('Please fill in all required (*) project fields.')
     return
   }

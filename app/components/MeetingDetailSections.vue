@@ -50,11 +50,7 @@
           <input v-model="form.project_name" required type="text" placeholder="e.g. Website Redesign" :class="inputClass" />
         </div>
         <div>
-          <label :class="labelClass">Client name <span class="text-red-500">*</span></label>
-          <input v-model="form.client_name" required type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
-        </div>
-        <div>
-          <label :class="labelClass">Upwork account</label>
+          <label :class="labelClass">Upwork account <span class="text-red-500">*</span></label>
           <AppSelect
             v-model="form.upwork_account"
             :options="upworkAccountOptions"
@@ -63,7 +59,7 @@
           />
         </div>
         <div>
-          <label :class="labelClass">Upwork project type</label>
+          <label :class="labelClass">Upwork project type <span class="text-red-500">*</span></label>
           <AppSelect
             v-model="form.project_type"
             :options="projectTypeOptions"
@@ -71,13 +67,17 @@
             :input-class="inputClass"
           />
         </div>
-        <div class="sm:col-span-2">
-          <label :class="labelClass">Job description</label>
-          <textarea v-model="form.job_description" rows="3" placeholder="Role / scope of work…" :class="inputClass" />
+        <div>
+          <label :class="labelClass">Client name <span class="text-red-500">*</span></label>
+          <input v-model="form.client_name" required type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
         </div>
         <div class="sm:col-span-2">
           <label :class="labelClass">Upwork link</label>
           <input v-model="form.link_url" type="url" placeholder="https://…" :class="inputClass" />
+        </div>
+        <div class="sm:col-span-2">
+          <label :class="labelClass">Job description</label>
+          <textarea v-model="form.job_description" rows="3" placeholder="Role / scope of work…" :class="inputClass" />
         </div>
       </div>
     </section>

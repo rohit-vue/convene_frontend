@@ -59,11 +59,20 @@
               <input v-model="form.name" :required="canEditProject" :disabled="!canEditProject" type="text" placeholder="e.g. Website Redesign" :class="inputClass" />
             </div>
             <div>
-              <label :class="labelClass">Client name</label>
-              <input v-model="form.client_name" :disabled="!canEditProject" type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
+              <label :class="labelClass">
+                Client name
+                <span v-if="canEditProject && !isInhouseProject" class="text-red-500">*</span>
+              </label>
+              <input
+                v-model="form.client_name"
+                :disabled="!canEditProject || isInhouseProject"
+                type="text"
+                placeholder="e.g. Acme Corp"
+                :class="inputClass"
+              />
             </div>
             <div>
-              <label :class="labelClass">Start date</label>
+              <label :class="labelClass">Start date <span v-if="canEditProject" class="text-red-500">*</span></label>
               <DatePicker
                 v-model="form.start_date"
                 :disabled="!canEditProject"
@@ -83,7 +92,7 @@
           <h2 class="text-sm font-semibold uppercase tracking-wide text-fg-subtle">Upwork</h2>
           <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label :class="labelClass">Upwork account</label>
+              <label :class="labelClass">Upwork account <span v-if="canEditProject" class="text-red-500">*</span></label>
               <AppSelect
                 v-model="form.upwork_account"
                 :options="projectUpworkAccountOptions"
@@ -103,7 +112,10 @@
               />
             </div>
             <div>
-              <label :class="labelClass">Job type</label>
+              <label :class="labelClass">
+                Job type
+                <span v-if="canEditProject && !isInhouseProject" class="text-red-500">*</span>
+              </label>
               <AppSelect
                 v-model="form.job_type"
                 :options="jobTypeOptions"
@@ -269,6 +281,7 @@ watch(
   () => form.upwork_account,
   (value) => {
     if (isInhouseUpworkAccount(value)) {
+      form.client_name = ''
       form.job_type = ''
       form.link_url = ''
       form.hourly_rate = ''
@@ -295,13 +308,29 @@ async function save() {
     toast.error('Project name is required.')
     return
   }
+  if (!form.upwork_account) {
+    toast.error('Upwork account is required.')
+    return
+  }
+  if (!isInhouseProject.value && !form.client_name.trim()) {
+    toast.error('Client name is required.')
+    return
+  }
+  if (!form.start_date) {
+    toast.error('Start date is required.')
+    return
+  }
+  if (!isInhouseProject.value && !form.job_type) {
+    toast.error('Job type is required.')
+    return
+  }
   loading.value = true
   try {
     const { hourly_rate: _hourlyRate, ...rest } = form
     const payload = {
       ...rest,
       ...(isInhouseProject.value
-        ? { job_type: '', link_url: '', hourly_rate: '' }
+        ? { client_name: '', job_type: '', link_url: '', hourly_rate: '' }
         : form.job_type === 'hourly'
           ? {
               hourly_rate: form.hourly_rate
