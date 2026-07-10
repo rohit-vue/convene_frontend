@@ -99,6 +99,14 @@ export interface ProjectDailyLog {
   updated_by_name?: string | null
 }
 
+export interface AdminDailyLog extends ProjectDailyLog {
+  project_name?: string | null
+  client_name?: string | null
+  job_type?: string | null
+  assigned_to?: string | null
+  assignee_name?: string | null
+}
+
 export type ProjectInput = Partial<Omit<Project, 'id' | 'created_at' | 'updated_at' | 'created_by'>>
 
 export interface AssignProjectInput {

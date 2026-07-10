@@ -1,4 +1,5 @@
 import type {
+  AdminDailyLog,
   AssignProjectInput,
   DailyLogInput,
   Project,
@@ -43,6 +44,8 @@ export const useProjects = () => {
   const getMilestoneCostHistory = (id: string) => getMilestones(id)
   const changeMilestoneCost = (id: string, body: { milestone_cost: string; comment: string }) =>
     addMilestone(id, { amount: body.milestone_cost, comment: body.comment })
+  const listAllDailyLogs = () =>
+    apiFetch<AdminDailyLog[]>('/api/projects/daily-logs')
   const getDailyLogs = (id: string) =>
     apiFetch<ProjectDailyLog[]>(`/api/projects/${id}/daily-logs`)
   const createDailyLog = (id: string, body: DailyLogInput) =>
@@ -97,6 +100,7 @@ export const useProjects = () => {
     addMilestone,
     updateMilestone,
     deleteMilestone,
+    listAllDailyLogs,
     getDailyLogs,
     createDailyLog,
     updateDailyLog,
