@@ -1,9 +1,13 @@
 // Shared project field options and label helpers.
 
+import { upworkAccountOptions } from '~/utils/meetings'
+
 export interface SelectOption {
   value: string
   label: string
 }
+
+export const INHOUSE_UPWORK_ACCOUNT = 'Inhouse'
 
 export const jobTypeOptions: SelectOption[] = [
   { value: 'hourly', label: 'Hourly' },
@@ -49,6 +53,15 @@ export function jobCategoryLabel(value?: string | null): string {
 export function projectStatusLabel(value?: string | null): string {
   return (value && statusLabelMap[value]) || '—'
 }
+
+export function isInhouseUpworkAccount(value?: string | null): boolean {
+  return value === INHOUSE_UPWORK_ACCOUNT
+}
+
+export const projectUpworkAccountOptions: SelectOption[] = [
+  ...upworkAccountOptions,
+  { value: INHOUSE_UPWORK_ACCOUNT, label: 'Inhouse' },
+]
 
 export function formatHourlyRateLabel(value?: number | string | null): string {
   const digits = String(value ?? '').replace(/\D/g, '')
