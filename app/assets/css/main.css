@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * Convene brand palette (light theme), derived from the logo.
  * The built-in `indigo` scale is remapped to the logo's navy blue (primary),
@@ -28,18 +30,79 @@
   --color-violet-700: #216a63;
   --color-violet-800: #1c554f;
   --color-violet-900: #164641;
+
+  --color-surface: var(--app-surface);
+  --color-muted: var(--app-muted);
+  --color-elevated: var(--app-elevated);
+  --color-border: var(--app-border);
+  --color-fg: var(--app-fg);
+  --color-fg-muted: var(--app-fg-muted);
+  --color-fg-subtle: var(--app-fg-subtle);
 }
 
 :root {
-  --bg: #f8fafc;
+  --app-bg: #f8fafc;
+  --app-surface: #ffffff;
+  --app-muted: #f8fafc;
+  --app-elevated: #f1f5f9;
+  --app-border: #e2e8f0;
+  --app-fg: #1e293b;
+  --app-fg-muted: #475569;
+  --app-fg-subtle: #94a3b8;
+}
+
+.dark {
+  --app-bg: #0b1220;
+  --app-surface: #111827;
+  --app-muted: #0f172a;
+  --app-elevated: #1e293b;
+  --app-border: #334155;
+  --app-fg: #e2e8f0;
+  --app-fg-muted: #94a3b8;
+  --app-fg-subtle: #64748b;
 }
 
 html,
 body {
   min-height: 100%;
   overflow-x: hidden;
-  background-color: var(--bg);
-  color: #1e293b;
+  background-color: var(--app-bg);
+  color: var(--app-fg);
   font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-border) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--app-border);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--app-fg-subtle);
+}
+
+.dark * {
+  scrollbar-color: #475569 transparent;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+  background-color: #475569;
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+  background-color: #64748b;
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NuxtLink to="/meetings" class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-800">
+    <NuxtLink to="/meetings" class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-fg-muted transition hover:text-fg">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
       Back to meetings
     </NuxtLink>
@@ -11,24 +11,24 @@
 
     <form v-else-if="meeting" class="space-y-6" @submit.prevent="save">
       <!-- Header -->
-      <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+      <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div class="min-w-0">
             <h1 class="text-xl font-bold tracking-tight sm:text-2xl">{{ form.project_name || 'Untitled meeting' }}</h1>
-            <p class="mt-1 text-sm text-slate-500">{{ form.client_name || '—' }}</p>
+            <p class="mt-1 text-sm text-fg-muted">{{ form.client_name || '—' }}</p>
           </div>
           <div class="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:gap-3">
             <button
               type="button"
               :disabled="deleting || loading"
-              class="rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-60"
+              class="rounded-xl border border-red-200 bg-surface px-4 py-2 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-60"
               @click="openDeleteModal"
             >
               {{ deleting ? 'Deleting…' : 'Delete meeting' }}
             </button>
             <button
               type="button"
-              class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+              class="rounded-xl border border-border bg-surface px-4 py-2 text-sm font-medium text-fg shadow-sm transition hover:bg-elevated"
               @click="openCreateModal"
             >
               Follow-up meeting
@@ -53,18 +53,18 @@
       />
     </form>
 
-    <div v-else class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+    <div v-else class="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
       <ContentLoader variant="table" :rows="8" :columns="4" />
     </div>
 
-    <div v-if="showCreateModal" class="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-slate-900/45 p-4 backdrop-blur-sm" @click.self="showCreateModal = false">
-      <div class="my-8 w-full max-w-2xl rounded-2xl border border-slate-100 bg-white shadow-2xl">
-        <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+    <div v-if="showCreateModal" class="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-slate-900/45 p-4 backdrop-blur-sm dark:bg-black/60" @click.self="showCreateModal = false">
+      <div class="my-8 w-full max-w-2xl rounded-2xl border border-border bg-surface shadow-2xl">
+        <div class="flex items-center justify-between border-b border-border px-6 py-4">
           <div>
-            <h3 class="text-lg font-semibold text-slate-900">Create follow-up meeting</h3>
-            <p class="mt-1 text-sm text-slate-500">Add a new meeting update and keep the logistics history in one place.</p>
+            <h3 class="text-lg font-semibold text-fg">Create follow-up meeting</h3>
+            <p class="mt-1 text-sm text-fg-muted">Add a new meeting update and keep the logistics history in one place.</p>
           </div>
-          <button type="button" class="grid h-8 w-8 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600" @click="showCreateModal = false">
+          <button type="button" class="grid h-8 w-8 place-items-center rounded-lg text-fg-subtle transition hover:bg-elevated hover:text-fg-muted" @click="showCreateModal = false">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
@@ -116,8 +116,8 @@
           <p v-if="createError" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ createError }}</p>
         </div>
 
-        <div class="flex items-center justify-end gap-3 border-t border-slate-100 px-6 py-4">
-          <button type="button" class="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100" @click="showCreateModal = false">
+        <div class="flex items-center justify-end gap-3 border-t border-border px-6 py-4">
+          <button type="button" class="rounded-xl px-4 py-2 text-sm font-medium text-fg-muted transition hover:bg-elevated" @click="showCreateModal = false">
             Cancel
           </button>
           <button type="button" :disabled="createLoading" class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60" @click="saveFollowUpMeeting">
@@ -137,9 +137,9 @@
       @close="closeDeleteModal"
       @confirm="confirmDeleteMeeting"
     >
-      <div v-if="meeting" class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
-        <p class="font-medium text-slate-800">{{ form.project_name || meeting.project_name }}</p>
-        <p v-if="form.client_name || meeting.client_name" class="mt-1 text-slate-500">
+      <div v-if="meeting" class="rounded-xl border border-border bg-elevated px-4 py-3 text-sm">
+        <p class="font-medium text-fg">{{ form.project_name || meeting.project_name }}</p>
+        <p v-if="form.client_name || meeting.client_name" class="mt-1 text-fg-muted">
           {{ form.client_name || meeting.client_name }}
         </p>
       </div>
@@ -148,6 +148,7 @@
 </template>
 
 <script setup lang="ts">
+import { formInputClass as inputClass } from '~/utils/ui'
 import { toLocalDateTimeInput } from '~/utils/dates'
 
 definePageMeta({ middleware: 'employee' })
@@ -168,9 +169,7 @@ const { data: meetingUpdates, refresh: refreshUpdates } = await useAsyncData(
   { server: false, default: () => [] },
 )
 
-const labelClass = 'mb-1 block text-sm font-medium text-slate-700'
-const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
+const labelClass = 'mb-1 block text-sm font-medium text-fg'
 
 const loading = ref(false)
 const deleting = ref(false)

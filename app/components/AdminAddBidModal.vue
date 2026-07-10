@@ -1,14 +1,14 @@
 <template>
   <div
     v-if="open"
-    class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm dark:bg-black/60"
     @click.self="close"
   >
-    <div class="my-8 w-full max-w-lg rounded-2xl bg-white shadow-xl">
-      <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-        <h2 class="text-lg font-semibold text-slate-800">{{ isEdit ? 'Edit bid' : 'Add bid' }}</h2>
+    <div class="my-8 w-full max-w-lg rounded-2xl bg-surface shadow-xl">
+      <div class="flex items-center justify-between border-b border-border px-6 py-4">
+        <h2 class="text-lg font-semibold text-fg">{{ isEdit ? 'Edit bid' : 'Add bid' }}</h2>
         <button
-          class="grid h-8 w-8 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+          class="grid h-8 w-8 place-items-center rounded-lg text-fg-subtle transition hover:bg-elevated hover:text-fg-muted"
           @click="close"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -17,7 +17,7 @@
 
       <form class="space-y-5 px-6 py-5" @submit.prevent="save">
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">
+          <label class="mb-1 block text-sm font-medium text-fg">
             Upwork account <span class="text-red-500">*</span>
           </label>
           <AppSelect
@@ -29,7 +29,7 @@
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">
+          <label class="mb-1 block text-sm font-medium text-fg">
             Job link <span class="text-red-500">*</span>
           </label>
           <input
@@ -43,7 +43,7 @@
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Status</label>
+            <label class="mb-1 block text-sm font-medium text-fg">Status</label>
             <AppSelect
               v-model="form.status"
               :options="bidStatusOptions"
@@ -51,7 +51,7 @@
             />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">
+            <label class="mb-1 block text-sm font-medium text-fg">
               Project type <span class="text-red-500">*</span>
             </label>
             <AppSelect
@@ -64,21 +64,21 @@
         </div>
 
         <div v-if="form.job_type === 'hourly'">
-          <label class="mb-1 block text-sm font-medium text-slate-700">
+          <label class="mb-1 block text-sm font-medium text-fg">
             Hourly rate <span class="text-red-500">*</span>
           </label>
           <BudgetInput v-model="form.hourly_rate" :input-class="inputClass" placeholder="50" />
         </div>
 
         <div v-else-if="form.job_type === 'fixed'">
-          <label class="mb-1 block text-sm font-medium text-slate-700">
+          <label class="mb-1 block text-sm font-medium text-fg">
             Fixed amount <span class="text-red-500">*</span>
           </label>
           <BudgetInput v-model="form.fixed_amount" :input-class="inputClass" placeholder="1000" />
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Bid date</label>
+          <label class="mb-1 block text-sm font-medium text-fg">Bid date</label>
           <DatePicker
             v-model="form.bid_date"
             placeholder="Select date"
@@ -86,11 +86,11 @@
             :input-class="inputClass"
             full-width
           />
-          <p class="mt-1 text-xs text-slate-400">Defaults to today if left unchanged.</p>
+          <p class="mt-1 text-xs text-fg-subtle">Defaults to today if left unchanged.</p>
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Notes</label>
+          <label class="mb-1 block text-sm font-medium text-fg">Notes</label>
           <textarea
             v-model="form.notes"
             rows="3"
@@ -101,8 +101,8 @@
 
         <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
 
-        <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">
-          <button type="button" class="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100" @click="close">
+        <div class="flex justify-end gap-3 border-t border-border pt-4">
+          <button type="button" class="rounded-xl px-4 py-2 text-sm font-medium text-fg-muted hover:bg-elevated" @click="close">
             Cancel
           </button>
           <button
@@ -119,6 +119,8 @@
 </template>
 
 <script setup lang="ts">
+
+import { formInputClass as inputClass } from '~/utils/ui'
 import type { BidJobType, BidStatus, UpworkBid } from '~/types/bids'
 import { bidJobTypeOptions, bidStatusOptions } from '~/utils/bids'
 
@@ -134,8 +136,6 @@ const emit = defineEmits<{
 
 const { create, update } = useBids()
 
-const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
 
 const loading = ref(false)
 const error = ref('')

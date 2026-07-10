@@ -13,7 +13,7 @@
       ]"
       @click.stop="toggle"
     >
-      <span class="truncate" :class="modelValue ? 'text-slate-700' : 'text-slate-400'">
+      <span class="truncate" :class="modelValue ? 'text-fg' : 'text-fg-subtle'">
         {{ displayValue }}
       </span>
       <svg
@@ -26,7 +26,7 @@
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="shrink-0 text-slate-400"
+        class="shrink-0 text-fg-subtle"
       >
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 16 14" />
@@ -37,13 +37,13 @@
       <div
         v-if="open"
         ref="panel"
-        class="fixed z-[200] w-56 rounded-xl border border-slate-100 bg-white p-4 shadow-xl"
+        class="fixed z-[200] w-56 rounded-xl border border-border bg-surface p-4 shadow-xl"
         :style="panelStyle"
         @click.stop
       >
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="mb-1 block text-xs font-medium text-slate-500">Hour</label>
+            <label class="mb-1 block text-xs font-medium text-fg-muted">Hour</label>
             <AppSelect
               v-model="selectedHour"
               :options="hourOptions"
@@ -52,7 +52,7 @@
             />
           </div>
           <div>
-            <label class="mb-1 block text-xs font-medium text-slate-500">Minute</label>
+            <label class="mb-1 block text-xs font-medium text-fg-muted">Minute</label>
             <AppSelect
               v-model="selectedMinute"
               :options="minuteOptions"
@@ -77,7 +77,7 @@ const props = defineProps({
   inputClass: {
     type: String,
     default:
-      'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20',
+      'rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20',
   },
 })
 
@@ -86,7 +86,7 @@ const emit = defineEmits(['update:modelValue'])
 const { openExclusive, closeExclusive } = useExclusiveDropdown()
 
 const selectClass =
-  'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
+  'rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
 
 const root = ref(null)
 const trigger = ref(null)

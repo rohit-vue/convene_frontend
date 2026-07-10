@@ -2,7 +2,7 @@
   <div>
     <NuxtLink
       :to="backTarget.to"
-      class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-800"
+      class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-fg-muted transition hover:text-fg"
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
       {{ backTarget.label }}
@@ -13,19 +13,19 @@
     </div>
 
     <div v-else-if="meeting" class="space-y-6">
-      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+      <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p class="text-xs font-medium uppercase tracking-wide text-slate-400">Meeting</p>
-            <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-800">{{ form.project_name || 'Untitled meeting' }}</h1>
-            <p class="mt-1 text-sm text-slate-500">{{ form.client_name || '—' }}</p>
-            <p v-if="meeting.employee_name" class="mt-2 text-sm text-slate-500">
-              Employee: <span class="font-medium text-slate-700">{{ meeting.employee_name }}</span>
+            <p class="text-xs font-medium uppercase tracking-wide text-fg-subtle">Meeting</p>
+            <h1 class="mt-1 text-2xl font-bold tracking-tight text-fg">{{ form.project_name || 'Untitled meeting' }}</h1>
+            <p class="mt-1 text-sm text-fg-muted">{{ form.client_name || '—' }}</p>
+            <p v-if="meeting.employee_name" class="mt-2 text-sm text-fg-muted">
+              Employee: <span class="font-medium text-fg">{{ meeting.employee_name }}</span>
             </p>
           </div>
           <span
             v-if="currentOutcome"
-            class="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700"
+            class="inline-flex rounded-full bg-indigo-50 dark:bg-indigo-950 px-3 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-300"
           >
             {{ meetingOutcomeLabel(currentOutcome) }}
           </span>
@@ -40,7 +40,7 @@
       />
     </div>
 
-    <div v-else class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+    <div v-else class="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
       <ContentLoader variant="table" :rows="8" :columns="4" />
     </div>
   </div>

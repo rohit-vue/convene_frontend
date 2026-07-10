@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Create your account</h1>
-    <p class="mt-1.5 text-sm text-slate-500">Start running better client meetings with Convene.</p>
+    <h1 class="text-2xl font-bold tracking-tight text-fg">Create your account</h1>
+    <p class="mt-1.5 text-sm text-fg-muted">Start running better client meetings with Convene.</p>
 
     <div v-if="emailSent" class="mt-8 rounded-2xl border border-emerald-100 bg-emerald-50 p-6 text-center">
       <div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-emerald-100 text-emerald-600">
@@ -16,9 +16,9 @@
 
     <form v-else class="mt-8 space-y-4" @submit.prevent="signup">
       <div>
-        <label class="mb-1.5 block text-sm font-medium text-slate-700">Full name</label>
+        <label class="mb-1.5 block text-sm font-medium text-fg">Full name</label>
         <div class="relative">
-          <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </span>
           <input
@@ -26,15 +26,15 @@
             type="text"
             required
             placeholder="Jane Doe"
-            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+            class="w-full rounded-xl border border-border bg-elevated py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-indigo-400 focus:bg-surface focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/40"
           />
         </div>
       </div>
 
       <div>
-        <label class="mb-1.5 block text-sm font-medium text-slate-700">Email</label>
+        <label class="mb-1.5 block text-sm font-medium text-fg">Email</label>
         <div class="relative">
-          <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
           </span>
           <input
@@ -42,15 +42,15 @@
             type="email"
             required
             placeholder="you@company.com"
-            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+            class="w-full rounded-xl border border-border bg-elevated py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-indigo-400 focus:bg-surface focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/40"
           />
         </div>
       </div>
 
       <div>
-        <label class="mb-1.5 block text-sm font-medium text-slate-700">Password</label>
+        <label class="mb-1.5 block text-sm font-medium text-fg">Password</label>
         <div class="relative">
-          <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </span>
           <input
@@ -59,11 +59,11 @@
             required
             minlength="6"
             placeholder="At least 6 characters"
-            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-10 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+            class="w-full rounded-xl border border-border bg-elevated py-2.5 pl-10 pr-10 text-sm outline-none transition focus:border-indigo-400 focus:bg-surface focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/40"
           />
           <button
             type="button"
-            class="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-slate-400 transition hover:text-slate-600"
+            class="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-fg-subtle transition hover:text-fg-muted"
             :aria-label="showPassword ? 'Hide password' : 'Show password'"
             @click="showPassword = !showPassword"
           >
@@ -71,7 +71,7 @@
             <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
-        <p class="mt-1.5 text-xs text-slate-400">Use at least 6 characters.</p>
+        <p class="mt-1.5 text-xs text-fg-subtle">Use at least 6 characters.</p>
       </div>
 
       <p v-if="error" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ error }}</p>
@@ -84,14 +84,14 @@
         {{ loading ? 'Creating account…' : 'Create account' }}
       </button>
 
-      <p class="text-center text-xs text-slate-400">
+      <p class="text-center text-xs text-fg-subtle">
         By signing up you'll join as an employee. Admin access is granted by your workspace owner.
       </p>
     </form>
 
-    <p v-if="!emailSent" class="mt-6 text-center text-sm text-slate-500">
+    <p v-if="!emailSent" class="mt-6 text-center text-sm text-fg-muted">
       Already have an account?
-      <NuxtLink to="/login" class="font-medium text-indigo-600 hover:text-indigo-700">Sign in</NuxtLink>
+      <NuxtLink to="/login" class="font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-300">Sign in</NuxtLink>
     </p>
   </div>
 </template>

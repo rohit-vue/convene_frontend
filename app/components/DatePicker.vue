@@ -13,7 +13,7 @@
       ]"
       @click.stop="toggle"
     >
-      <span class="truncate" :class="modelValue ? 'text-slate-700' : 'text-slate-400'">
+      <span class="truncate" :class="modelValue ? 'text-fg' : 'text-fg-subtle'">
         {{ displayValue }}
       </span>
       <svg
@@ -26,7 +26,7 @@
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="shrink-0 text-slate-400"
+        class="shrink-0 text-fg-subtle"
       >
         <path d="M8 2v4" />
         <path d="M16 2v4" />
@@ -39,7 +39,7 @@
       <div
         v-if="open"
         ref="panel"
-        class="fixed z-[200] max-w-[calc(100vw-1rem)] rounded-xl border border-slate-100 bg-white p-4 shadow-xl"
+        class="fixed z-[200] max-w-[calc(100vw-1rem)] rounded-xl border border-border bg-surface p-4 shadow-xl"
         :style="panelStyle"
         @click.stop="onPanelClick"
       >
@@ -57,7 +57,7 @@
           <span
             v-for="day in weekDays"
             :key="day"
-            class="py-1 text-center text-[10px] font-medium uppercase tracking-wide text-slate-400"
+            class="py-1 text-center text-[10px] font-medium uppercase tracking-wide text-fg-subtle"
           >
             {{ day }}
           </span>
@@ -76,25 +76,25 @@
             {{ cell.day }}
             <span
               v-if="markedSet.has(cell.dateKey)"
-              class="absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full"
-              :class="cell.dateKey === modelValue ? 'bg-white' : 'bg-indigo-500'"
+              class="absolute bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full"
+              :class="cell.dateKey === modelValue ? 'bg-white' : 'bg-indigo-500 dark:bg-indigo-400'"
             />
           </button>
         </div>
 
         <div
           v-if="showMarkedLegend || (allowClear && modelValue)"
-          class="mt-3 flex items-center justify-between border-t border-slate-100 pt-3"
+          class="mt-3 flex items-center justify-between border-t border-border pt-3"
         >
-          <div v-if="showMarkedLegend" class="flex items-center gap-1.5 text-xs text-slate-500">
-            <span class="h-1 w-1 rounded-full bg-indigo-500" />
+          <div v-if="showMarkedLegend" class="flex items-center gap-1.5 text-xs text-fg-muted">
+            <span class="h-1.5 w-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />
             Has data
           </div>
           <span v-else />
           <button
             v-if="allowClear && modelValue"
             type="button"
-            class="text-xs font-medium text-indigo-600 transition hover:text-indigo-700"
+            class="text-xs font-medium text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-300"
             @click="clear"
           >
             Clear
@@ -130,7 +130,7 @@ const props = defineProps({
   inputClass: {
     type: String,
     default:
-      'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20',
+      'rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20',
   },
 })
 
@@ -158,20 +158,20 @@ const calendarDays = computed(() => buildCalendarDays(viewYear.value, viewMonth.
 function dayCellClass(cell) {
   const disabled = isDateKeyDisabled(cell.dateKey, props.min, props.max)
   if (disabled) {
-    return 'cursor-not-allowed text-slate-300'
+    return 'cursor-not-allowed text-fg-subtle'
   }
   if (cell.dateKey === props.modelValue) {
     return 'bg-indigo-600 font-medium text-white'
   }
   if (cell.dateKey === todayKey.value) {
     return cell.outside
-      ? 'text-slate-300 ring-1 ring-indigo-100'
-      : 'font-medium text-indigo-600 ring-1 ring-indigo-200 hover:bg-indigo-50'
+      ? 'text-fg-subtle ring-1 ring-indigo-200 dark:ring-indigo-700'
+      : 'font-medium text-indigo-600 ring-1 ring-indigo-200 hover:bg-indigo-50 dark:text-indigo-300 dark:ring-indigo-700 dark:hover:bg-indigo-950'
   }
   if (cell.outside) {
-    return 'text-slate-300 hover:bg-slate-50'
+    return 'text-fg-subtle hover:bg-elevated'
   }
-  return 'text-slate-700 hover:bg-slate-100'
+  return 'text-fg hover:bg-elevated'
 }
 
 function updatePosition() {

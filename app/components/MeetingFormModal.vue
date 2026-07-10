@@ -1,14 +1,14 @@
 <template>
   <div
     v-if="open"
-    class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm dark:bg-black/60"
     @click.self="close"
   >
-    <div class="my-8 w-full max-w-2xl rounded-2xl bg-white shadow-xl">
+    <div class="my-8 w-full max-w-2xl rounded-2xl bg-surface shadow-xl">
       <!-- Header -->
-      <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-        <h2 class="text-lg font-semibold text-slate-800">{{ isEdit ? 'Edit Meeting' : 'New Meeting' }}</h2>
-        <button class="grid h-8 w-8 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600" @click="close">
+      <div class="flex items-center justify-between border-b border-border px-6 py-4">
+        <h2 class="text-lg font-semibold text-fg">{{ isEdit ? 'Edit Meeting' : 'New Meeting' }}</h2>
+        <button class="grid h-8 w-8 place-items-center rounded-lg text-fg-subtle transition hover:bg-elevated hover:text-fg-muted" @click="close">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
@@ -18,18 +18,18 @@
         <!-- Project & client -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Project Title <span class="text-red-500">*</span></label>
+            <label class="mb-1 block text-sm font-medium text-fg">Project Title <span class="text-red-500">*</span></label>
             <input v-model="form.project_name" required type="text" placeholder="e.g. Website Redesign" :class="inputClass" />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Client name <span class="text-red-500">*</span></label>
+            <label class="mb-1 block text-sm font-medium text-fg">Client name <span class="text-red-500">*</span></label>
             <input v-model="form.client_name" required type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Project type</label>
+            <label class="mb-1 block text-sm font-medium text-fg">Project type</label>
             <AppSelect
               v-model="form.project_type"
               :options="projectTypeOptions"
@@ -38,7 +38,7 @@
             />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Upwork account</label>
+            <label class="mb-1 block text-sm font-medium text-fg">Upwork account</label>
             <AppSelect
               v-model="form.upwork_account"
               :options="upworkAccountOptions"
@@ -47,20 +47,20 @@
             />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Upwork Link</label>
+            <label class="mb-1 block text-sm font-medium text-fg">Upwork Link</label>
             <input v-model="form.link_url" type="url" placeholder="https://…" :class="inputClass" />
           </div>
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Job description</label>
+          <label class="mb-1 block text-sm font-medium text-fg">Job description</label>
           <textarea v-model="form.job_description" rows="3" placeholder="Role / scope of work…" :class="inputClass" />
         </div>
 
         <!-- Meeting details -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Date &amp; time <span class="text-red-500">*</span></label>
+            <label class="mb-1 block text-sm font-medium text-fg">Date &amp; time <span class="text-red-500">*</span></label>
             <DateTimePicker
               v-model="form.meeting_at"
               placeholder="Select date & time"
@@ -69,11 +69,11 @@
             />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Duration (min)</label>
+            <label class="mb-1 block text-sm font-medium text-fg">Duration (min)</label>
             <input v-model="form.duration_minutes" type="number" min="0" placeholder="30" :class="inputClass" />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Meeting outcome <span class="text-red-500">*</span></label>
+            <label class="mb-1 block text-sm font-medium text-fg">Meeting outcome <span class="text-red-500">*</span></label>
             <AppSelect
               v-model="form.meeting_outcome"
               :options="meetingOutcomeOptions"
@@ -86,23 +86,23 @@
         <!-- Commercials -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Budget discussed</label>
+            <label class="mb-1 block text-sm font-medium text-fg">Budget discussed</label>
             <BudgetInput v-model="form.budget_discussed" :input-class="inputClass" />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Deadline / expected timeline</label>
+            <label class="mb-1 block text-sm font-medium text-fg">Deadline / expected timeline</label>
             <input v-model="form.deadline" type="text" placeholder="e.g. 6 weeks" :class="inputClass" />
           </div>
         </div>
 
         <!-- Discussion -->
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Notes / meeting summary</label>
+          <label class="mb-1 block text-sm font-medium text-fg">Notes / meeting summary</label>
           <textarea v-model="form.notes" rows="3" placeholder="What was discussed…" :class="inputClass" />
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Requirements discussed</label>
+          <label class="mb-1 block text-sm font-medium text-fg">Requirements discussed</label>
           <textarea v-model="form.requirements_discussed" rows="2" placeholder="Client requirements…" :class="inputClass" />
         </div>
 
@@ -110,8 +110,8 @@
       </form>
 
       <!-- Footer -->
-      <div class="flex items-center justify-end gap-3 border-t border-slate-100 px-6 py-4">
-        <button type="button" class="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100" @click="close">
+      <div class="flex items-center justify-end gap-3 border-t border-border px-6 py-4">
+        <button type="button" class="rounded-xl px-4 py-2 text-sm font-medium text-fg-muted transition hover:bg-elevated" @click="close">
           Cancel
         </button>
         <button
@@ -128,6 +128,7 @@
 </template>
 
 <script setup>
+import { formInputClass as inputClass } from '~/utils/ui'
 import { toLocalDateTimeInput } from '~/utils/dates'
 
 const props = defineProps({
@@ -137,9 +138,6 @@ const props = defineProps({
 const emit = defineEmits(['close', 'saved'])
 
 const isEdit = computed(() => !!props.meeting?.id)
-
-const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
 
 const { create, update } = useMeetings()
 const { getOptions } = useEmployees()
