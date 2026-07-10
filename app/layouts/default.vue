@@ -1,23 +1,23 @@
 <template>
-  <div class="flex min-h-screen bg-slate-50 text-slate-800">
+  <div class="flex min-h-screen bg-muted text-fg">
     <div
       v-if="sidebarOpen"
-      class="fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm lg:hidden"
+      class="fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm lg:hidden dark:bg-black/60"
       @click="sidebarOpen = false"
     />
 
     <aside
-      class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white px-4 py-6 transition-transform duration-200 ease-in-out lg:translate-x-0"
+      class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border bg-surface px-4 py-6 transition-transform duration-200 ease-in-out lg:translate-x-0"
       :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
     >
       <div class="mb-8 flex items-center justify-between gap-3 px-2">
         <img
           src="/convenelogo.png"
           alt="Convene"
-          class="h-12 w-auto max-w-[calc(100%-2.5rem)] shrink object-contain sm:h-14 lg:h-16"
+          class="h-12 w-auto max-w-[calc(100%-2.5rem)] shrink object-contain sm:h-14 lg:h-16 dark:brightness-0 dark:invert"
         />
         <button
-          class="grid h-8 w-8 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 lg:hidden"
+          class="grid h-8 w-8 place-items-center rounded-lg text-fg-subtle transition hover:bg-elevated hover:text-fg lg:hidden"
           aria-label="Close menu"
           @click="sidebarOpen = false"
         >
@@ -30,20 +30,22 @@
           v-for="item in nav"
           :key="item.to"
           :to="item.to"
-          class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-          active-class="!bg-indigo-50 !text-indigo-700"
+          :class="navLinkClass"
+          :active-class="navLinkActiveClass"
           @click="sidebarOpen = false"
         >
-          <span class="text-slate-400 transition group-hover:text-slate-600" v-html="item.icon" />
+          <span class="text-fg-subtle transition group-hover:text-fg-muted" v-html="item.icon" />
           {{ item.label }}
         </NuxtLink>
       </nav>
 
-      <div class="mt-auto border-t border-slate-100 pt-4">
+      <div class="mt-auto border-t border-border pt-4">
+        <ThemeToggle class="mb-3" />
+
         <NuxtLink
           to="/profile"
-          class="group flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition hover:bg-slate-100"
-          active-class="!bg-indigo-50"
+          class="group flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition hover:bg-elevated"
+          active-class="!bg-indigo-50 !text-indigo-700 dark:!bg-indigo-900/40 dark:!text-indigo-200"
           @click="sidebarOpen = false"
         >
           <ProfileAvatar
@@ -54,14 +56,14 @@
             ring
           />
           <div class="min-w-0 text-sm leading-tight">
-            <p class="truncate font-medium text-slate-800">{{ displayName }}</p>
-            <p class="text-xs capitalize text-slate-400">{{ role }}</p>
+            <p class="truncate font-medium text-fg">{{ displayName }}</p>
+            <p class="text-xs capitalize text-fg-subtle">{{ role }}</p>
           </div>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-auto shrink-0 text-slate-300 transition group-hover:text-slate-500"><path d="m9 18 6-6-6-6"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-auto shrink-0 text-fg-subtle transition group-hover:text-fg-muted"><path d="m9 18 6-6-6-6"/></svg>
         </NuxtLink>
 
         <button
-          class="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600"
+          class="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-fg-muted transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/50 dark:hover:text-red-400"
           @click="logout"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
@@ -71,9 +73,9 @@
     </aside>
 
     <div class="flex min-w-0 flex-1 flex-col lg:pl-64">
-      <header class="sticky top-0 z-10 flex items-center gap-3 border-b border-slate-200 bg-white/70 px-4 py-3 backdrop-blur sm:gap-4 sm:px-6 sm:py-4 lg:px-8">
+      <header class="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-surface/70 px-4 py-3 backdrop-blur sm:gap-4 sm:px-6 sm:py-4 lg:px-8">
         <button
-          class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 lg:hidden"
+          class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-fg-muted transition hover:bg-elevated hover:text-fg lg:hidden"
           aria-label="Open menu"
           @click="sidebarOpen = true"
         >
@@ -97,6 +99,8 @@
 </template>
 
 <script setup>
+import { navLinkActiveClass, navLinkClass } from '~/utils/ui'
+
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const { displayName, role, initials, avatarUrl, isAdmin, isEmployee, fetchProfile } = useProfile()

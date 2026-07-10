@@ -1,9 +1,9 @@
 <template>
-  <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+  <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
     <div class="flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Daily logs</h2>
-        <p class="mt-1 text-sm text-slate-500">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-fg-subtle">Daily logs</h2>
+        <p class="mt-1 text-sm text-fg-muted">
           {{ isHourly
             ? 'Record tasks completed and tracker time for this project.'
             : 'Record tasks completed for this project.' }}
@@ -11,7 +11,7 @@
       </div>
       <div class="flex flex-col items-stretch gap-3 sm:items-end">
         <div v-if="logs?.length" class="w-full sm:w-auto">
-          <label class="mb-1 block text-xs font-medium text-slate-500 sm:text-right">Filter by date</label>
+          <label class="mb-1 block text-xs font-medium text-fg-muted sm:text-right">Filter by date</label>
           <DateFilterPicker
             v-model="filterDate"
             :marked-dates="markedDates"
@@ -19,9 +19,9 @@
             :input-class="filterInputClass"
           />
         </div>
-        <div v-if="isHourly && totalTrackerMinutes > 0" class="w-full rounded-xl bg-indigo-50 px-3 py-2 text-left sm:w-auto sm:text-right">
+        <div v-if="isHourly && totalTrackerMinutes > 0" class="w-full rounded-xl bg-indigo-50 dark:bg-indigo-950 px-3 py-2 text-left sm:w-auto sm:text-right">
           <p class="text-xs font-medium uppercase tracking-wide text-indigo-400">Total tracked</p>
-          <p class="text-sm font-semibold text-indigo-700">{{ formatTrackerMinutes(totalTrackerMinutes) }}</p>
+          <p class="text-sm font-semibold text-indigo-700 dark:text-indigo-300">{{ formatTrackerMinutes(totalTrackerMinutes) }}</p>
         </div>
       </div>
     </div>
@@ -29,18 +29,18 @@
     <div
       v-if="canEditLogs && !readOnly"
       ref="formSection"
-      class="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4"
+      class="mt-5 space-y-4 rounded-xl border border-border bg-elevated/60 p-4"
       :class="editingId ? 'border-indigo-200 ring-1 ring-indigo-100' : ''"
     >
       <p
         v-if="editingId"
-        class="rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-800"
+        class="rounded-lg bg-indigo-50 dark:bg-indigo-950 px-3 py-2 text-sm text-indigo-800"
       >
         Editing log for <strong>{{ formatLogDate(editingLogDate) }}</strong>. You can only update the task description below.
       </p>
       <div v-if="!editingId" class="grid grid-cols-1 gap-4" :class="isHourly ? 'sm:grid-cols-2' : ''">
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">
+          <label class="mb-1 block text-sm font-medium text-fg">
             Date <span class="text-red-500">*</span>
           </label>
           <DatePicker
@@ -55,7 +55,7 @@
           </p>
         </div>
         <div v-if="isHourly">
-          <label class="mb-1 block text-sm font-medium text-slate-700">
+          <label class="mb-1 block text-sm font-medium text-fg">
             Tracker time (hours) <span class="text-red-500">*</span>
           </label>
           <input
@@ -66,17 +66,17 @@
             placeholder="e.g. 2.5"
             :class="inputClass"
           />
-          <p v-if="trackerHours > 0" class="mt-1 text-xs text-slate-400">
+          <p v-if="trackerHours > 0" class="mt-1 text-xs text-fg-subtle">
             {{ formatTrackerMinutes(Math.round(trackerHours * 60)) }}
           </p>
         </div>
       </div>
-      <div v-else-if="isHourly" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
-        <span class="text-slate-500">Tracked time:</span>
+      <div v-else-if="isHourly" class="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg-muted">
+        <span class="text-fg-muted">Tracked time:</span>
         {{ formatTrackerMinutes(editingTrackerMinutes) }}
       </div>
       <div>
-        <label class="mb-1 block text-sm font-medium text-slate-700">
+        <label class="mb-1 block text-sm font-medium text-fg">
           Tasks done <span class="text-red-500">*</span>
         </label>
         <textarea
@@ -98,7 +98,7 @@
         <button
           v-if="editingId"
           type="button"
-          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+          class="rounded-xl border border-border bg-surface px-4 py-2 text-sm font-medium text-fg-muted transition hover:bg-elevated"
           @click="cancelEdit"
         >
           Cancel
@@ -107,12 +107,12 @@
     </div>
 
     <div class="mt-6">
-      <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-400">Log history</h3>
+      <h3 class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">Log history</h3>
       <div v-if="logsLoading" class="mt-3">
         <ContentLoader variant="table" :rows="3" :columns="3" />
       </div>
-      <div v-else-if="!logs?.length" class="mt-3 text-sm text-slate-400">No daily logs yet.</div>
-      <div v-else-if="!displayedLogs.length" class="mt-3 text-sm text-slate-400">
+      <div v-else-if="!logs?.length" class="mt-3 text-sm text-fg-subtle">No daily logs yet.</div>
+      <div v-else-if="!displayedLogs.length" class="mt-3 text-sm text-fg-subtle">
         No log for the selected date.
       </div>
       <ol v-else class="mt-4 space-y-0">
@@ -120,30 +120,30 @@
           v-for="(entry, index) in displayedLogs"
           :key="entry.id"
           class="relative flex gap-4 pb-6 pl-6 ml-2"
-          :class="index < displayedLogs.length - 1 ? 'border-l border-slate-200' : ''"
+          :class="index < displayedLogs.length - 1 ? 'border-l border-border' : ''"
         >
-          <span class="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-indigo-500 ring-4 ring-white" />
+          <span class="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-indigo-500 ring-4 ring-surface" />
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="text-sm font-semibold text-slate-800">{{ formatLogDate(entry.log_date) }}</span>
+              <span class="text-sm font-semibold text-fg">{{ formatLogDate(entry.log_date) }}</span>
               <span
                 v-if="isHourly"
-                class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600"
+                class="rounded-full bg-elevated px-2 py-0.5 text-xs font-medium text-fg-muted"
               >
                 {{ formatTrackerMinutes(entry.tracker_minutes) }}
               </span>
-              <span v-if="entry.updated_at && entry.updated_at !== entry.created_at" class="text-xs text-slate-400">
+              <span v-if="entry.updated_at && entry.updated_at !== entry.created_at" class="text-xs text-fg-subtle">
                 edited {{ formatDateTime(entry.updated_at) }}
               </span>
             </div>
-            <p class="mt-2 whitespace-pre-wrap text-sm text-slate-600">{{ entry.tasks_done }}</p>
-            <p v-if="entry.logged_by_name" class="mt-2 text-xs text-slate-400">
+            <p class="mt-2 whitespace-pre-wrap text-sm text-fg-muted">{{ entry.tasks_done }}</p>
+            <p v-if="entry.logged_by_name" class="mt-2 text-xs text-fg-subtle">
               by {{ entry.logged_by_name }}
             </p>
             <div v-if="canManageLog(entry)" class="mt-2 flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                class="text-xs font-medium text-indigo-600 transition hover:text-indigo-700"
+                class="text-xs font-medium text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-300"
                 @click="startEdit(entry)"
               >
                 Edit
@@ -171,15 +171,16 @@
       @close="closeDeleteModal"
       @confirm="confirmDeleteLog"
     >
-      <div v-if="logToDelete" class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
-        <p class="font-medium text-slate-800">{{ formatLogDate(logToDelete.log_date) }}</p>
-        <p class="mt-2 line-clamp-3 whitespace-pre-wrap text-slate-600">{{ logToDelete.tasks_done }}</p>
+      <div v-if="logToDelete" class="rounded-xl border border-border bg-elevated px-4 py-3 text-sm">
+        <p class="font-medium text-fg">{{ formatLogDate(logToDelete.log_date) }}</p>
+        <p class="mt-2 line-clamp-3 whitespace-pre-wrap text-fg-muted">{{ logToDelete.tasks_done }}</p>
       </div>
     </ConfirmDeleteModal>
   </div>
 </template>
 
 <script setup lang="ts">
+import { filterInputClass, formInputClass as inputClass } from '~/utils/ui'
 import type { ProjectDailyLog } from '~/types/projects'
 
 const props = defineProps({
@@ -207,11 +208,7 @@ const currentUserId = computed(() => user.value?.id ?? sessionUserId.value)
 
 const { getDailyLogs, createDailyLog, updateDailyLog, deleteDailyLog, getAdminDailyLogs } = useProjects()
 
-const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
 
-const filterInputClass =
-  'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
 
 const isHourly = computed(() => props.jobType === 'hourly')
 

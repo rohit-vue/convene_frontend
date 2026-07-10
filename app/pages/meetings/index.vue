@@ -3,7 +3,7 @@
     <div class="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
       <div class="min-w-0">
         <h1 class="text-xl font-bold tracking-tight sm:text-2xl">Meetings</h1>
-        <p class="mt-1 text-sm text-slate-500">
+        <p class="mt-1 text-sm text-fg-muted">
           {{ isAdmin ? 'View and assign meetings across the team.' : 'Track and manage all your meetings.' }}
         </p>
       </div>
@@ -24,8 +24,8 @@
       </button>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-      <div v-if="isAdmin" class="border-b border-slate-100 bg-slate-50 px-4 py-4 sm:px-6">
+    <div class="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+      <div v-if="isAdmin" class="border-b border-border bg-elevated px-4 py-4 sm:px-6">
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
           <div class="w-full sm:w-auto">
             <label :class="filterLabelClass">Date</label>
@@ -77,7 +77,7 @@
 
       <div v-else class="overflow-x-auto">
       <table class="w-full min-w-[640px] text-sm">
-        <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+        <thead class="bg-elevated text-left text-xs uppercase tracking-wide text-fg-muted">
           <tr>
             <th class="px-4 py-4 font-medium sm:px-6">Project</th>
             <th class="px-4 py-4 font-medium sm:px-6">Client</th>
@@ -89,19 +89,19 @@
             <th v-if="!isAdmin" class="px-4 py-4 font-medium sm:px-6">Outcome</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100">
+        <tbody class="divide-y divide-border">
           <tr
             v-for="m in displayedMeetings"
             :key="m.id"
-            class="cursor-pointer transition hover:bg-slate-50"
+            class="cursor-pointer transition hover:bg-elevated"
             @click="openMeeting(m)"
           >
-            <td class="px-4 py-4 font-medium text-slate-800 sm:px-6">{{ m.project_name }}</td>
-            <td class="px-4 py-4 text-slate-600 sm:px-6">{{ m.client_name || '—' }}</td>
-            <td v-if="isAdmin" class="px-4 py-4 text-slate-600 sm:px-6">{{ m.employee_name || '—' }}</td>
-            <td v-if="!isAdmin" class="px-4 py-4 text-slate-600 sm:px-6">{{ projectTypeLabel(m.project_type) }}</td>
-            <td class="px-4 py-4 text-slate-600 sm:px-6">{{ upworkAccountLabel(m.upwork_account) }}</td>
-            <td class="whitespace-nowrap px-4 py-4 text-slate-600 sm:px-6">{{ formatDate(m.meeting_at) }}</td>
+            <td class="px-4 py-4 font-medium text-fg sm:px-6">{{ m.project_name }}</td>
+            <td class="px-4 py-4 text-fg-muted sm:px-6">{{ m.client_name || '—' }}</td>
+            <td v-if="isAdmin" class="px-4 py-4 text-fg-muted sm:px-6">{{ m.employee_name || '—' }}</td>
+            <td v-if="!isAdmin" class="px-4 py-4 text-fg-muted sm:px-6">{{ projectTypeLabel(m.project_type) }}</td>
+            <td class="px-4 py-4 text-fg-muted sm:px-6">{{ upworkAccountLabel(m.upwork_account) }}</td>
+            <td class="whitespace-nowrap px-4 py-4 text-fg-muted sm:px-6">{{ formatDate(m.meeting_at) }}</td>
             <td v-if="isAdmin" class="px-4 py-4 sm:px-6">
               <span
                 class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
@@ -110,11 +110,11 @@
                 {{ assignmentStatusLabel(m.assignment_status) }}
               </span>
             </td>
-            <td v-if="!isAdmin" class="px-4 py-4 text-slate-600 sm:px-6">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
+            <td v-if="!isAdmin" class="px-4 py-4 text-fg-muted sm:px-6">{{ meetingOutcomeLabel(m.meeting_outcome) }}</td>
           </tr>
 
           <tr v-if="displayedMeetings.length === 0">
-            <td :colspan="isAdmin ? 6 : 6" class="px-4 py-12 text-center text-sm text-slate-400 sm:px-6">
+            <td :colspan="isAdmin ? 6 : 6" class="px-4 py-12 text-center text-sm text-fg-subtle sm:px-6">
               {{ emptyMeetingsMessage }}
             </td>
           </tr>
@@ -129,6 +129,8 @@
 </template>
 
 <script setup>
+import { filterInputClass, filterLabelClass } from '~/utils/ui'
+
 const { isAdmin, isEmployee, fetchProfile } = useProfile()
 const { list } = useMeetings()
 
@@ -146,10 +148,6 @@ const dateSortOrder = ref('desc')
 const filterUpworkAccount = ref('')
 const filterEmployeeId = ref('')
 const filterStatus = ref('')
-
-const filterLabelClass = 'mb-1 block text-xs font-medium text-slate-500'
-const filterInputClass =
-  'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
 
 const dateSortOptions = [
   { value: 'desc', label: 'Newest first' },
@@ -262,9 +260,9 @@ function formatDate(value) {
 }
 
 function statusBadgeClass(status) {
-  if (status === 'accepted') return 'bg-emerald-50 text-emerald-700'
-  if (status === 'pending') return 'bg-amber-50 text-amber-700'
+  if (status === 'accepted') return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+  if (status === 'pending') return 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
   if (status === 'declined') return 'bg-red-50 text-red-700'
-  return 'bg-slate-100 text-slate-600'
+  return 'bg-elevated text-fg-muted'
 }
 </script>

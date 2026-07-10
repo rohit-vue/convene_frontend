@@ -13,7 +13,7 @@
       ]"
       @click.stop="toggle"
     >
-      <span class="truncate" :class="displayLabel ? 'text-slate-700' : 'text-slate-400'">
+      <span class="truncate" :class="displayLabel ? 'text-fg' : 'text-fg-subtle'">
         {{ displayLabel || placeholder }}
       </span>
       <svg
@@ -26,7 +26,7 @@
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="shrink-0 text-slate-400 transition-transform"
+        class="shrink-0 text-fg-subtle transition-transform"
         :class="open ? 'rotate-180' : ''"
       >
         <path d="m6 9 6 6 6-6" />
@@ -37,7 +37,7 @@
       <div
         v-if="open"
         ref="panel"
-        class="fixed z-[200] overflow-hidden rounded-xl border border-slate-100 bg-white shadow-xl"
+        class="fixed z-[200] overflow-hidden rounded-xl border border-border bg-surface shadow-xl"
         :style="panelStyle"
         @click.stop
       >
@@ -99,7 +99,7 @@ const props = defineProps({
   inputClass: {
     type: String,
     default:
-      'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20',
+      'rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20',
   },
 })
 
@@ -120,12 +120,12 @@ const displayLabel = computed(() => {
 
 function optionClass(opt) {
   if (opt.disabled) {
-    return 'cursor-not-allowed text-slate-300'
+    return 'cursor-not-allowed text-fg-subtle'
   }
   if (opt.value === props.modelValue) {
     return 'bg-indigo-600 font-medium text-white'
   }
-  return 'text-slate-700 hover:bg-slate-100'
+  return 'text-fg hover:bg-elevated'
 }
 
 function updatePosition() {

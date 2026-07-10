@@ -1,8 +1,8 @@
 <template>
-  <div class="flex min-h-screen bg-white text-slate-800">
+  <div class="flex min-h-screen bg-surface text-fg">
     <!-- Brand / marketing panel -->
     <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-br from-indigo-800 via-indigo-700 to-violet-600 p-12 text-white lg:flex">
-      <div class="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+      <div class="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-surface/10 blur-3xl" />
       <div class="pointer-events-none absolute -bottom-24 -left-16 h-80 w-80 rounded-full bg-violet-400/20 blur-3xl" />
 
       <div class="relative w-fit rounded-2xl bg-white/95 px-4 py-2.5 shadow-sm">
@@ -26,7 +26,7 @@
         <ul class="mt-10 space-y-6">
           <li v-for="f in features" :key="f.title" class="flex items-start gap-4">
             <span
-              class="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 ring-1 ring-white/15 backdrop-blur"
+              class="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface/10 ring-1 ring-white/15 backdrop-blur"
               v-html="f.icon"
             />
             <div>
@@ -46,7 +46,7 @@
     <!-- Form panel -->
     <div class="flex w-full items-center justify-center px-4 py-8 sm:px-6 sm:py-10 lg:w-1/2">
       <div class="w-full max-w-sm">
-        <div class="mb-8 flex justify-center lg:hidden">
+        <div class="mb-8 flex justify-center rounded-2xl bg-white px-6 py-4 shadow-sm lg:hidden">
           <img src="/convenelogo.png" alt="Convene" class="h-20 w-auto object-contain" />
         </div>
         <slot />

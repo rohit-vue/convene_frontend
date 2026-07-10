@@ -3,14 +3,14 @@
     <div class="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
       <div class="min-w-0">
         <h1 class="text-xl font-bold tracking-tight sm:text-2xl">Daily logs</h1>
-        <p class="mt-1 text-sm text-slate-500">
+        <p class="mt-1 text-sm text-fg-muted">
           Review logs submitted by employees across all projects.
         </p>
       </div>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-      <div class="border-b border-slate-100 bg-slate-50 px-4 py-4 sm:px-6">
+    <div class="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+      <div class="border-b border-border bg-elevated px-4 py-4 sm:px-6">
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
           <div class="w-full sm:w-auto">
             <label :class="filterLabelClass">Date</label>
@@ -57,7 +57,7 @@
 
       <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[800px] text-sm">
-          <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+          <thead class="bg-elevated text-left text-xs uppercase tracking-wide text-fg-muted">
             <tr>
               <th class="px-4 py-4 font-medium sm:px-6">Date</th>
               <th class="px-4 py-4 font-medium sm:px-6">Employee</th>
@@ -67,28 +67,28 @@
               <th class="px-4 py-4 font-medium sm:px-6">Tracker</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100">
+          <tbody class="divide-y divide-border">
             <tr
               v-for="entry in displayedLogs"
               :key="entry.id"
-              class="cursor-pointer transition hover:bg-slate-50"
+              class="cursor-pointer transition hover:bg-elevated"
               @click="openLog(entry)"
             >
-              <td class="whitespace-nowrap px-4 py-4 text-slate-600 sm:px-6">
+              <td class="whitespace-nowrap px-4 py-4 text-fg-muted sm:px-6">
                 {{ formatLogDate(entry.log_date) }}
               </td>
-              <td class="px-4 py-4 text-slate-600 sm:px-6">{{ entry.logged_by_name || '—' }}</td>
-              <td class="px-4 py-4 font-medium text-slate-800 sm:px-6">{{ entry.project_name || '—' }}</td>
-              <td class="px-4 py-4 text-slate-600 sm:px-6">{{ entry.client_name || '—' }}</td>
-              <td class="max-w-xs px-4 py-4 text-slate-600 sm:px-6">
+              <td class="px-4 py-4 text-fg-muted sm:px-6">{{ entry.logged_by_name || '—' }}</td>
+              <td class="px-4 py-4 font-medium text-fg sm:px-6">{{ entry.project_name || '—' }}</td>
+              <td class="px-4 py-4 text-fg-muted sm:px-6">{{ entry.client_name || '—' }}</td>
+              <td class="max-w-xs px-4 py-4 text-fg-muted sm:px-6">
                 <p class="line-clamp-2 whitespace-pre-wrap">{{ entry.tasks_done || '—' }}</p>
               </td>
-              <td class="whitespace-nowrap px-4 py-4 text-slate-600 sm:px-6">
+              <td class="whitespace-nowrap px-4 py-4 text-fg-muted sm:px-6">
                 {{ entry.job_type === 'hourly' ? formatTrackerMinutes(entry.tracker_minutes) : '—' }}
               </td>
             </tr>
             <tr v-if="!displayedLogs.length">
-              <td colspan="6" class="px-4 py-12 text-center text-sm text-slate-400 sm:px-6">
+              <td colspan="6" class="px-4 py-12 text-center text-sm text-fg-subtle sm:px-6">
                 {{ emptyMessage }}
               </td>
             </tr>
@@ -103,6 +103,7 @@
 import type { AdminDailyLog } from '~/types/projects'
 import { collectDateKeys } from '~/utils/dates'
 import { jobTypeOptions } from '~/utils/projects'
+import { filterInputClass, filterLabelClass } from '~/utils/ui'
 
 definePageMeta({ middleware: 'admin' })
 
@@ -112,10 +113,6 @@ const filterDate = ref('')
 const dateSortOrder = ref('desc')
 const filterEmployeeId = ref('')
 const filterProjectType = ref('')
-
-const filterLabelClass = 'mb-1 block text-xs font-medium text-slate-500'
-const filterInputClass =
-  'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
 
 const dateSortOptions = [
   { value: 'desc', label: 'Newest first' },

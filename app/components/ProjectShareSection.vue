@@ -1,13 +1,13 @@
 <template>
-  <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
-    <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Share project</h2>
-    <p class="mt-1 text-sm text-slate-500">
+  <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
+    <h2 class="text-sm font-semibold uppercase tracking-wide text-fg-subtle">Share project</h2>
+    <p class="mt-1 text-sm text-fg-muted">
       Grant another employee access to view this project and add their own daily logs.
     </p>
 
-    <div class="mt-5 flex flex-wrap items-end gap-3 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+    <div class="mt-5 flex flex-wrap items-end gap-3 rounded-xl border border-border bg-elevated/60 p-4">
       <div class="min-w-0 w-full flex-1 sm:min-w-[200px]">
-        <label class="mb-1 block text-sm font-medium text-slate-700">Employee</label>
+        <label class="mb-1 block text-sm font-medium text-fg">Employee</label>
         <AppSelect
           v-model="selectedEmployeeId"
           :options="employeeSelectOptions"
@@ -26,20 +26,20 @@
     </div>
 
     <div class="mt-6">
-      <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-400">People with access</h3>
+      <h3 class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">People with access</h3>
       <div v-if="sharesLoading" class="mt-3">
         <ContentLoader variant="table" :rows="2" :columns="3" />
       </div>
-      <div v-else-if="!shares?.length" class="mt-3 text-sm text-slate-400">Not shared with anyone yet.</div>
-      <ul v-else class="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-100">
+      <div v-else-if="!shares?.length" class="mt-3 text-sm text-fg-subtle">Not shared with anyone yet.</div>
+      <ul v-else class="mt-4 divide-y divide-border rounded-xl border border-border">
         <li
           v-for="share in shares"
           :key="share.id"
           class="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
         >
           <div>
-            <p class="text-sm font-medium text-slate-800">{{ share.shared_with_name || 'Employee' }}</p>
-            <p class="text-xs text-slate-400">
+            <p class="text-sm font-medium text-fg">{{ share.shared_with_name || 'Employee' }}</p>
+            <p class="text-xs text-fg-subtle">
               Shared {{ formatDate(share.created_at) }}
               <span v-if="!share.can_edit_logs"> · view only</span>
             </p>
@@ -48,14 +48,14 @@
             v-if="share.can_edit_logs"
             type="button"
             :disabled="revokingId === share.id"
-            class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-60"
+            class="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-fg-muted transition hover:bg-elevated disabled:opacity-60"
             @click="revoke(share.id)"
           >
             {{ revokingId === share.id ? 'Revoking…' : 'Revoke log access' }}
           </button>
           <span
             v-else
-            class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500"
+            class="rounded-full bg-elevated px-2.5 py-0.5 text-xs font-medium text-fg-muted"
           >
             View only
           </span>
@@ -66,6 +66,7 @@
 </template>
 
 <script setup lang="ts">
+import { formInputClass as inputClass } from '~/utils/ui'
 import type { ProjectShare } from '~/types/projects'
 
 const props = defineProps({
@@ -75,8 +76,6 @@ const props = defineProps({
 const { listShares, shareProject, revokeShare } = useProjects()
 const { getOptions } = useEmployees()
 
-const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
 
 const selectedEmployeeId = ref('')
 const sharing = ref(false)

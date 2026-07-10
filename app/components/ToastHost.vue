@@ -31,9 +31,9 @@
 const { toasts, dismiss } = useToast()
 
 function toastClass(type) {
-  if (type === 'success') return 'border-emerald-200 bg-emerald-50/95 text-emerald-900'
-  if (type === 'error') return 'border-red-200 bg-red-50/95 text-red-900'
-  return 'border-slate-200 bg-white/95 text-slate-800'
+  if (type === 'success') return 'border-emerald-200 bg-emerald-50/95 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/95 dark:text-emerald-200'
+  if (type === 'error') return 'border-red-200 bg-red-50/95 text-red-900 dark:border-red-800 dark:bg-red-950/95 dark:text-red-200'
+  return 'border-border bg-surface/95 text-fg'
 }
 
 function toastIcon(type) {

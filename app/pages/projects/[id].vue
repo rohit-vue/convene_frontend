@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NuxtLink to="/projects" class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-800">
+    <NuxtLink to="/projects" class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-fg-muted transition hover:text-fg">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
       Back to projects
     </NuxtLink>
@@ -20,11 +20,11 @@
       </div>
 
       <form class="space-y-6" @submit.prevent="save">
-        <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+        <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0 flex-1">
               <h1 class="text-xl font-bold tracking-tight sm:text-2xl">{{ form.name || 'Untitled project' }}</h1>
-              <p class="mt-1 text-sm text-slate-500">{{ form.client_name || 'No client set' }}</p>
+              <p class="mt-1 text-sm text-fg-muted">{{ form.client_name || 'No client set' }}</p>
             </div>
             <span class="shrink-0 rounded-full px-3 py-1 text-xs font-medium" :class="statusMeta[project.status]?.badge">
               {{ statusMeta[project.status]?.label }}
@@ -35,7 +35,7 @@
             <button
               type="button"
               :disabled="deleting || loading"
-              class="rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-60"
+              class="rounded-xl border border-red-200 bg-surface px-4 py-2 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-60"
               @click="openDeleteModal"
             >
               {{ deleting ? 'Deleting…' : 'Delete project' }}
@@ -51,8 +51,8 @@
 
         </div>
 
-        <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Overview</h2>
+        <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-fg-subtle">Overview</h2>
           <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label :class="labelClass">Project name <span v-if="canEditProject" class="text-red-500">*</span></label>
@@ -79,8 +79,8 @@
           </div>
         </div>
 
-        <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Upwork</h2>
+        <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-fg-subtle">Upwork</h2>
           <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label :class="labelClass">Upwork account</label>
@@ -133,12 +133,12 @@
         />
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+          <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
             <label :class="labelClass">Requirements</label>
             <textarea v-model="form.requirements" :disabled="!canEditProject" rows="5" placeholder="Client requirements, deliverables…" :class="inputClass" />
           </div>
 
-          <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+          <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
             <label :class="labelClass">Notes</label>
             <textarea v-model="form.notes" :disabled="!canEditProject" rows="5" placeholder="Internal notes, context, follow-ups…" :class="inputClass" />
           </div>
@@ -166,7 +166,7 @@
       </form>
     </div>
 
-    <div v-else class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+    <div v-else class="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
       <ContentLoader variant="table" :rows="8" :columns="4" />
     </div>
 
@@ -180,9 +180,9 @@
       @close="closeDeleteModal"
       @confirm="confirmDeleteProject"
     >
-      <div v-if="project" class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
-        <p class="font-medium text-slate-800">{{ form.name || project.name }}</p>
-        <p v-if="form.client_name || project.client_name" class="mt-1 text-slate-500">
+      <div v-if="project" class="rounded-xl border border-border bg-elevated px-4 py-3 text-sm">
+        <p class="font-medium text-fg">{{ form.name || project.name }}</p>
+        <p v-if="form.client_name || project.client_name" class="mt-1 text-fg-muted">
           {{ form.client_name || project.client_name }}
         </p>
       </div>
@@ -191,6 +191,7 @@
 </template>
 
 <script setup lang="ts">
+import { formInputClass as inputClass } from '~/utils/ui'
 definePageMeta({ middleware: 'employee' })
 
 const route = useRoute()
@@ -203,16 +204,14 @@ const { data: project, error, refresh } = await useAsyncData(
   { server: false },
 )
 
-const labelClass = 'mb-1 block text-sm font-medium text-slate-700'
-const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
+const labelClass = 'mb-1 block text-sm font-medium text-fg'
 
 const statusMeta = {
-  planning: { label: 'Planning', badge: 'bg-slate-100 text-slate-600' },
-  active: { label: 'Active', badge: 'bg-indigo-50 text-indigo-700' },
-  on_hold: { label: 'On hold', badge: 'bg-amber-50 text-amber-700' },
-  completed: { label: 'Completed', badge: 'bg-emerald-50 text-emerald-700' },
-  cancelled: { label: 'Cancelled', badge: 'bg-red-50 text-red-600' },
+  planning: { label: 'Planning', badge: 'bg-elevated text-fg-muted' },
+  active: { label: 'Active', badge: 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300' },
+  on_hold: { label: 'On hold', badge: 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300' },
+  completed: { label: 'Completed', badge: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' },
+  cancelled: { label: 'Cancelled', badge: 'bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400' },
 }
 
 const loading = ref(false)

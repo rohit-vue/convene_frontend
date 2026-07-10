@@ -1,14 +1,14 @@
 <template>
   <div
     v-if="open"
-    class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm dark:bg-black/60"
     @click.self="close"
   >
-    <div class="my-8 w-full max-w-lg rounded-2xl bg-white shadow-xl">
-      <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-        <h2 class="text-lg font-semibold text-slate-800">Assign Meeting</h2>
+    <div class="my-8 w-full max-w-lg rounded-2xl bg-surface shadow-xl">
+      <div class="flex items-center justify-between border-b border-border px-6 py-4">
+        <h2 class="text-lg font-semibold text-fg">Assign Meeting</h2>
         <button
-          class="grid h-8 w-8 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+          class="grid h-8 w-8 place-items-center rounded-lg text-fg-subtle transition hover:bg-elevated hover:text-fg-muted"
           @click="close"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -17,7 +17,7 @@
 
       <form class="space-y-5 px-6 py-5" @submit.prevent="save">
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Assign to <span class="text-red-500">*</span></label>
+          <label class="mb-1 block text-sm font-medium text-fg">Assign to <span class="text-red-500">*</span></label>
           <AppSelect
             v-model="form.employee_id"
             :options="employeeSelectOptions"
@@ -27,17 +27,17 @@
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Project Title <span class="text-red-500">*</span></label>
+          <label class="mb-1 block text-sm font-medium text-fg">Project Title <span class="text-red-500">*</span></label>
           <input v-model="form.project_name" required type="text" placeholder="e.g. Website Redesign" :class="inputClass" />
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Client Name <span class="text-red-500">*</span></label>
+          <label class="mb-1 block text-sm font-medium text-fg">Client Name <span class="text-red-500">*</span></label>
           <input v-model="form.client_name" required type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Upwork Account</label>
+          <label class="mb-1 block text-sm font-medium text-fg">Upwork Account</label>
           <AppSelect
             v-model="form.upwork_account"
             :options="upworkSelectOptions"
@@ -47,13 +47,13 @@
         </div>
 
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">Upwork Link</label>
+          <label class="mb-1 block text-sm font-medium text-fg">Upwork Link</label>
           <input v-model="form.link_url" type="url" placeholder="https://www.upwork.com/…" :class="inputClass" />
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Date <span class="text-red-500">*</span></label>
+            <label class="mb-1 block text-sm font-medium text-fg">Date <span class="text-red-500">*</span></label>
             <DatePicker
               v-model="form.date"
               placeholder="Select date"
@@ -62,7 +62,7 @@
             />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-slate-700">Time <span class="text-red-500">*</span></label>
+            <label class="mb-1 block text-sm font-medium text-fg">Time <span class="text-red-500">*</span></label>
             <TimePicker
               v-model="form.time"
               placeholder="Select time"
@@ -74,8 +74,8 @@
 
         <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
 
-        <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">
-          <button type="button" class="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100" @click="close">
+        <div class="flex justify-end gap-3 border-t border-border pt-4">
+          <button type="button" class="rounded-xl px-4 py-2 text-sm font-medium text-fg-muted hover:bg-elevated" @click="close">
             Cancel
           </button>
           <button
@@ -92,14 +92,12 @@
 </template>
 
 <script setup>
+import { formInputClass as inputClass } from '~/utils/ui'
 const props = defineProps({
   open: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['close', 'saved'])
-
-const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
 
 const { assign } = useMeetings()
 const { getOptions } = useEmployees()

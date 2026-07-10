@@ -1,13 +1,13 @@
 <template>
   <div ref="root" class="relative w-full max-w-72">
-    <span class="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-slate-400">
+    <span class="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-fg-subtle">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
     </span>
     <input
       v-model="query"
       type="text"
       :placeholder="placeholder"
-      class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+      class="w-full rounded-xl border border-border bg-elevated py-2 pl-9 pr-4 text-sm outline-none transition focus:border-indigo-400 focus:bg-surface focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/40"
       @focus="onFocus"
       @keydown.escape="close"
       @keydown.down.prevent="moveHighlight(1)"
@@ -17,32 +17,32 @@
 
     <div
       v-if="open && (loading || hasResults || searched)"
-      class="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+      class="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-border bg-surface shadow-lg"
     >
-      <div v-if="loading" class="px-4 py-3 text-sm text-slate-500">Searching…</div>
+      <div v-if="loading" class="px-4 py-3 text-sm text-fg-muted">Searching…</div>
 
-      <div v-else-if="!hasResults" class="px-4 py-3 text-sm text-slate-500">
+      <div v-else-if="!hasResults" class="px-4 py-3 text-sm text-fg-muted">
         No results for “{{ query.trim() }}”
       </div>
 
       <div v-else class="max-h-80 overflow-y-auto py-1">
         <template v-if="results.meetings.length">
-          <p class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Meetings</p>
+          <p class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-fg-subtle">Meetings</p>
           <button
             v-for="(item, i) in results.meetings"
             :key="`m-${item.id}`"
             type="button"
-            class="flex w-full items-start gap-3 px-3 py-2 text-left text-sm transition hover:bg-slate-50"
-            :class="highlightIndex === flatIndex('meetings', i) ? 'bg-indigo-50' : ''"
+            class="flex w-full items-start gap-3 px-3 py-2 text-left text-sm transition hover:bg-elevated"
+            :class="highlightIndex === flatIndex('meetings', i) ? 'bg-indigo-50 dark:bg-indigo-950' : ''"
             @mouseenter="highlightIndex = flatIndex('meetings', i)"
             @click="goTo(item)"
           >
-            <span class="mt-0.5 text-slate-400">
+            <span class="mt-0.5 text-fg-subtle">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
             </span>
             <span class="min-w-0 flex-1">
-              <span class="block truncate font-medium text-slate-800">{{ item.project_name }}</span>
-              <span class="block truncate text-xs text-slate-500">
+              <span class="block truncate font-medium text-fg">{{ item.project_name }}</span>
+              <span class="block truncate text-xs text-fg-muted">
                 {{ item.client_name || 'No client' }}
                 <template v-if="item.employee_name"> · {{ item.employee_name }}</template>
               </span>
@@ -51,22 +51,22 @@
         </template>
 
         <template v-if="results.projects.length">
-          <p class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Projects</p>
+          <p class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-fg-subtle">Projects</p>
           <button
             v-for="(item, i) in results.projects"
             :key="`p-${item.id}`"
             type="button"
-            class="flex w-full items-start gap-3 px-3 py-2 text-left text-sm transition hover:bg-slate-50"
-            :class="highlightIndex === flatIndex('projects', i) ? 'bg-indigo-50' : ''"
+            class="flex w-full items-start gap-3 px-3 py-2 text-left text-sm transition hover:bg-elevated"
+            :class="highlightIndex === flatIndex('projects', i) ? 'bg-indigo-50 dark:bg-indigo-950' : ''"
             @mouseenter="highlightIndex = flatIndex('projects', i)"
             @click="goTo(item)"
           >
-            <span class="mt-0.5 text-slate-400">
+            <span class="mt-0.5 text-fg-subtle">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
             </span>
             <span class="min-w-0 flex-1">
-              <span class="block truncate font-medium text-slate-800">{{ item.name }}</span>
-              <span class="block truncate text-xs capitalize text-slate-500">
+              <span class="block truncate font-medium text-fg">{{ item.name }}</span>
+              <span class="block truncate text-xs capitalize text-fg-muted">
                 {{ item.client_name || 'No client' }}
                 <template v-if="item.status"> · {{ item.status.replace(/_/g, ' ') }}</template>
               </span>
@@ -75,22 +75,22 @@
         </template>
 
         <template v-if="isAdmin && results.employees.length">
-          <p class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Employees</p>
+          <p class="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-fg-subtle">Employees</p>
           <button
             v-for="(item, i) in results.employees"
             :key="`e-${item.id}`"
             type="button"
-            class="flex w-full items-start gap-3 px-3 py-2 text-left text-sm transition hover:bg-slate-50"
-            :class="highlightIndex === flatIndex('employees', i) ? 'bg-indigo-50' : ''"
+            class="flex w-full items-start gap-3 px-3 py-2 text-left text-sm transition hover:bg-elevated"
+            :class="highlightIndex === flatIndex('employees', i) ? 'bg-indigo-50 dark:bg-indigo-950' : ''"
             @mouseenter="highlightIndex = flatIndex('employees', i)"
             @click="goTo(item)"
           >
-            <span class="mt-0.5 text-slate-400">
+            <span class="mt-0.5 text-fg-subtle">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
             </span>
             <span class="min-w-0 flex-1">
-              <span class="block truncate font-medium text-slate-800">{{ item.name }}</span>
-              <span v-if="item.email" class="block truncate text-xs text-slate-500">{{ item.email }}</span>
+              <span class="block truncate font-medium text-fg">{{ item.name }}</span>
+              <span v-if="item.email" class="block truncate text-xs text-fg-muted">{{ item.email }}</span>
             </span>
           </button>
         </template>

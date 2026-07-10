@@ -1,31 +1,31 @@
 <template>
   <div class="space-y-6">
-    <section class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+    <section class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
       <div>
-        <h2 class="text-lg font-semibold text-slate-900">Project &amp; account details</h2>
-        <p class="mt-1 text-sm text-slate-500">Core meeting context and project information.</p>
+        <h2 class="text-lg font-semibold text-fg">Project &amp; account details</h2>
+        <p class="mt-1 text-sm text-fg-muted">Core meeting context and project information.</p>
       </div>
 
       <div v-if="readOnly" class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <dt :class="readOnlyLabelClass">Project name</dt>
-          <dd class="mt-1 text-sm text-slate-800">{{ form.project_name || '—' }}</dd>
+          <dd class="mt-1 text-sm text-fg">{{ form.project_name || '—' }}</dd>
         </div>
         <div>
           <dt :class="readOnlyLabelClass">Client name</dt>
-          <dd class="mt-1 text-sm text-slate-800">{{ form.client_name || '—' }}</dd>
+          <dd class="mt-1 text-sm text-fg">{{ form.client_name || '—' }}</dd>
         </div>
         <div>
           <dt :class="readOnlyLabelClass">Upwork account</dt>
-          <dd class="mt-1 text-sm text-slate-800">{{ upworkAccountLabel(form.upwork_account) }}</dd>
+          <dd class="mt-1 text-sm text-fg">{{ upworkAccountLabel(form.upwork_account) }}</dd>
         </div>
         <div>
           <dt :class="readOnlyLabelClass">Upwork project type</dt>
-          <dd class="mt-1 text-sm text-slate-800">{{ projectTypeLabel(form.project_type) }}</dd>
+          <dd class="mt-1 text-sm text-fg">{{ projectTypeLabel(form.project_type) }}</dd>
         </div>
         <div class="sm:col-span-2">
           <dt :class="readOnlyLabelClass">Job description</dt>
-          <dd class="mt-2 whitespace-pre-wrap text-sm text-slate-700">{{ form.job_description || '—' }}</dd>
+          <dd class="mt-2 whitespace-pre-wrap text-sm text-fg">{{ form.job_description || '—' }}</dd>
         </div>
         <div class="sm:col-span-2">
           <dt :class="readOnlyLabelClass">Upwork link</dt>
@@ -35,11 +35,11 @@
               :href="form.link_url"
               target="_blank"
               rel="noopener noreferrer"
-              class="break-all font-medium text-indigo-600 hover:text-indigo-700"
+              class="break-all font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-300"
             >
               {{ form.link_url }}
             </a>
-            <span v-else class="text-slate-800">—</span>
+            <span v-else class="text-fg">—</span>
           </dd>
         </div>
       </div>
@@ -82,10 +82,10 @@
       </div>
     </section>
 
-    <section class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+    <section class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
       <div>
-        <h2 class="text-lg font-semibold text-slate-900">Update timeline</h2>
-        <p class="mt-1 text-sm text-slate-500">
+        <h2 class="text-lg font-semibold text-fg">Update timeline</h2>
+        <p class="mt-1 text-sm text-fg-muted">
           {{ readOnly
             ? 'Every saved meeting update for this project and its logistics.'
             : 'Review every saved meeting update for this project and open any version to inspect its logistics.' }}
@@ -100,68 +100,68 @@
             type="button"
             class="w-full rounded-xl border px-4 py-3 text-left transition"
             :class="item.id === selectedUpdateId
-              ? 'border-indigo-200 bg-indigo-50 shadow-sm'
-              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'"
+              ? 'border-indigo-200 bg-indigo-50 dark:bg-indigo-950 shadow-sm'
+              : 'border-border bg-surface hover:border-border hover:bg-elevated'"
             @click="selectUpdate(item.id)"
           >
             <div class="flex items-center justify-between gap-3">
-              <span class="text-sm font-semibold text-slate-800">{{ formatTimelineLabel(item.meeting_at) }}</span>
-              <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+              <span class="text-sm font-semibold text-fg">{{ formatTimelineLabel(item.meeting_at) }}</span>
+              <span class="rounded-full bg-elevated px-2.5 py-1 text-xs font-medium text-fg-muted">
                 {{ meetingOutcomeLabel(item.meeting_outcome) }}
               </span>
             </div>
-            <p class="mt-1 text-sm text-slate-500">{{ form.project_name || 'Untitled meeting' }}</p>
+            <p class="mt-1 text-sm text-fg-muted">{{ form.project_name || 'Untitled meeting' }}</p>
           </button>
 
-          <div v-if="!meetingUpdates?.length" class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-sm text-slate-500">
+          <div v-if="!meetingUpdates?.length" class="rounded-xl border border-dashed border-border bg-elevated px-4 py-5 text-sm text-fg-muted">
             No updates yet for this project.
           </div>
         </div>
 
-        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div class="rounded-2xl border border-border bg-elevated p-5">
           <div class="flex items-center justify-between gap-3">
             <div>
-              <p class="text-sm font-semibold text-slate-800">{{ form.project_name || 'Untitled meeting' }}</p>
-              <p class="mt-1 text-sm text-slate-500">{{ form.client_name || '—' }}</p>
+              <p class="text-sm font-semibold text-fg">{{ form.project_name || 'Untitled meeting' }}</p>
+              <p class="mt-1 text-sm text-fg-muted">{{ form.client_name || '—' }}</p>
             </div>
-            <span v-if="selectedUpdate" class="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
+            <span v-if="selectedUpdate" class="rounded-full bg-surface px-3 py-1 text-xs font-medium text-fg-muted shadow-sm">
               {{ formatTimelineLabel(selectedUpdate.meeting_at) }}
             </span>
           </div>
 
-          <section class="mt-5 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-            <h3 class="text-sm font-semibold text-slate-800">Meeting logistics</h3>
+          <section class="mt-5 rounded-2xl border border-border bg-surface p-6 shadow-sm">
+            <h3 class="text-sm font-semibold text-fg">Meeting logistics</h3>
 
             <div v-if="selectedUpdate && readOnly" class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div>
                 <dt :class="readOnlyLabelClass">Date &amp; time</dt>
-                <dd class="mt-1 text-sm text-slate-800">{{ formatDateTime(selectedUpdate.meeting_at) }}</dd>
+                <dd class="mt-1 text-sm text-fg">{{ formatDateTime(selectedUpdate.meeting_at) }}</dd>
               </div>
               <div>
                 <dt :class="readOnlyLabelClass">Meeting outcome</dt>
-                <dd class="mt-1 text-sm text-slate-800">{{ meetingOutcomeLabel(selectedUpdate.meeting_outcome) }}</dd>
+                <dd class="mt-1 text-sm text-fg">{{ meetingOutcomeLabel(selectedUpdate.meeting_outcome) }}</dd>
               </div>
               <div>
                 <dt :class="readOnlyLabelClass">Duration</dt>
-                <dd class="mt-1 text-sm text-slate-800">
+                <dd class="mt-1 text-sm text-fg">
                   {{ selectedUpdate.duration_minutes ? `${selectedUpdate.duration_minutes} min` : '—' }}
                 </dd>
               </div>
               <div>
                 <dt :class="readOnlyLabelClass">Budget discussed</dt>
-                <dd class="mt-1 text-sm text-slate-800">{{ formatBudgetLabel(selectedUpdate.budget_discussed) }}</dd>
+                <dd class="mt-1 text-sm text-fg">{{ formatBudgetLabel(selectedUpdate.budget_discussed) }}</dd>
               </div>
               <div class="sm:col-span-2">
                 <dt :class="readOnlyLabelClass">Deadline / expected timeline</dt>
-                <dd class="mt-1 text-sm text-slate-800">{{ selectedUpdate.deadline || '—' }}</dd>
+                <dd class="mt-1 text-sm text-fg">{{ selectedUpdate.deadline || '—' }}</dd>
               </div>
               <div class="sm:col-span-2">
                 <dt :class="readOnlyLabelClass">Notes / meeting summary</dt>
-                <dd class="mt-2 whitespace-pre-wrap text-sm text-slate-700">{{ selectedUpdate.notes || '—' }}</dd>
+                <dd class="mt-2 whitespace-pre-wrap text-sm text-fg">{{ selectedUpdate.notes || '—' }}</dd>
               </div>
               <div class="sm:col-span-2">
                 <dt :class="readOnlyLabelClass">Requirements discussed</dt>
-                <dd class="mt-2 whitespace-pre-wrap text-sm text-slate-700">{{ selectedUpdate.requirements_discussed || '—' }}</dd>
+                <dd class="mt-2 whitespace-pre-wrap text-sm text-fg">{{ selectedUpdate.requirements_discussed || '—' }}</dd>
               </div>
             </div>
 
@@ -227,7 +227,7 @@
               </div>
             </div>
 
-            <p v-else class="mt-6 text-sm text-slate-500">Choose a timeline entry to review its logistics.</p>
+            <p v-else class="mt-6 text-sm text-fg-muted">Choose a timeline entry to review its logistics.</p>
           </section>
         </div>
       </div>
@@ -236,6 +236,7 @@
 </template>
 
 <script setup lang="ts">
+import { formInputClass as inputClass } from '~/utils/ui'
 import type { MeetingUpdate } from '~/types/meetings'
 
 const props = defineProps({
@@ -247,10 +248,8 @@ const props = defineProps({
 
 const selectedUpdateId = defineModel<string | null>('selectedUpdateId', { default: null })
 
-const labelClass = 'mb-1 block text-sm font-medium text-slate-700'
-const readOnlyLabelClass = 'text-xs font-medium uppercase tracking-wide text-slate-400'
-const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100'
+const labelClass = 'mb-1 block text-sm font-medium text-fg'
+const readOnlyLabelClass = 'text-xs font-medium uppercase tracking-wide text-fg-subtle'
 
 const selectedUpdate = computed(() => {
   if (!props.meetingUpdates?.length) return null

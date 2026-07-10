@@ -1,34 +1,34 @@
 <template>
-  <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-    <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Milestones</h2>
+  <div class="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+    <h2 class="text-sm font-semibold uppercase tracking-wide text-fg-subtle">Milestones</h2>
 
     <div v-if="activeMilestone" class="mt-4 flex flex-wrap items-center gap-3">
-      <span class="text-sm text-slate-500">Current</span>
+      <span class="text-sm text-fg-muted">Current</span>
       <span class="rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-violet-700">
         Milestone {{ activeMilestone.milestone_number }} · {{ formatMilestoneCostLabel(activeMilestone.amount) }}
       </span>
       <span class="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">Active</span>
     </div>
-    <p v-else-if="!milestones?.length" class="mt-4 text-sm text-slate-500">No milestones added yet.</p>
-    <p v-else-if="!readOnly && projectStatus !== 'active'" class="mt-4 text-sm text-slate-500">
+    <p v-else-if="!milestones?.length" class="mt-4 text-sm text-fg-muted">No milestones added yet.</p>
+    <p v-else-if="!readOnly && projectStatus !== 'active'" class="mt-4 text-sm text-fg-muted">
       All milestones are closed while this project is not active.
     </p>
-    <p v-else-if="!readOnly" class="mt-4 text-sm text-slate-500">No active milestone.</p>
+    <p v-else-if="!readOnly" class="mt-4 text-sm text-fg-muted">No active milestone.</p>
 
     <div
       v-if="canAddMilestone && !editingId"
-      class="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4"
+      class="mt-5 space-y-4 rounded-xl border border-border bg-elevated/60 p-4"
     >
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">
+          <label class="mb-1 block text-sm font-medium text-fg">
             {{ nextMilestoneLabel }} amount <span class="text-red-500">*</span>
           </label>
           <BudgetInput v-model="newAmount" :input-class="inputClass" placeholder="5000" />
         </div>
       </div>
       <div>
-        <label class="mb-1 block text-sm font-medium text-slate-700">
+        <label class="mb-1 block text-sm font-medium text-fg">
           Comment <span class="text-red-500">*</span>
         </label>
         <textarea
@@ -53,22 +53,22 @@
     <div
       v-else-if="editingId && !readOnly"
       ref="formSection"
-      class="mt-5 space-y-4 rounded-xl border border-indigo-200 bg-slate-50/60 p-4 ring-1 ring-indigo-100"
+      class="mt-5 space-y-4 rounded-xl border border-indigo-200 bg-elevated/60 p-4 ring-1 ring-indigo-100"
     >
-      <p class="rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-800">
+      <p class="rounded-lg bg-indigo-50 dark:bg-indigo-950 px-3 py-2 text-sm text-indigo-800">
         Editing milestone <strong>{{ editingMilestoneNumber }}</strong>.
         Update the amount and comment below.
       </p>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label class="mb-1 block text-sm font-medium text-slate-700">
+          <label class="mb-1 block text-sm font-medium text-fg">
             Amount <span class="text-red-500">*</span>
           </label>
           <BudgetInput v-model="editAmount" :input-class="inputClass" placeholder="5000" />
         </div>
       </div>
       <div>
-        <label class="mb-1 block text-sm font-medium text-slate-700">
+        <label class="mb-1 block text-sm font-medium text-fg">
           Comment <span class="text-red-500">*</span>
         </label>
         <textarea
@@ -89,7 +89,7 @@
         </button>
         <button
           type="button"
-          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+          class="rounded-xl border border-border bg-surface px-4 py-2 text-sm font-medium text-fg-muted transition hover:bg-elevated"
           @click="cancelEdit"
         >
           Cancel
@@ -105,17 +105,17 @@
     </p>
 
     <div class="mt-6">
-      <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-400">All milestones</h3>
+      <h3 class="text-xs font-semibold uppercase tracking-wide text-fg-subtle">All milestones</h3>
       <div v-if="milestonesLoading" class="mt-3">
         <ContentLoader variant="table" :rows="3" :columns="3" />
       </div>
-      <div v-else-if="!milestones?.length" class="mt-3 text-sm text-slate-400">No milestones yet.</div>
+      <div v-else-if="!milestones?.length" class="mt-3 text-sm text-fg-subtle">No milestones yet.</div>
       <ol v-else class="mt-4 space-y-0">
         <li
           v-for="(entry, index) in sortedMilestones"
           :key="entry.id"
           class="relative flex gap-4 pb-6"
-          :class="index < sortedMilestones.length - 1 ? 'border-l border-slate-200 pl-6 ml-2' : 'pl-6 ml-2'"
+          :class="index < sortedMilestones.length - 1 ? 'border-l border-border pl-6 ml-2' : 'pl-6 ml-2'"
         >
           <span
             class="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-white"
@@ -123,29 +123,29 @@
           />
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="text-sm font-semibold text-slate-800">
+              <span class="text-sm font-semibold text-fg">
                 Milestone {{ entry.milestone_number }}
               </span>
-              <span class="text-sm text-slate-600">{{ formatMilestoneCostLabel(entry.amount) }}</span>
+              <span class="text-sm text-fg-muted">{{ formatMilestoneCostLabel(entry.amount) }}</span>
               <span
                 class="rounded-full px-2.5 py-0.5 text-xs font-medium"
-                :class="entry.status === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'"
+                :class="entry.status === 'active' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-elevated text-fg-muted'"
               >
                 {{ entry.status === 'active' ? 'Active' : 'Completed' }}
               </span>
-              <span class="text-xs text-slate-400">{{ formatDateTime(entry.created_at) }}</span>
+              <span class="text-xs text-fg-subtle">{{ formatDateTime(entry.created_at) }}</span>
             </div>
-            <p class="mt-1 text-sm text-slate-600">{{ entry.comment }}</p>
-            <p v-if="entry.created_by_name" class="mt-1 text-xs text-slate-400">
+            <p class="mt-1 text-sm text-fg-muted">{{ entry.comment }}</p>
+            <p v-if="entry.created_by_name" class="mt-1 text-xs text-fg-subtle">
               by {{ entry.created_by_name }}
             </p>
-            <p v-if="entry.completed_at" class="mt-1 text-xs text-slate-400">
+            <p v-if="entry.completed_at" class="mt-1 text-xs text-fg-subtle">
               Completed {{ formatDateTime(entry.completed_at) }}
             </p>
             <div v-if="!readOnly" class="mt-2 flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                class="text-xs font-medium text-indigo-600 transition hover:text-indigo-700"
+                class="text-xs font-medium text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-300"
                 @click="startEdit(entry)"
               >
                 Edit
@@ -174,17 +174,18 @@
       @close="closeDeleteModal"
       @confirm="confirmDeleteMilestone"
     >
-      <div v-if="milestoneToDelete" class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
-        <p class="font-medium text-slate-800">
+      <div v-if="milestoneToDelete" class="rounded-xl border border-border bg-elevated px-4 py-3 text-sm">
+        <p class="font-medium text-fg">
           Milestone {{ milestoneToDelete.milestone_number }} · {{ formatMilestoneCostLabel(milestoneToDelete.amount) }}
         </p>
-        <p class="mt-2 line-clamp-3 text-slate-600">{{ milestoneToDelete.comment }}</p>
+        <p class="mt-2 line-clamp-3 text-fg-muted">{{ milestoneToDelete.comment }}</p>
       </div>
     </ConfirmDeleteModal>
   </div>
 </template>
 
 <script setup lang="ts">
+import { formInputClass as inputClass } from '~/utils/ui'
 import type { ProjectMilestone } from '~/types/projects'
 
 const props = defineProps({
@@ -198,8 +199,6 @@ const emit = defineEmits(['updated'])
 
 const { getMilestones, addMilestone, updateMilestone, deleteMilestone, getAdminMilestones } = useProjects()
 
-const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100'
 
 const formSection = ref<HTMLElement | null>(null)
 const newAmount = ref('')

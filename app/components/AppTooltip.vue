@@ -14,7 +14,7 @@
   <Teleport to="body">
     <div
       v-if="visible && content"
-      class="pointer-events-none fixed z-[300] max-w-sm rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm leading-relaxed text-slate-700 shadow-xl shadow-slate-200/80"
+      class="pointer-events-none fixed z-[300] max-w-sm rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm leading-relaxed text-fg shadow-xl shadow-slate-200/80 dark:shadow-black/40"
       :style="panelStyle"
       role="tooltip"
     >

@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-slate-500">$</span>
+    <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-fg-muted">$</span>
     <input
       ref="inputEl"
       :value="displayValue"
@@ -31,7 +31,7 @@ const props = defineProps({
   inputClass: {
     type: String,
     default:
-      'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100',
+      'w-full rounded-xl border border-border bg-elevated px-3 py-2 text-sm outline-none transition focus:border-indigo-400 focus:bg-surface focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/40',
   },
 })
 
