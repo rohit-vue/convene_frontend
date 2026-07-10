@@ -91,7 +91,12 @@
             </div>
             <div>
               <label :class="labelClass">Duration (min)</label>
-              <input v-model="createForm.duration_minutes" type="number" min="0" placeholder="30" :class="inputClass" />
+              <NumberInput
+                v-model="createForm.duration_minutes"
+                :min="0"
+                placeholder="30"
+                :input-class="inputClass"
+              />
             </div>
             <div>
               <label :class="labelClass">Budget discussed</label>

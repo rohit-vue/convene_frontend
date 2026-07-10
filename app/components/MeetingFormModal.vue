@@ -71,7 +71,12 @@
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-fg">Duration (min)</label>
-            <input v-model="form.duration_minutes" type="number" min="0" placeholder="30" :class="inputClass" />
+            <NumberInput
+              v-model="form.duration_minutes"
+              :min="0"
+              placeholder="30"
+              :input-class="inputClass"
+            />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-fg">Meeting outcome <span class="text-red-500">*</span></label>

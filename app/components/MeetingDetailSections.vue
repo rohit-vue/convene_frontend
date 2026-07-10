@@ -178,13 +178,12 @@
               </div>
               <div>
                 <label :class="labelClass">Duration (min)</label>
-                <input
-                  :value="logisticsForm.duration_minutes"
-                  type="number"
-                  min="0"
+                <NumberInput
+                  :model-value="logisticsForm.duration_minutes"
+                  :min="0"
                   placeholder="30"
-                  :class="inputClass"
-                  @input="updateLogisticsField('duration_minutes', ($event.target as HTMLInputElement).value)"
+                  :input-class="inputClass"
+                  @update:model-value="updateLogisticsField('duration_minutes', $event)"
                 />
               </div>
               <div>
