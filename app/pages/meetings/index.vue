@@ -142,13 +142,13 @@ import { filterInputClass, filterLabelClass } from '~/utils/ui'
 
 import { exportMeetingsPdf } from '~/utils/exportPdf'
 
-const { isAdmin, isEmployee, fetchProfile } = useProfile()
+const { isAdmin, isEmployee, profile, fetchProfile } = useProfile()
 const { list } = useMeetings()
 const toast = useToast()
 
 await fetchProfile()
 
-if (!isAdmin.value && !isEmployee.value) {
+if (profile.value && !isAdmin.value && !isEmployee.value) {
   await navigateTo('/')
 }
 

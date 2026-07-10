@@ -1,5 +1,8 @@
 export default defineNuxtRouteMiddleware(async () => {
-  const { fetchProfile, isEmployee } = useProfile()
+  const user = useSupabaseUser()
+  const { fetchProfile, isEmployee, profile } = useProfile()
   await fetchProfile()
-  if (!isEmployee.value) return navigateTo('/')
+  if (user.value && profile.value && !isEmployee.value) {
+    return navigateTo('/')
+  }
 })
