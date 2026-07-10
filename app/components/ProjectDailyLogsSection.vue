@@ -58,13 +58,13 @@
           <label class="mb-1 block text-sm font-medium text-fg">
             Tracker time (hours) <span class="text-red-500">*</span>
           </label>
-          <input
-            v-model.number="trackerHours"
-            type="number"
-            min="0"
-            step="0.25"
+          <NumberInput
+            v-model="trackerHours"
+            as-number
+            :min="0"
+            :step="0.25"
             placeholder="e.g. 2.5"
-            :class="inputClass"
+            :input-class="inputClass"
           />
           <p v-if="trackerHours > 0" class="mt-1 text-xs text-fg-subtle">
             {{ formatTrackerMinutes(Math.round(trackerHours * 60)) }}
