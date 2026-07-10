@@ -63,6 +63,7 @@
               :options="jobTypeOptions"
               placeholder="Select…"
               :input-class="inputClass"
+              :disabled="isInhouseProject"
             />
           </div>
         </div>
@@ -79,7 +80,13 @@
 
         <div>
           <label class="mb-1 block text-sm font-medium text-slate-700">Upwork link</label>
-          <input v-model="form.link_url" type="url" placeholder="https://www.upwork.com/…" :class="inputClass" />
+          <input
+            v-model="form.link_url"
+            type="url"
+            placeholder="https://www.upwork.com/…"
+            :class="inputClass"
+            :disabled="isInhouseProject"
+          />
         </div>
 
         <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
@@ -124,11 +131,13 @@ const employeeSelectOptions = computed(() =>
   (employees.value || []).map((emp) => ({ value: emp.id, label: emp.name })),
 )
 
-const upworkSelectOptions = computed(() => upworkAccountOptions)
+const upworkSelectOptions = computed(() => projectUpworkAccountOptions)
 
 const loading = ref(false)
 const error = ref('')
 const toast = useToast()
+
+const isInhouseProject = computed(() => isInhouseUpworkAccount(form.upwork_account))
 
 function blankForm() {
   return {
@@ -165,9 +174,9 @@ async function save() {
       client_name: form.client_name.trim(),
       start_date: form.start_date || undefined,
       job_category: form.job_category || undefined,
-      job_type: form.job_type || undefined,
+      job_type: isInhouseProject.value ? undefined : form.job_type || undefined,
       upwork_account: form.upwork_account || undefined,
-      link_url: form.link_url || undefined,
+      link_url: isInhouseProject.value ? undefined : form.link_url || undefined,
     })
     Object.assign(form, blankForm())
     toast.success('Project assigned.')
@@ -179,6 +188,16 @@ async function save() {
     loading.value = false
   }
 }
+
+watch(
+  () => form.upwork_account,
+  (value) => {
+    if (isInhouseUpworkAccount(value)) {
+      form.job_type = ''
+      form.link_url = ''
+    }
+  },
+)
 
 watch(
   () => props.open,

@@ -7,6 +7,16 @@
           Review logs submitted by employees across all projects.
         </p>
       </div>
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <button
+          type="button"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          :disabled="isExporting || isLoading || !displayedLogs.length"
+          @click="exportPdf"
+        >
+          {{ isExporting ? 'Exporting…' : 'Export PDF' }}
+        </button>
+      </div>
     </div>
 
     <div class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
@@ -102,16 +112,19 @@
 <script setup lang="ts">
 import type { AdminDailyLog } from '~/types/projects'
 import { collectDateKeys } from '~/utils/dates'
+import { exportDailyLogsPdf } from '~/utils/exportPdf'
 import { jobTypeOptions } from '~/utils/projects'
 
 definePageMeta({ middleware: 'admin' })
 
 const { listAllDailyLogs } = useProjects()
+const toast = useToast()
 
 const filterDate = ref('')
 const dateSortOrder = ref('desc')
 const filterEmployeeId = ref('')
 const filterProjectType = ref('')
+const isExporting = ref(false)
 
 const filterLabelClass = 'mb-1 block text-xs font-medium text-slate-500'
 const filterInputClass =
@@ -189,6 +202,19 @@ const emptyMessage = computed(() => {
   if (hasActiveFilters.value) return 'No daily logs match the selected filters.'
   return 'No daily logs yet.'
 })
+
+async function exportPdf() {
+  if (isExporting.value || !displayedLogs.value.length) return
+  isExporting.value = true
+  try {
+    await exportDailyLogsPdf(displayedLogs.value)
+    toast.success('Daily logs PDF downloaded.')
+  } catch (e) {
+    toast.error(toastErrorMessage(e, 'Failed to export daily logs PDF.'))
+  } finally {
+    isExporting.value = false
+  }
+}
 
 function openLog(entry: AdminDailyLog) {
   if (entry.assigned_to && entry.project_id) {

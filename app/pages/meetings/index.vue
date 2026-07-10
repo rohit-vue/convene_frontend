@@ -9,6 +9,15 @@
       </div>
       <div v-if="isAdmin" class="flex flex-wrap items-center gap-2 sm:gap-3">
         <button
+          type="button"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          :disabled="isExporting || isLoading || !displayedMeetings.length"
+          @click="exportPdf"
+        >
+          {{ isExporting ? 'Exporting…' : 'Export PDF' }}
+        </button>
+        <button
+          type="button"
           class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
           @click="showAssignModal = true"
         >
@@ -129,8 +138,11 @@
 </template>
 
 <script setup>
+import { exportMeetingsPdf } from '~/utils/exportPdf'
+
 const { isAdmin, isEmployee, fetchProfile } = useProfile()
 const { list } = useMeetings()
+const toast = useToast()
 
 await fetchProfile()
 
@@ -140,6 +152,7 @@ if (!isAdmin.value && !isEmployee.value) {
 
 const showModal = ref(false)
 const showAssignModal = ref(false)
+const isExporting = ref(false)
 
 const filterDate = ref('')
 const dateSortOrder = ref('desc')
@@ -243,6 +256,19 @@ async function onSaved() {
 async function onAssignSaved() {
   showAssignModal.value = false
   await refresh()
+}
+
+async function exportPdf() {
+  if (!isAdmin.value || isExporting.value || !displayedMeetings.value.length) return
+  isExporting.value = true
+  try {
+    await exportMeetingsPdf(displayedMeetings.value)
+    toast.success('Meetings PDF downloaded.')
+  } catch (e) {
+    toast.error(toastErrorMessage(e, 'Failed to export meetings PDF.'))
+  } finally {
+    isExporting.value = false
+  }
 }
 
 function openMeeting(m) {
