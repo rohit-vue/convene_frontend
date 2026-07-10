@@ -25,42 +25,67 @@
         </button>
       </div>
 
-      <nav class="space-y-1">
-        <NuxtLink
-          v-for="item in nav"
-          :key="item.to"
-          :to="item.to"
-          :class="navLinkClass"
-          :active-class="navLinkActiveClass"
-          @click="sidebarOpen = false"
-        >
-          <span class="text-fg-subtle transition group-hover:text-fg-muted" v-html="item.icon" />
-          {{ item.label }}
-        </NuxtLink>
-      </nav>
+      <ClientOnly>
+        <nav class="space-y-1">
+          <NuxtLink
+            v-for="item in nav"
+            :key="item.to"
+            :to="item.to"
+            :class="navLinkClass"
+            :active-class="navLinkActiveClass"
+            @click="sidebarOpen = false"
+          >
+            <span class="text-fg-subtle transition group-hover:text-fg-muted" v-html="item.icon" />
+            {{ item.label }}
+          </NuxtLink>
+        </nav>
+        <template #fallback>
+          <nav class="space-y-1" aria-hidden="true">
+            <div class="h-10 animate-pulse rounded-xl bg-elevated" />
+            <div class="h-10 animate-pulse rounded-xl bg-elevated" />
+            <div class="h-10 animate-pulse rounded-xl bg-elevated" />
+          </nav>
+        </template>
+      </ClientOnly>
 
       <div class="mt-auto border-t border-border pt-4">
-        <ThemeToggle class="mb-3" />
+        <ClientOnly>
+          <ThemeToggle class="mb-3" />
+          <template #fallback>
+            <div class="mb-3 h-10" aria-hidden="true" />
+          </template>
+        </ClientOnly>
 
-        <NuxtLink
-          to="/profile"
-          class="group flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition hover:bg-elevated"
-          active-class="!bg-indigo-50 !text-indigo-700 dark:!bg-indigo-900/40 dark:!text-indigo-200"
-          @click="sidebarOpen = false"
-        >
-          <ProfileAvatar
-            :src="avatarUrl"
-            :initials="initials"
-            size="sm"
-            shape="circle"
-            ring
-          />
-          <div class="min-w-0 text-sm leading-tight">
-            <p class="truncate font-medium text-fg">{{ displayName }}</p>
-            <p class="text-xs capitalize text-fg-subtle">{{ role }}</p>
-          </div>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-auto shrink-0 text-fg-subtle transition group-hover:text-fg-muted"><path d="m9 18 6-6-6-6"/></svg>
-        </NuxtLink>
+        <ClientOnly>
+          <NuxtLink
+            to="/profile"
+            class="group flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition hover:bg-elevated"
+            active-class="!bg-indigo-50 !text-indigo-700 dark:!bg-indigo-900/40 dark:!text-indigo-200"
+            @click="sidebarOpen = false"
+          >
+            <ProfileAvatar
+              :src="avatarUrl"
+              :initials="initials"
+              size="sm"
+              shape="circle"
+              ring
+            />
+            <div class="min-w-0 text-sm leading-tight">
+              <p class="truncate font-medium text-fg">{{ displayName }}</p>
+              <p class="text-xs capitalize text-fg-subtle">{{ role || '…' }}</p>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-auto shrink-0 text-fg-subtle transition group-hover:text-fg-muted"><path d="m9 18 6-6-6-6"/></svg>
+          </NuxtLink>
+          <template #fallback>
+            <div class="flex items-center gap-3 rounded-xl px-2 py-2" aria-hidden="true">
+              <div class="h-9 w-9 animate-pulse rounded-full bg-elevated" />
+              <div class="min-w-0 flex-1 space-y-1.5">
+                <div class="h-3.5 w-24 animate-pulse rounded bg-elevated" />
+                <div class="h-3 w-14 animate-pulse rounded bg-elevated" />
+              </div>
+            </div>
+          </template>
+        </ClientOnly>
 
         <button
           class="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-fg-muted transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/50 dark:hover:text-red-400"
@@ -83,11 +108,21 @@
         </button>
 
         <div class="min-w-0 flex-1">
-          <HeaderSearch />
+          <ClientOnly>
+            <HeaderSearch />
+            <template #fallback>
+              <div class="h-9 w-full max-w-md animate-pulse rounded-xl bg-elevated" />
+            </template>
+          </ClientOnly>
         </div>
 
         <div class="flex shrink-0 items-center gap-2 sm:gap-4">
-          <NotificationBell />
+          <ClientOnly>
+            <NotificationBell />
+            <template #fallback>
+              <div class="h-9 w-9 animate-pulse rounded-full bg-elevated" />
+            </template>
+          </ClientOnly>
         </div>
       </header>
 
@@ -103,7 +138,7 @@ import { navLinkActiveClass, navLinkClass } from '~/utils/ui'
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-const { displayName, role, initials, avatarUrl, isAdmin, isEmployee, fetchProfile } = useProfile()
+const { displayName, role, initials, avatarUrl, isAdmin, isEmployee, profile, authUser, fetchProfile } = useProfile()
 const route = useRoute()
 
 const sidebarOpen = ref(false)
@@ -134,6 +169,8 @@ const nav = computed(() => {
       icon: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>',
     },
   ]
+
+  if (!profile.value) return items
 
   if (isEmployee.value) {
     items.push(
@@ -184,6 +221,8 @@ const nav = computed(() => {
 })
 
 async function logout() {
+  profile.value = null
+  authUser.value = null
   await supabase.auth.signOut()
   await navigateTo('/login')
 }

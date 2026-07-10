@@ -1,5 +1,9 @@
 export default defineNuxtRouteMiddleware(async () => {
-  const { fetchProfile, isAdmin } = useProfile()
+  const user = useSupabaseUser()
+  const { fetchProfile, isAdmin, profile } = useProfile()
   await fetchProfile()
-  if (!isAdmin.value) return navigateTo('/')
+  // Only redirect when we know the role; avoid bouncing admins if profile is still loading
+  if (user.value && profile.value && !isAdmin.value) {
+    return navigateTo('/')
+  }
 })

@@ -21,18 +21,20 @@ export const useProfile = () => {
   async function resolveAuthUser(): Promise<AuthUserSnapshot | null> {
     if (user.value?.id) return user.value as unknown as AuthUserSnapshot
 
-    const { data } = await supabase.auth.getSession()
-    const sessionUser = data.session?.user
-    if (sessionUser?.id) return sessionUser as unknown as AuthUserSnapshot
+    const { data, error } = await supabase.auth.getUser()
+    if (error || !data.user?.id) return null
 
-    return null
+    return data.user as unknown as AuthUserSnapshot
   }
 
   async function fetchProfile() {
     const resolvedUser = await resolveAuthUser()
     if (!resolvedUser?.id) {
-      profile.value = null
-      authUser.value = null
+      // Avoid wiping a loaded profile during brief auth hydration gaps
+      if (!user.value && !authUser.value) {
+        profile.value = null
+        authUser.value = null
+      }
       return
     }
 
@@ -58,7 +60,8 @@ export const useProfile = () => {
 
   const displayName = computed(() => fullName.value || activeUser.value?.email || 'User')
 
-  const role = computed(() => profile.value?.role ?? 'employee')
+  // null until profile loads — never invent "employee" during SSR/hydration
+  const role = computed(() => profile.value?.role ?? null)
 
   const jobTitle = computed(() => profile.value?.job_title ?? null)
 
@@ -83,6 +86,7 @@ export const useProfile = () => {
 
   return {
     profile,
+    authUser,
     fullName,
     displayName,
     role,

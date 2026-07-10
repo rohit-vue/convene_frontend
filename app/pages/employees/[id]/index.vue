@@ -172,7 +172,7 @@ const { getById } = useEmployees()
 const { data: employee, error } = await useAuthenticatedAsyncData(
   `employee-${route.params.id}`,
   () => getById(route.params.id as string),
-  { default: () => null },
+  { server: false, default: () => null },
 )
 
 const statusMeta = {

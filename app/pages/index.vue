@@ -8,7 +8,7 @@
     <ContentLoader
       v-if="isLoading"
       variant="dashboard"
-      :stats-count="isAdmin ? 4 : 3"
+      :stats-count="loaderStatsCount"
     />
 
     <template v-else>
@@ -177,19 +177,22 @@
 </template>
 
 <script setup>
-const { isAdmin, isEmployee } = useProfile()
+const { isAdmin, isEmployee, profile, fetchProfile } = useProfile()
 const { getOverview } = useDashboard()
 const { accept: acceptMeetingRequest } = useMeetings()
 const { accept: acceptProjectRequest } = useProjects()
 const toast = useToast()
 
+await fetchProfile()
+
 const { data: overview, status, refresh: refreshOverview } = await useAsyncData(
   'dashboard-overview',
   () => getOverview(),
-  { server: false },
+  { server: false, default: () => null },
 )
 
 const isLoading = computed(() => status.value !== 'success' && status.value !== 'error')
+const loaderStatsCount = computed(() => (profile.value ? (isAdmin.value ? 4 : 3) : 4))
 
 const pendingMeetings = computed(() => overview.value?.pendingMeetings ?? [])
 const pendingProjects = computed(() => overview.value?.pendingProjects ?? [])
