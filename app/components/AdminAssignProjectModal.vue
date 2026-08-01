@@ -46,6 +46,18 @@
           />
         </div>
 
+        <div>
+          <label class="mb-1 block text-sm font-medium text-fg">Estimated hours</label>
+          <input
+            v-model="form.estimated_hours"
+            type="number"
+            min="0"
+            step="0.5"
+            placeholder="e.g. 40"
+            :class="inputClass"
+          />
+        </div>
+
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label class="mb-1 block text-sm font-medium text-fg">Job category</label>
@@ -143,6 +155,7 @@ function blankForm() {
     name: '',
     client_name: '',
     start_date: '',
+    estimated_hours: '',
     job_category: '',
     job_type: '',
     upwork_account: '',
@@ -171,6 +184,7 @@ async function save() {
       name: form.name.trim(),
       client_name: form.client_name.trim(),
       start_date: form.start_date || undefined,
+      estimated_hours: form.estimated_hours === '' ? undefined : form.estimated_hours,
       job_category: form.job_category || undefined,
       job_type: isInhouseProject.value ? undefined : form.job_type || undefined,
       upwork_account: form.upwork_account || undefined,
