@@ -37,6 +37,12 @@
             <dd class="mt-1 text-sm text-fg">{{ formatDate(project.start_date) }}</dd>
           </div>
           <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-fg-subtle">Estimated hours</dt>
+            <dd class="mt-1 text-sm text-fg">
+              {{ project.estimated_hours != null ? `${project.estimated_hours}h` : '—' }}
+            </dd>
+          </div>
+          <div>
             <dt class="text-xs font-medium uppercase tracking-wide text-fg-subtle">Created</dt>
             <dd class="mt-1 text-sm text-fg">{{ formatDate(project.created_at) }}</dd>
           </div>

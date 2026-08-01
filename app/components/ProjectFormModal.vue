@@ -56,6 +56,27 @@
               full-width
             />
           </div>
+          <div :class="isEdit ? '' : 'sm:col-span-2'">
+            <label class="mb-1 block text-sm font-medium text-fg">Estimated hours</label>
+            <input
+              v-model="form.estimated_hours"
+              type="number"
+              min="0"
+              step="0.5"
+              placeholder="e.g. 40"
+              :class="inputClass"
+            />
+          </div>
+        </div>
+
+        <div v-if="!isEdit">
+          <label class="mb-1 block text-sm font-medium text-fg">Start date <span class="text-red-500">*</span></label>
+          <DatePicker
+            v-model="form.start_date"
+            placeholder="Select date"
+            :input-class="inputClass"
+            full-width
+          />
         </div>
 
         <div v-if="!isEdit">
@@ -193,6 +214,7 @@ function blankForm() {
     client_name: '',
     status: 'planning',
     start_date: '',
+    estimated_hours: '',
     job_category: '',
     job_type: '',
     upwork_account: '',
@@ -214,6 +236,8 @@ function hydrate() {
       client_name: props.project.client_name ?? '',
       status: props.project.status ?? 'planning',
       start_date: props.project.start_date ?? '',
+      estimated_hours:
+        props.project.estimated_hours != null ? String(props.project.estimated_hours) : '',
       job_category: props.project.job_category ?? '',
       job_type: props.project.job_type ?? '',
       upwork_account: props.project.upwork_account ?? '',

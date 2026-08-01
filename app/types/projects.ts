@@ -42,6 +42,7 @@ export interface Project {
   job_category?: string | null
   job_type?: string | null
   hourly_rate?: number | null
+  estimated_hours?: number | null
   milestone_cost?: number | null
   upwork_account?: string | null
   link_url?: string | null
@@ -118,4 +119,5 @@ export interface AssignProjectInput {
   job_type?: string
   upwork_account?: string
   link_url?: string
+  estimated_hours?: string | number
 }

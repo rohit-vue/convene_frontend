@@ -81,6 +81,18 @@
                 full-width
               />
             </div>
+            <div>
+              <label :class="labelClass">Estimated hours</label>
+              <input
+                v-model="form.estimated_hours"
+                :disabled="!canEditProject"
+                type="number"
+                min="0"
+                step="0.5"
+                placeholder="e.g. 40"
+                :class="inputClass"
+              />
+            </div>
             <div class="sm:col-span-3">
               <label :class="labelClass">Job description</label>
               <textarea v-model="form.job_description" :disabled="!canEditProject" rows="5" placeholder="Role / scope of work…" :class="inputClass" />
@@ -243,6 +255,7 @@ function blankForm() {
     name: '',
     client_name: '',
     start_date: '',
+    estimated_hours: '',
     job_category: '',
     job_type: '',
     hourly_rate: '',
@@ -264,6 +277,8 @@ function fill(p) {
     for (const key of Object.keys(next)) {
       if (key === 'hourly_rate') {
         next.hourly_rate = p.hourly_rate != null ? String(p.hourly_rate) : ''
+      } else if (key === 'estimated_hours') {
+        next.estimated_hours = p.estimated_hours != null ? String(p.estimated_hours) : ''
       } else if (key === 'start_date' && p[key]) {
         next.start_date = String(p[key]).slice(0, 10)
       } else if (p[key] !== null && p[key] !== undefined) {
