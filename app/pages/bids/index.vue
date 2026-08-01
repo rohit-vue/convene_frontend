@@ -86,16 +86,17 @@
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full min-w-[1080px] table-fixed text-sm">
+          <table class="w-full min-w-[1180px] table-fixed text-sm">
           <thead class="bg-surface text-left text-xs uppercase tracking-wide text-fg-muted">
             <tr>
-              <th class="w-[11%] px-4 py-3 font-medium">Upwork account</th>
-              <th class="w-[21%] px-4 py-3 font-medium">Job link</th>
-              <th class="w-[9%] px-4 py-3 font-medium">Status</th>
+              <th class="w-[10%] px-4 py-3 font-medium">Upwork account</th>
+              <th class="w-[18%] px-4 py-3 font-medium">Job link</th>
+              <th class="w-[8%] px-4 py-3 font-medium">Status</th>
+              <th class="w-[8%] px-4 py-3 font-medium">Client hired</th>
               <th class="w-[8%] px-4 py-3 font-medium">Project type</th>
               <th class="w-[8%] px-4 py-3 font-medium">Amount</th>
-              <th class="w-[14%] px-4 py-3 font-medium">Notes</th>
-              <th class="w-[14%] px-4 py-3 font-medium">Added at</th>
+              <th class="w-[12%] px-4 py-3 font-medium">Notes</th>
+              <th class="w-[13%] px-4 py-3 font-medium">Added at</th>
               <th class="w-[15%] min-w-[8.5rem] px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
@@ -133,6 +134,13 @@
                 >
                   {{ bidStatusLabel(bid.status) }}
                 </span>
+              </td>
+              <td class="whitespace-nowrap px-4 py-4 text-fg-muted">
+                <span v-if="bid.client_hired === true" class="font-medium text-emerald-700 dark:text-emerald-400">
+                  Yes{{ bid.total_hired != null ? ` (${bid.total_hired})` : '' }}
+                </span>
+                <span v-else-if="bid.client_hired === false">No</span>
+                <span v-else>—</span>
               </td>
               <td class="whitespace-nowrap px-4 py-4 text-fg-muted">{{ bidJobTypeLabel(bid.job_type) }}</td>
               <td class="whitespace-nowrap px-4 py-4 font-medium text-fg">
