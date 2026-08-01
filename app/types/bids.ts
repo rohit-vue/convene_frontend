@@ -1,5 +1,12 @@
 export type BidStatus = 'applied' | 'canceled' | 'accepted' | 'invited'
 export type BidJobType = 'fixed' | 'hourly'
+export type BidCheckStatus =
+  | 'SUCCESS'
+  | 'FAILED'
+  | 'NOT_FOUND'
+  | 'INVALID_URL'
+  | 'UNAUTHORIZED'
+  | 'RATE_LIMITED'
 
 export interface UpworkBid {
   id: string
@@ -13,6 +20,11 @@ export interface UpworkBid {
   notes?: string | null
   created_by: string
   created_at: string
+  client_hired?: boolean | null
+  total_hired?: number | null
+  last_checked_at?: string | null
+  last_check_status?: BidCheckStatus | string | null
+  upwork_job_id?: string | null
 }
 
 export interface UpworkBidInput {

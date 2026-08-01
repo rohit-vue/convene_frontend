@@ -43,8 +43,27 @@
             <dd class="mt-1 text-sm font-medium text-fg">{{ formatBidAmount(bid) }}</dd>
           </div>
           <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-fg-subtle">Client hired</dt>
+            <dd class="mt-1 text-sm text-fg">
+              <template v-if="bid.client_hired === true">
+                Yes{{ bid.total_hired != null ? ` (${bid.total_hired} total)` : '' }}
+              </template>
+              <template v-else-if="bid.client_hired === false">No</template>
+              <template v-else>—</template>
+            </dd>
+          </div>
+          <div>
             <dt class="text-xs font-medium uppercase tracking-wide text-fg-subtle">Added at</dt>
             <dd class="mt-1 text-sm text-fg">{{ formatDateTime(bid.created_at) }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-fg-subtle">Last hiring check</dt>
+            <dd class="mt-1 text-sm text-fg">
+              {{ bid.last_check_status || '—' }}
+              <span v-if="bid.last_checked_at" class="text-fg-muted">
+                · {{ formatDateTime(bid.last_checked_at) }}
+              </span>
+            </dd>
           </div>
         </dl>
 
