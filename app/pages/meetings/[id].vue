@@ -91,7 +91,12 @@
             </div>
             <div>
               <label :class="labelClass">Duration (min)</label>
-              <input v-model="createForm.duration_minutes" type="number" min="0" placeholder="30" :class="inputClass" />
+              <NumberInput
+                v-model="createForm.duration_minutes"
+                :min="0"
+                placeholder="30"
+                :input-class="inputClass"
+              />
             </div>
             <div>
               <label :class="labelClass">Budget discussed</label>
@@ -290,7 +295,7 @@ function buildUpdateBody(includeOutcome = true) {
 }
 
 async function save() {
-  if (!form.project_name || !form.client_name) {
+  if (!form.project_name || !form.client_name || !form.upwork_account || !form.project_type) {
     toast.error('Please fill in all required (*) project fields.')
     return
   }

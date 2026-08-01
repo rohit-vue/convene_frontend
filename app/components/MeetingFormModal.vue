@@ -22,14 +22,19 @@
             <input v-model="form.project_name" required type="text" placeholder="e.g. Website Redesign" :class="inputClass" />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-fg">Client name <span class="text-red-500">*</span></label>
-            <input v-model="form.client_name" required type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
+            <label class="mb-1 block text-sm font-medium text-fg">Upwork account <span class="text-red-500">*</span></label>
+            <AppSelect
+              v-model="form.upwork_account"
+              :options="upworkAccountOptions"
+              placeholder="Select…"
+              :input-class="inputClass"
+            />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label class="mb-1 block text-sm font-medium text-fg">Project type</label>
+            <label class="mb-1 block text-sm font-medium text-fg">Project type <span class="text-red-500">*</span></label>
             <AppSelect
               v-model="form.project_type"
               :options="projectTypeOptions"
@@ -38,18 +43,14 @@
             />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium text-fg">Upwork account</label>
-            <AppSelect
-              v-model="form.upwork_account"
-              :options="upworkAccountOptions"
-              placeholder="Select…"
-              :input-class="inputClass"
-            />
+            <label class="mb-1 block text-sm font-medium text-fg">Client name <span class="text-red-500">*</span></label>
+            <input v-model="form.client_name" required type="text" placeholder="e.g. Acme Corp" :class="inputClass" />
           </div>
-          <div>
-            <label class="mb-1 block text-sm font-medium text-fg">Upwork Link</label>
-            <input v-model="form.link_url" type="url" placeholder="https://…" :class="inputClass" />
-          </div>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-fg">Upwork Link</label>
+          <input v-model="form.link_url" type="url" placeholder="https://…" :class="inputClass" />
         </div>
 
         <div>
@@ -70,7 +71,12 @@
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-fg">Duration (min)</label>
-            <input v-model="form.duration_minutes" type="number" min="0" placeholder="30" :class="inputClass" />
+            <NumberInput
+              v-model="form.duration_minutes"
+              :min="0"
+              placeholder="30"
+              :input-class="inputClass"
+            />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium text-fg">Meeting outcome <span class="text-red-500">*</span></label>
@@ -197,6 +203,8 @@ async function save() {
   if (
     !form.project_name ||
     !form.client_name ||
+    !form.upwork_account ||
+    !form.project_type ||
     !form.meeting_at ||
     !form.meeting_outcome
   ) {
