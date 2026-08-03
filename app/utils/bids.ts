@@ -81,5 +81,23 @@ export function groupBidsByDay(bids: UpworkBid[]): UpworkBidDayGroup[] {
       date,
       label: formatBidDayLabel(date),
       bids: items,
+      lastFetchedAt: latestHiringCheckAt(items),
     }))
+}
+
+/** Most recent last_checked_at among bids in a day group, or null if none. */
+export function latestHiringCheckAt(bids: UpworkBid[]): string | null {
+  let latest: string | null = null
+  let latestMs = -1
+
+  for (const bid of bids) {
+    const value = bid.last_checked_at
+    if (!value) continue
+    const ms = new Date(value).getTime()
+    if (Number.isNaN(ms) || ms <= latestMs) continue
+    latestMs = ms
+    latest = value
+  }
+
+  return latest
 }

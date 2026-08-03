@@ -53,6 +53,12 @@
             </dd>
           </div>
           <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-fg-subtle">Invites sent</dt>
+            <dd class="mt-1 text-sm text-fg">
+              {{ bid.invites_sent != null ? bid.invites_sent : '—' }}
+            </dd>
+          </div>
+          <div>
             <dt class="text-xs font-medium uppercase tracking-wide text-fg-subtle">Added at</dt>
             <dd class="mt-1 text-sm text-fg">{{ formatDateTime(bid.created_at) }}</dd>
           </div>
