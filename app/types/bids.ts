@@ -22,6 +22,7 @@ export interface UpworkBid {
   created_at: string
   client_hired?: boolean | null
   total_hired?: number | null
+  invites_sent?: number | null
   last_checked_at?: string | null
   last_check_status?: BidCheckStatus | string | null
   upwork_job_id?: string | null
@@ -42,4 +43,5 @@ export interface UpworkBidDayGroup {
   date: string
   label: string
   bids: UpworkBid[]
+  lastFetchedAt?: string | null
 }

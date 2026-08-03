@@ -78,26 +78,53 @@
         :key="group.date"
         class="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm"
       >
-        <div class="border-b border-border bg-elevated px-6 py-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-elevated px-6 py-4">
           <h2 class="text-sm font-semibold text-fg">
             {{ group.label }}
             <span class="font-normal text-fg-muted">· {{ group.bids.length }} {{ group.bids.length === 1 ? 'bid' : 'bids' }}</span>
           </h2>
+          <div class="flex flex-wrap items-center gap-3">
+            <p
+              v-if="group.lastFetchedAt"
+              class="text-xs text-fg-muted"
+            >
+              <span class="text-fg-subtle">Last fetched</span>
+              <span class="mx-1.5 text-fg-subtle">·</span>
+              <time :datetime="group.lastFetchedAt">
+                {{ formatDateTime(group.lastFetchedAt) }}
+              </time>
+            </p>
+            <p
+              v-else
+              class="text-xs text-fg-subtle"
+            >
+              Not fetched yet
+            </p>
+            <button
+              type="button"
+              class="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-fg shadow-sm transition hover:bg-elevated disabled:cursor-not-allowed disabled:opacity-60"
+              :disabled="fetchingDate === group.date"
+              @click.stop="fetchHiresForDay(group.date)"
+            >
+              {{ fetchingDate === group.date ? 'Fetching…' : 'Fetch hires' }}
+            </button>
+          </div>
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full min-w-[1180px] table-fixed text-sm">
+          <table class="w-full min-w-[1260px] table-fixed text-sm">
           <thead class="bg-surface text-left text-xs uppercase tracking-wide text-fg-muted">
             <tr>
               <th class="w-[10%] px-4 py-3 font-medium">Upwork account</th>
-              <th class="w-[18%] px-4 py-3 font-medium">Job link</th>
+              <th class="w-[16%] px-4 py-3 font-medium">Job link</th>
               <th class="w-[8%] px-4 py-3 font-medium">Status</th>
               <th class="w-[8%] px-4 py-3 font-medium">Client hired</th>
+              <th class="w-[7%] px-4 py-3 font-medium">Invites sent</th>
               <th class="w-[8%] px-4 py-3 font-medium">Project type</th>
-              <th class="w-[8%] px-4 py-3 font-medium">Amount</th>
-              <th class="w-[12%] px-4 py-3 font-medium">Notes</th>
-              <th class="w-[13%] px-4 py-3 font-medium">Added at</th>
-              <th class="w-[15%] min-w-[8.5rem] px-4 py-3 font-medium text-right">Actions</th>
+              <th class="w-[7%] px-4 py-3 font-medium">Amount</th>
+              <th class="w-[11%] px-4 py-3 font-medium">Notes</th>
+              <th class="w-[12%] px-4 py-3 font-medium">Added at</th>
+              <th class="w-[13%] min-w-[8.5rem] px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-border">
@@ -141,6 +168,9 @@
                 </span>
                 <span v-else-if="bid.client_hired === false">No</span>
                 <span v-else>—</span>
+              </td>
+              <td class="whitespace-nowrap px-4 py-4 text-fg-muted">
+                {{ bid.invites_sent != null ? bid.invites_sent : '—' }}
               </td>
               <td class="whitespace-nowrap px-4 py-4 text-fg-muted">{{ bidJobTypeLabel(bid.job_type) }}</td>
               <td class="whitespace-nowrap px-4 py-4 font-medium text-fg">
@@ -202,7 +232,7 @@ import { exportBidsPdf } from '~/utils/exportPdf'
 
 definePageMeta({ middleware: 'admin' })
 
-const { list } = useBids()
+const { list, runHiringCheckForDate } = useBids()
 const toast = useToast()
 
 const showModal = ref(false)
@@ -210,6 +240,7 @@ const showViewModal = ref(false)
 const selectedBid = ref<UpworkBid | null>(null)
 const editingBid = ref<UpworkBid | null>(null)
 const isExporting = ref(false)
+const fetchingDate = ref<string | null>(null)
 const filterDate = ref('')
 const filterUpworkAccount = ref('')
 
@@ -272,6 +303,80 @@ async function exportPdf() {
     toast.error(toastErrorMessage(e, 'Failed to export bids PDF.'))
   } finally {
     isExporting.value = false
+  }
+}
+
+function applyHiringCheckResults(summary: {
+  completedAt?: string
+  results?: Array<{
+    bidId: string
+    status: string
+    totalHired: number | null
+    invitesSent: number | null
+    clientHired: boolean | null
+    updated: boolean
+  }>
+}) {
+  const results = summary.results
+  if (!results?.length || !bids.value?.length) return
+
+  const checkedAt = summary.completedAt || new Date().toISOString()
+  const byId = new Map(results.map((r) => [r.bidId, r]))
+
+  bids.value = bids.value.map((bid) => {
+    const result = byId.get(bid.id)
+    if (!result) return bid
+
+    if (result.updated) {
+      return {
+        ...bid,
+        total_hired: result.totalHired,
+        invites_sent: result.invitesSent,
+        client_hired:
+          result.clientHired ??
+          (result.totalHired != null ? result.totalHired > 0 : bid.client_hired),
+        last_checked_at: checkedAt,
+        last_check_status: result.status,
+      }
+    }
+
+    return {
+      ...bid,
+      last_checked_at: checkedAt,
+      last_check_status: result.status,
+    }
+  })
+
+  if (selectedBid.value) {
+    const updated = bids.value.find((b) => b.id === selectedBid.value?.id)
+    if (updated) selectedBid.value = updated
+  }
+}
+
+async function fetchHiresForDay(date: string) {
+  if (!date || fetchingDate.value) return
+  fetchingDate.value = date
+  try {
+    const summary = await runHiringCheckForDate(date)
+    applyHiringCheckResults(summary)
+
+    if (summary.error) {
+      toast.error(summary.error)
+    } else if (summary.checked === 0) {
+      toast.success('No bids to check for this day.')
+    } else if (summary.failed || summary.unauthorized) {
+      toast.error(
+        `Checked ${summary.checked}: ${summary.updated} updated, ${summary.failed + summary.unauthorized} failed.`,
+      )
+    } else {
+      toast.success(
+        `Updated hiring status for ${summary.updated} of ${summary.checked} bid${summary.checked === 1 ? '' : 's'}.`,
+      )
+    }
+  } catch (e) {
+    toast.error(toastErrorMessage(e, 'Failed to fetch hires from Upwork.'))
+  } finally {
+    fetchingDate.value = null
   }
 }
 
