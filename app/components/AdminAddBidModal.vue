@@ -77,16 +77,29 @@
           <BudgetInput v-model="form.fixed_amount" :input-class="inputClass" placeholder="1000" />
         </div>
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-fg">Bid date</label>
-          <DatePicker
-            v-model="form.bid_date"
-            placeholder="Select date"
-            :max="maxBidDate"
-            :input-class="inputClass"
-            full-width
-          />
-          <p class="mt-1 text-xs text-fg-subtle">Defaults to today if left unchanged.</p>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-fg">Bid date</label>
+            <DatePicker
+              v-model="form.bid_date"
+              placeholder="Select date"
+              :max="maxBidDate"
+              :input-class="inputClass"
+              full-width
+            />
+            <p class="mt-1 text-xs text-fg-subtle">Defaults to today if left unchanged.</p>
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-fg">Connects used</label>
+            <input
+              v-model="form.connects_used"
+              type="number"
+              min="0"
+              step="1"
+              placeholder="e.g. 16"
+              :class="inputClass"
+            />
+          </div>
         </div>
 
         <div>
@@ -153,6 +166,7 @@ function blankForm() {
     hourly_rate: '',
     fixed_amount: '',
     bid_date: todayDateKey(),
+    connects_used: '',
     notes: '',
   }
 }
@@ -169,6 +183,7 @@ function hydrate() {
       hourly_rate: props.bid.hourly_rate != null ? String(props.bid.hourly_rate) : '',
       fixed_amount: props.bid.fixed_amount != null ? String(props.bid.fixed_amount) : '',
       bid_date: props.bid.bid_date?.slice(0, 10) || todayDateKey(),
+      connects_used: props.bid.connects_used != null ? String(props.bid.connects_used) : '',
       notes: props.bid.notes ?? '',
     })
   } else {
@@ -235,6 +250,10 @@ async function save() {
     fixed_amount:
       form.job_type === 'fixed' ? sanitizeBudgetInput(form.fixed_amount) : undefined,
     bid_date: form.bid_date || undefined,
+    connects_used:
+      form.connects_used !== '' && form.connects_used != null
+        ? Number(form.connects_used)
+        : null,
     notes: form.notes.trim() || undefined,
   }
 

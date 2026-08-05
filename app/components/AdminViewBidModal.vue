@@ -43,6 +43,12 @@
             <dd class="mt-1 text-sm font-medium text-fg">{{ formatBidAmount(bid) }}</dd>
           </div>
           <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-fg-subtle">Connects used</dt>
+            <dd class="mt-1 text-sm text-fg">
+              {{ bid.connects_used != null ? bid.connects_used : '—' }}
+            </dd>
+          </div>
+          <div>
             <dt class="text-xs font-medium uppercase tracking-wide text-fg-subtle">Client hired</dt>
             <dd class="mt-1 text-sm text-fg">
               <template v-if="bid.client_hired === true">
