@@ -18,6 +18,7 @@ export interface UpworkBid {
   hourly_rate?: number | null
   fixed_amount?: number | null
   notes?: string | null
+  connects_used?: number | null
   created_by: string
   created_at: string
   client_hired?: boolean | null
@@ -37,6 +38,7 @@ export interface UpworkBidInput {
   hourly_rate?: string | number
   fixed_amount?: string | number
   notes?: string
+  connects_used?: number | string | null
 }
 
 export interface UpworkBidDayGroup {

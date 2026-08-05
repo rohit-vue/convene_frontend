@@ -112,19 +112,20 @@
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full min-w-[1260px] table-fixed text-sm">
+          <table class="w-full min-w-[1340px] table-fixed text-sm">
           <thead class="bg-surface text-left text-xs uppercase tracking-wide text-fg-muted">
             <tr>
-              <th class="w-[10%] px-4 py-3 font-medium">Upwork account</th>
-              <th class="w-[16%] px-4 py-3 font-medium">Job link</th>
-              <th class="w-[8%] px-4 py-3 font-medium">Status</th>
-              <th class="w-[8%] px-4 py-3 font-medium">Client hired</th>
-              <th class="w-[7%] px-4 py-3 font-medium">Invites sent</th>
-              <th class="w-[8%] px-4 py-3 font-medium">Project type</th>
-              <th class="w-[7%] px-4 py-3 font-medium">Amount</th>
-              <th class="w-[11%] px-4 py-3 font-medium">Notes</th>
-              <th class="w-[12%] px-4 py-3 font-medium">Added at</th>
-              <th class="w-[13%] min-w-[8.5rem] px-4 py-3 font-medium text-right">Actions</th>
+              <th class="w-[9%] px-4 py-3 font-medium">Upwork account</th>
+              <th class="w-[15%] px-4 py-3 font-medium">Job link</th>
+              <th class="w-[7%] px-4 py-3 font-medium">Status</th>
+              <th class="w-[7%] px-4 py-3 font-medium">Client hired</th>
+              <th class="w-[6%] px-4 py-3 font-medium">Invites sent</th>
+              <th class="w-[7%] px-4 py-3 font-medium">Project type</th>
+              <th class="w-[6%] px-4 py-3 font-medium">Amount</th>
+              <th class="w-[7%] px-4 py-3 font-medium">Connects used</th>
+              <th class="w-[10%] px-4 py-3 font-medium">Notes</th>
+              <th class="w-[11%] px-4 py-3 font-medium">Added at</th>
+              <th class="w-[12%] min-w-[8.5rem] px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-border">
@@ -175,6 +176,9 @@
               <td class="whitespace-nowrap px-4 py-4 text-fg-muted">{{ bidJobTypeLabel(bid.job_type) }}</td>
               <td class="whitespace-nowrap px-4 py-4 font-medium text-fg">
                 {{ formatBidAmount(bid) }}
+              </td>
+              <td class="whitespace-nowrap px-4 py-4 text-fg-muted">
+                {{ bid.connects_used != null ? bid.connects_used : '—' }}
               </td>
               <td class="overflow-hidden px-4 py-4 text-fg-muted">
                 <AppTooltip
